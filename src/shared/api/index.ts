@@ -1,2 +1,2 @@
-export { AXIOS_INSTANCE, customInstance } from './mutator';
-export type { ErrorType, BodyType } from './mutator';
+export { AXIOS_INSTANCE, customInstance } from './api-instance';
+export type { ErrorType, BodyType } from './api-instance';
