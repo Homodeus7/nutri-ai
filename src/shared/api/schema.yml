@@ -1,0 +1,826 @@
+openapi: 3.0.3
+info:
+  title: Nutri AI Food Calorie Tracker API
+  description: API для учёта и подсчёта калорий с возможностью ввода приёма пищи через ИИ
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3000/api
+    description: Development server
+  - url: https://api.nutri-ai.app
+    description: Production server
+
+tags:
+  - name: Auth
+    description: Аутентификация и авторизация
+  - name: Calendar
+    description: Календарь приёмов пищи
+  - name: Day
+    description: Управление дневными записями
+  - name: Meals
+    description: Управление приёмами пищи
+  - name: AI
+    description: AI-парсинг текстовых описаний еды
+  - name: Plans
+    description: Планы питания и диеты
+  - name: Stats
+    description: Статистика и аналитика
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      required:
+        - id
+        - email
+        - passwordHash
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        passwordHash:
+          type: string
+        displayName:
+          type: string
+        timezone:
+          type: string
+          example: Europe/Moscow
+        dailyKcalGoal:
+          type: integer
+          minimum: 0
+        createdAt:
+          type: string
+          format: date-time
+
+    DayEntry:
+      type: object
+      required:
+        - id
+        - userId
+        - date
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        date:
+          type: string
+          format: date
+          example: "2025-10-20"
+        targetKcal:
+          type: integer
+          minimum: 0
+        consumedKcal:
+          type: integer
+          minimum: 0
+        notes:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        meals:
+          type: array
+          items:
+            $ref: "#/components/schemas/Meal"
+
+    Meal:
+      type: object
+      required:
+        - id
+        - dayEntryId
+        - type
+        - totalKcal
+        - source
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        dayEntryId:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [breakfast, lunch, dinner, snack, other]
+        time:
+          type: string
+          pattern: "^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$"
+          example: "14:30"
+        name:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/FoodItem"
+        totalKcal:
+          type: integer
+          minimum: 0
+        source:
+          type: string
+          enum: [manual, ai]
+        aiConfidence:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    FoodItem:
+      type: object
+      required:
+        - id
+        - mealId
+        - name
+        - quantity
+        - unit
+        - kcal
+      properties:
+        id:
+          type: string
+          format: uuid
+        mealId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        quantity:
+          type: number
+          format: float
+        unit:
+          type: string
+          example: g
+        kcal:
+          type: integer
+          minimum: 0
+        protein:
+          type: number
+          format: float
+        fat:
+          type: number
+          format: float
+        carbs:
+          type: number
+          format: float
+        source:
+          type: string
+
+    DietPlan:
+      type: object
+      required:
+        - id
+        - name
+        - targetKcal
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+          nullable: true
+        name:
+          type: string
+        targetKcal:
+          type: integer
+          minimum: 0
+        macros:
+          type: object
+          properties:
+            proteinPct:
+              type: number
+            fatPct:
+              type: number
+            carbsPct:
+              type: number
+        description:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    AiParseLog:
+      type: object
+      required:
+        - id
+        - requestText
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+          nullable: true
+        requestText:
+          type: string
+        requestPayload:
+          type: object
+        responsePayload:
+          type: object
+        responseTimeMs:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+
+    CalendarDay:
+      type: object
+      required:
+        - date
+        - consumedKcal
+        - targetKcal
+        - consumedPercent
+      properties:
+        date:
+          type: string
+          format: date
+          example: "2025-10-20"
+        consumedKcal:
+          type: integer
+          minimum: 0
+        targetKcal:
+          type: integer
+          minimum: 0
+        consumedPercent:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 100
+
+    SignupRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+          minLength: 8
+        displayName:
+          type: string
+        timezone:
+          type: string
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+
+    GoogleAuthRequest:
+      type: object
+      required:
+        - idToken
+      properties:
+        idToken:
+          type: string
+          description: Google ID token from Gmail OAuth
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        user:
+          $ref: "#/components/schemas/User"
+
+    CreateMealRequest:
+      type: object
+      required:
+        - type
+        - totalKcal
+        - source
+      properties:
+        type:
+          type: string
+          enum: [breakfast, lunch, dinner, snack, other]
+        time:
+          type: string
+          pattern: "^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$"
+        name:
+          type: string
+        items:
+          type: array
+          items:
+            type: object
+            required:
+              - name
+              - quantity
+              - unit
+              - kcal
+            properties:
+              name:
+                type: string
+              quantity:
+                type: number
+              unit:
+                type: string
+              kcal:
+                type: integer
+              protein:
+                type: number
+              fat:
+                type: number
+              carbs:
+                type: number
+              source:
+                type: string
+        totalKcal:
+          type: integer
+          minimum: 0
+        source:
+          type: string
+          enum: [manual, ai]
+        aiConfidence:
+          type: number
+          minimum: 0
+          maximum: 1
+
+    AiParseMealRequest:
+      type: object
+      required:
+        - text
+      properties:
+        userId:
+          type: string
+          format: uuid
+        date:
+          type: string
+          format: date
+          example: "2025-10-20"
+        text:
+          type: string
+          maxLength: 2048
+          example: "завтрак: овсянка 50 г с бананом и мёдом, кофе с молоком"
+
+    AiParseMealResponse:
+      type: object
+      properties:
+        parsedItems:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              quantity:
+                type: number
+              unit:
+                type: string
+              kcal:
+                type: integer
+              protein:
+                type: number
+              fat:
+                type: number
+              carbs:
+                type: number
+              confidence:
+                type: number
+                minimum: 0
+                maximum: 1
+        totalKcal:
+          type: integer
+          minimum: 0
+        warnings:
+          type: array
+          items:
+            type: string
+
+    StatsResponse:
+      type: object
+      properties:
+        from:
+          type: string
+          format: date
+        to:
+          type: string
+          format: date
+        totalKcal:
+          type: integer
+        averageKcal:
+          type: number
+        averageGoalCompletion:
+          type: number
+        days:
+          type: array
+          items:
+            $ref: "#/components/schemas/CalendarDay"
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+
+  responses:
+    Unauthorized:
+      description: Не авторизован
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    NotFound:
+      description: Не найдено
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    BadRequest:
+      description: Некорректный запрос
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+paths:
+  /auth/signup:
+    post:
+      tags:
+        - Auth
+      summary: Регистрация нового пользователя
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignupRequest"
+      responses:
+        "201":
+          description: Пользователь создан
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Вход с email и паролем
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Успешный вход
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Неверные данные
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /auth/google:
+    post:
+      tags:
+        - Auth
+      summary: Вход через Google (Gmail)
+      description: Аутентификация через Google OAuth ID token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GoogleAuthRequest"
+      responses:
+        "200":
+          description: Успешный вход через Google
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Невалидный токен
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /calendar:
+    get:
+      tags:
+        - Calendar
+      summary: Получить календарь за месяц
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: month
+          required: true
+          schema:
+            type: string
+            pattern: '^\d{4}-\d{2}$'
+          example: "2025-10"
+      responses:
+        "200":
+          description: Данные календаря
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  month:
+                    type: string
+                  days:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/CalendarDay"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /day/{date}:
+    get:
+      tags:
+        - Day
+      summary: Получить данные за день
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: date
+          required: true
+          schema:
+            type: string
+            format: date
+          example: "2025-10-20"
+      responses:
+        "200":
+          description: Данные дня
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DayEntry"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /day/{date}/meals:
+    post:
+      tags:
+        - Day
+      summary: Создать приём пищи
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: date
+          required: true
+          schema:
+            type: string
+            format: date
+          example: "2025-10-20"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateMealRequest"
+      responses:
+        "201":
+          description: Приём создан
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Meal"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /meals/{id}:
+    put:
+      tags:
+        - Meals
+      summary: Обновить приём пищи
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateMealRequest"
+      responses:
+        "200":
+          description: Приём обновлён
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Meal"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    delete:
+      tags:
+        - Meals
+      summary: Удалить приём пищи
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Приём удалён
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /ai/parse-meal:
+    post:
+      tags:
+        - AI
+      summary: Распарсить текст через AI
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AiParseMealRequest"
+      responses:
+        "200":
+          description: Результат парсинга
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AiParseMealResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "408":
+          description: Таймаут AI
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /plans:
+    get:
+      tags:
+        - Plans
+      summary: Получить список планов
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Список планов
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  plans:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/DietPlan"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /plans/{id}/apply:
+    post:
+      tags:
+        - Plans
+      summary: Применить план
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: date
+          schema:
+            type: string
+            format: date
+          example: "2025-10-20"
+      responses:
+        "200":
+          description: План применён
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  appliedTo:
+                    type: string
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /stats:
+    get:
+      tags:
+        - Stats
+      summary: Статистика за период
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: from
+          required: true
+          schema:
+            type: string
+            format: date
+          example: "2025-10-01"
+        - in: query
+          name: to
+          required: true
+          schema:
+            type: string
+            format: date
+          example: "2025-10-31"
+      responses:
+        "200":
+          description: Статистика
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StatsResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
