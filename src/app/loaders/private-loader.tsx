@@ -20,6 +20,7 @@ export const loadPrivateLoaderData = async () => {
   // } catch {
   //   return {};
   // }
+  return {};
 };
 
 export function PrivateLoader({
