@@ -11,6 +11,7 @@ export const loadAppLoaderData = async () => {
   // } catch {
   //   return {};
   // }
+  return {};
 };
 
 export function AppLoader({
