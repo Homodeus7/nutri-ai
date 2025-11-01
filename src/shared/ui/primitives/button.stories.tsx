@@ -55,6 +55,7 @@ export const Link: Story = {
 };
 
 export const AllVariants: Story = {
+  args: { children: '' },
   render: () => (
     <div className="flex flex-col gap-4">
       <div className="flex gap-2">

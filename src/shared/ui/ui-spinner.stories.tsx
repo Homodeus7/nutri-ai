@@ -32,6 +32,7 @@ export const Large: Story = {
 };
 
 export const AllSizes: Story = {
+  args: { className: '' },
   render: () => (
     <div className="flex gap-8 items-center">
       <UiSpinner className="w-4 h-4 text-primary" />

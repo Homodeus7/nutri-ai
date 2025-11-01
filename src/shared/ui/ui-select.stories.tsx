@@ -23,6 +23,10 @@ const options: Option[] = [
 ];
 
 export const Default: Story = {
+  args: {
+    onChange: () => {},
+    getLabel: () => '',
+  },
   render: () => {
     const [value, setValue] = useState<Option | undefined>(options[0]);
     return (
@@ -38,6 +42,10 @@ export const Default: Story = {
 };
 
 export const WithLabel: Story = {
+  args: {
+    onChange: () => {},
+    getLabel: () => '',
+  },
   render: () => {
     const [value, setValue] = useState<Option | undefined>();
     return (
@@ -54,6 +62,10 @@ export const WithLabel: Story = {
 };
 
 export const WithError: Story = {
+  args: {
+    onChange: () => {},
+    getLabel: () => '',
+  },
   render: () => {
     const [value, setValue] = useState<Option | undefined>();
     return (
@@ -71,6 +83,10 @@ export const WithError: Story = {
 };
 
 export const SmallSize: Story = {
+  args: {
+    onChange: () => {},
+    getLabel: () => '',
+  },
   render: () => {
     const [value, setValue] = useState<Option | undefined>(options[1]);
     return (
