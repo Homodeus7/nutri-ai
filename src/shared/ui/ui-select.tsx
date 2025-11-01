@@ -4,7 +4,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/shared/ui/shadcn-temp/select";
+} from "@/shared/ui/primitives/select";
 import { ReactNode, useId } from "react";
 import clsx from "clsx";
 

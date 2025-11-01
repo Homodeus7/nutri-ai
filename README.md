@@ -1,161 +1,362 @@
-# Nutri AI Food Calorie Tracker App — Минимальная техническая документация
+# Nutri AI
 
-> Краткая и технически ёмкая спецификация для разработки фронтенда и бэкенда.
+Веб-приложение для учёта калорий с AI-парсингом приёмов пищи на базе Next.js и Feature-Sliced Design.
 
----
+## Стек технологий
 
-## 1. Цель проекта
+- **Next.js** 15.5.6 — фреймворк (Pages Router + Turbopack)
+- **React** 19.1.0 + **React DOM** 19.1.0
+- **TypeScript** ~5
+- **TailwindCSS** ^4 — утилитарная стилизация
+- **React Query** (TanStack Query) ^5.90 — серверное состояние
+- **Zustand** ^5.0 — клиентское состояние
+- **Axios** ^1.12 — HTTP клиент
+- **Orval** ^7.14 — генерация API из OpenAPI
+- **MSW** ^2.11 — мокирование API
+- **Shadcn UI** — переиспользуемый UI
+- **Lucide React** ^0.546 — иконки
+- **Socket.io Client** ^4.8 — WebSocket соединение
 
-Приложение для учёта и подсчёта калорий с возможностью ввода приёма пищи через ИИ и отслеживания прогресса по календарю и целям питания.
+## Скрипты
 
-## 2. Основные пользовательские сценарии
+```bash
+npm run dev             # Dev сервер (Turbopack)
+npm run build           # Production сборка
+npm start               # Запуск production сервера
+npm run storybook       # Запуск Storybook
+npm run build-storybook # Сборка статической версии Storybook
+npm run generate:api    # Генерация API клиента из OpenAPI
+npm run lint            # ESLint проверка
+```
 
-1. Просмотр календаря и выбор дня для ввода/редактирования приёма пищи.
-2. Настройка целевых параметров (диета/план питания, калорийность цели).
-3. Добавление приёма пищи: вручную или через ИИ (описание на естественном языке → распарсенные позиции и калории).
-4. Просмотр статистики: круговой график заполнения цели (0–100%).
+## Архитектура
 
-## 3. Страницы / экраны
+Проект следует принципам [Feature-Sliced Design](https://feature-sliced.design/):
 
-### 3.1 Главная — Календарь
+```
+├── pages/                # Next.js роутинг (тонкие обертки)
+│   ├── _app.tsx          # Корневой компонент
+│   ├── _document.tsx     # HTML документ
+│   ├── sign-in/          # Публичные страницы
+│   └── board/            # Защищённые страницы
+├── src/
+│   ├── app/              # Инфраструктура приложения
+│   │   ├── pub/          # Публичная конфигурация (app.tsx, лайауты)
+│   │   ├── providers/    # Провайдеры (AppProvider, PrivateProvider)
+│   │   ├── loaders/      # Загрузчики данных
+│   │   ├── layouts/      # Компоненты лайаутов
+│   │   └── interceptors/ # HTTP interceptors
+│   ├── features/         # Фичи (theme, i18n)
+│   ├── pages/            # Бизнес-логика страниц
+│   │   ├── sign-in/      # Страница входа
+│   │   └── board/        # Доска (защищённая)
+│   └── shared/           # Общая инфраструктура
+│       ├── api/          # API клиент + Orval генерация
+│       ├── ui/           # UI компоненты
+│       ├── lib/          # Утилиты и хуки
+│       └── constants/    # Константы
+```
 
-- Отображает месяц.
-- Выбор дня → переход на экран заполнения выбранной даты.
-- Краткий индика тор: % выполненной цели на день (используется для быстрого просмотра).
+**Правила импортов:**
 
-### 3.2 Экран заполнения дня
+- Нижние слои не импортируют верхние
+- Импорты через алиас `@/*` (абсолютные пути)
+- `/pages/` только для роутинга, логика в `/src/pages/`
 
-- Список приёмов пищи за выбранную дату (утро/обед/ужин/перекусы).
-- Кнопка "Добавить приём" → выбор: вручную / через ИИ.
-- Итог: потреблённые калории / целевая калорийность / круговой график 0–100%.
+**Подробнее:**
 
-### 3.3 Настройки плана питания
+- [ARCHITECTURE.md](./ARCHITECTURE.md) — система лайаутов и организация кода
 
-- Выбор/создание диеты или плана (целевая калорийность, соотношение Б/Ж/У при необходимости).
-- Возможность применить план к пользователю или к отдельной дате.
+## Установка
 
-### 3.4 Добавление еды через ИИ
+### Требования
 
-- Поле ввода текста (например: "завтрак: овсянка 50 г с бананом и мёдом, кофе с молоком").
-- Отправка на AI API → отображение распарсенного результата (позиций с весами и калориями) для подтверждения/редактирования.
+- Node.js >= 18
+- npm >= 9
 
-## 4. AI-интеграция (высокоуровнево)
+### Быстрый старт
 
-- **Назначение:** преобразовать свободный текст о приёме пищи в структуру `FoodItem[]` с оценкой калорий и макронутриентов.
-- **Вход:** { userId, date, tz, text }
-- **Выход:** { parsedItems: [{ name, qty, unit, kcal, protein, fat, carbs, confidence }], totalKcal, warnings }
-- **Рекомендации:**
-  - Сделать синхронный HTTP POST `/ai/parse-meal` с тайм-аутом (на клиенте ожидать ответ и показывать результат).
-  - Логировать исходные запросы и ответы (для улучшения модели и дебага).
-  - Валидировать `kcal` и округлять до целого; если confidence < порог — пометить как требующее проверки.
+```bash
+# Установка зависимостей
+npm install
 
-## 5. Бэкенд — сущности (описание полей)
+# Создать .env файл
+cp .env.example .env
 
-> В полях указано: `тип` — краткое описание (required/optional)
+# Запуск dev сервера с Turbopack
+npm run dev
+```
 
-### 5.1 User
+Приложение будет доступно на [http://localhost:3000](http://localhost:3000)
 
-- `id` — string (UUID) — идентификатор. (required)
-- `email` — string — логин/почта. (required)
-- `passwordHash` — string — хеш пароля. (required)
-- `displayName` — string — отображаемое имя. (optional)
-- `timezone` — string — зона пользователя (IANA), для корректного отображения дат. (optional)
-- `dailyKcalGoal` — integer — цель калорий в день (может приходить из плана). (optional)
-- `createdAt` — datetime. (required)
+### Переменные окружения
 
-### 5.2 DayEntry
+Создай `.env` файл на основе `.env.example`:
 
-- `id` — string (UUID). (required)
-- `userId` — string (FK → User.id). (required)
-- `date` — date (YYYY-MM-DD) — дата дня в зоне пользователя. (required)
-- `targetKcal` — integer — цель на этот день (если переопределена). (optional)
-- `consumedKcal` — integer — суммарно по всем meal.totalKcal. (computed / denormalized). (optional)
-- `notes` — string. (optional)
-- `createdAt`, `updatedAt` — datetime.
+```env
+# API
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
 
-### 5.3 Meal
+# WebSocket
+NEXT_PUBLIC_WS_URL=ws://localhost:8000
 
-- `id` — string (UUID). (required)
-- `dayEntryId` — string (FK → DayEntry.id). (required)
-- `type` — enum [breakfast, lunch, dinner, snack, other]. (required)
-- `time` — time (HH:MM) — время приёма. (optional)
-- `name` — string — название приёма/блюда. (optional)
-- `items` — array of FoodItem (see ниже) — детальные позиции. (optional)
-- `totalKcal` — integer — сумма калорий по items (если items отсутствуют — может быть вручную). (required)
-- `source` — enum [manual, ai] — откуда пришла запись. (required)
-- `aiConfidence` — float (0..1) — если source = ai. (optional)
-- `createdAt`, `updatedAt` — datetime.
+# Feature flags
+NEXT_PUBLIC_ENABLE_AI=true
+```
 
-### 5.4 FoodItem
+## Разработка
 
-- `id` — string (UUID).
-- `mealId` — string (FK → Meal.id).
-- `name` — string — название продукта/блюда. (required)
-- `quantity` — float — количество (число). (required)
-- `unit` — string — единица измерения (g, ml, piece, tbsp и т.п.). (required)
-- `kcal` — integer — калории для указанного количества. (required)
-- `protein` — float — грамм белка в этой позиции. (optional)
-- `fat` — float — грамм жира. (optional)
-- `carbs` — float — грамм углеводов. (optional)
-- `source` — string — если продукт сопоставлен с базой данных продуктов. (optional)
+### API генерация
 
-### 5.5 DietPlan
+После изменения `src/shared/api/schema.yml`:
 
-- `id` — string (UUID).
-- `userId` — string (FK) — может быть глобальным (null) или привязан к пользователю. (optional)
-- `name` — string — название плана. (required)
-- `targetKcal` — integer. (required)
-- `macros` — object { proteinPct, fatPct, carbsPct } (sum may be 100). (optional)
-- `description` — string. (optional)
-- `createdAt`, `updatedAt` — datetime.
+```bash
+npm run generate:api
+```
 
-### 5.6 AiParseLog
+Orval создаст React Query хуки в `src/shared/api/generated/`.
 
-- `id` — string (UUID).
-- `userId` — string (optional).
-- `requestText` — text — исходный ввод пользователя.
-- `requestPayload` — json — дополнительные данные (date, tz).
-- `responsePayload` — json — ответ ИИ.
-- `responseTimeMs` — integer.
-- `createdAt` — datetime.
+### Линтинг
 
-## 6. API — минимальный набор конечных точек (REST)
+```bash
+npm run lint
+```
 
-- `POST /auth/signup` — регистрация.
-- `POST /auth/login` — получить токен.
-- `GET /calendar?month=YYYY-MM` — получить краткие данные по дням (consumedPercent, consumedKcal, targetKcal).
-- `GET /day/:date` — получить DayEntry + meals + items для даты (YYYY-MM-DD).
-- `POST /day/:date/meals` — создать meal (body: { type, time, name, items?, totalKcal?, source }).
-- `PUT /meals/:id` — обновить meal.
-- `DELETE /meals/:id` — удалить meal.
-- `POST /ai/parse-meal` — проксирует/вызывает внешний AI для парсинга (body: { userId, date, text }).
-- `GET /plans` — список доступных планов.
-- `POST /plans/:id/apply?date=YYYY-MM-DD` — применить план к user/day.
-- `GET /stats?from=YYYY-MM-DD&to=YYYY-MM-DD` — агрегированная статистика (суммы, средние, заполнение %).
+ESLint с проверкой:
 
-## 7. Валидация и правила
+- TypeScript правила
+- Next.js специфичные правила
+- Import resolver для абсолютных путей
+- Boundaries plugin для FSD архитектуры
 
-- `kcal` — integer ≥ 0.
-- `date` — строго в формате YYYY-MM-DD.
-- `time` — HH:MM или nullable.
-- При source = ai: если `aiConfidence` < 0.6 пометить как требующее подтверждения.
-- Ограничение длины текста для AI-запроса (например, 2048 символов).
+### Система лайаутов
 
-## 8. Безопасность и приватность
+Проект использует Per-Page Layouts:
 
-- Аутентификация: JWT или сессии; все API кроме `/auth` — защищены.
-- Логи AI: хранить без персональных данных, либо шифровать при необходимости.
-- Пользовательские данные — доступ только владельцу.
+```tsx
+// pages/dashboard/index.tsx
+import { setPageLayout } from "@/shared/lib/next";
+import { getPrivateLayout } from "@/app/pub/get-private-layout";
+import { DashboardPage } from "@/pages/dashboard";
 
-## 9. Мониторинг и метрики (минимум)
+export default setPageLayout(DashboardPage, getPrivateLayout);
+```
 
-- Логи ошибок бэкенда и AI timeouts.
-- Количество AI-запросов, среднее время ответа, % low-confidence.
-- Наличие endpoint для админ-экспорта (csv) дневных данных при необходимости.
+**Доступные лайауты:**
 
-## 10. Нельзя забывать
+- `getOpenLayout` — публичные страницы (sign-in, landing)
+- `getPrivateLayout` — защищённые страницы с авторизацией
 
-- Поддерживать timezone пользователя при сохранении/отображении дат.
-- Делать округление калорий до целого при отображении и хранить целое в базе.
+### Стилизация
 
----
+TailwindCSS v4 с утилитами:
+
+```tsx
+import { cn } from "@/shared/lib/utils";
+
+<div
+  className={cn(
+    "bg-white dark:bg-gray-900",
+    "p-4 rounded-lg",
+    isActive && "border-2 border-blue-500",
+  )}
+>
+  Контент
+</div>;
+```
+
+### Работа с shadcn/ui
+
+Проект использует [shadcn/ui](https://ui.shadcn.com) — коллекцию переиспользуемых компонентов на базе Radix UI и TailwindCSS.
+
+**Паттерн использования:**
+
+1. **Примитивы** → `src/shared/ui/primitives/`
+   - Компоненты из shadcn/ui (Button, Select, Switch, Label и др.)
+   - Устанавливаются через CLI: `npx shadcn@latest add button`
+   - Низкоуровневые, настраиваемые компоненты
+
+2. **UI Kit** → `src/shared/ui/`
+   - Композитные компоненты на основе примитивов
+   - Бизнес-специфичная логика и стилизация
+   - Например: `ui-select.tsx`, `ui-spinner.tsx`
+
+**Добавление нового примитива:**
+
+```bash
+# Установка компонента из shadcn/ui
+npx shadcn@latest add dialog
+
+# Компонент появится в src/shared/ui/primitives/dialog.tsx
+```
+
+**Создание UI компонента:**
+
+```tsx
+// src/shared/ui/ui-dialog.tsx
+import { Dialog, DialogContent, DialogHeader } from "./primitives/dialog";
+
+export const UiDialog = ({ title, children, ...props }) => (
+  <Dialog {...props}>
+    <DialogContent>
+      <DialogHeader>{title}</DialogHeader>
+      {children}
+    </DialogContent>
+  </Dialog>
+);
+```
+
+**Преимущества:**
+
+- Полный контроль над кодом компонентов
+- Легкая кастомизация под проект
+- TypeScript из коробки
+
+### Storybook
+
+Проект использует [Storybook](https://storybook.js.org) для разработки и документации UI компонентов в изоляции.
+
+**Запуск:**
+
+```bash
+npm run storybook
+```
+
+Storybook будет доступен на [http://localhost:6006](http://localhost:6006)
+
+**Структура:**
+
+- Stories создаются рядом с компонентами: `component.stories.tsx`
+- Все stories в `src/shared/ui/`
+- Автоматическая генерация документации через `tags: ['autodocs']`
+
+**Создание новой story:**
+
+```tsx
+// src/shared/ui/ui-button.stories.tsx
+import type { Meta, StoryObj } from "@storybook/react";
+import { UiButton } from "./ui-button";
+
+const meta = {
+  title: "shared/ui/UiButton",
+  component: UiButton,
+  parameters: {
+    layout: "centered",
+  },
+  tags: ["autodocs"],
+} satisfies Meta<typeof UiButton>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+export const Default: Story = {
+  args: {
+    children: "Click me",
+  },
+};
+```
+
+**Преимущества:**
+
+- Изолированная разработка компонентов
+- Визуальное тестирование
+- Автоматическая документация
+- Проверка доступности (a11y addon)
+- Интеграция с Vitest для тестирования
+
+## Структура данных
+
+### Основные сущности
+
+- **User** — пользователь (email, displayName, dailyKcalGoal)
+- **DayEntry** — запись дня (date, targetKcal, consumedKcal)
+- **Meal** — приём пищи (type, time, totalKcal, source)
+- **FoodItem** — позиция продукта (name, quantity, kcal, macros)
+- **DietPlan** — план питания (targetKcal, macros)
+
+**Подробнее:**
+
+- [SPECIFICATIONS.md](./SPECIFICATIONS.md) — полная модель данных и API
+
+## Особенности
+
+### AI-парсинг приёмов пищи
+
+Пользователь вводит текст на естественном языке:
+
+```
+"завтрак: овсянка 50г с бананом и мёдом, кофе с молоком"
+```
+
+AI преобразует в структурированные данные:
+
+- Распознаёт продукты
+- Определяет количество
+- Рассчитывает калории и макронутриенты
+- Возвращает confidence level для проверки
+
+### Серверное состояние (React Query)
+
+```tsx
+import { useGetUserProfile } from "@/shared/api/generated";
+
+const { data, isLoading, error } = useGetUserProfile();
+```
+
+Конфигурация React Query в `@/shared/lib/react-query`.
+
+### Клиентское состояние (Zustand)
+
+```tsx
+import { create } from "zustand";
+
+const useStore = create((set) => ({
+  count: 0,
+  increment: () => set((state) => ({ count: state.count + 1 })),
+}));
+```
+
+### WebSocket соединение
+
+Real-time обновления через Socket.io:
+
+- Синхронизация данных между устройствами
+- Уведомления о достижении целей
+- Live обновления статистики
+
+### Темная тема
+
+Автоматическое определение темы системы через `features/theme`:
+
+```tsx
+import { useTheme } from "@/features/theme";
+
+const { theme, setTheme } = useTheme();
+```
+
+## Документация
+
+- [SPECIFICATIONS.md](./SPECIFICATIONS.md) — бизнес-требования и API
+- [ARCHITECTURE.md](./ARCHITECTURE.md) — архитектура лайаутов
+- [src/shared/api/README.md](./src/shared/api/README.md) — работа с API
+- [GIT_FLOW.md](./GIT_FLOW.md) — git workflow
+
+## Библиотеки и плагины
+
+### UI компоненты
+
+- **@radix-ui/react-\*** — доступные примитивы
+- **lucide-react** — иконки
+
+### Утилиты
+
+- **nanoid** — генерация уникальных ID
+- **@faker-js/faker** — генерация тестовых данных
+
+### Dev инструменты
+
+- **@tanstack/react-query-devtools** — отладка запросов
+
+## Лицензия
+
+Проприетарное ПО. Все права защищены.
