@@ -2,6 +2,94 @@
 
 Веб-приложение для учёта калорий с AI-парсингом приёмов пищи на базе Next.js и Feature-Sliced Design.
 
+## Содержание
+
+- [Быстрый старт](#быстрый-старт)
+- [Особенности](#особенности)
+- [Стек технологий](#стек-технологий)
+- [Скрипты](#скрипты)
+- [Архитектура](#архитектура)
+- [Установка](#установка)
+- [Разработка](#разработка)
+- [Структура данных](#структура-данных)
+- [Документация](#документация)
+- [Лицензия](#лицензия)
+
+## Быстрый старт
+
+```bash
+# Установка зависимостей
+npm install
+
+# Создать .env файл
+cp .env.example .env
+
+# Запуск dev сервера с Turbopack
+npm run dev
+```
+
+Приложение будет доступно на [http://localhost:3000](http://localhost:3000)
+
+**Требования:**
+- Node.js >= 18
+- npm >= 9
+
+## Особенности
+
+### AI-парсинг приёмов пищи
+
+Пользователь вводит текст на естественном языке:
+
+```
+"завтрак: овсянка 50г с бананом и мёдом, кофе с молоком"
+```
+
+AI преобразует в структурированные данные:
+
+- Распознаёт продукты
+- Определяет количество
+- Рассчитывает калории и макронутриенты
+- Возвращает confidence level для проверки
+
+### Серверное состояние (React Query)
+
+```tsx
+import { useGetUserProfile } from "@/shared/api/generated";
+
+const { data, isLoading, error } = useGetUserProfile();
+```
+
+Конфигурация React Query в `@/shared/lib/react-query`.
+
+### Клиентское состояние (Zustand)
+
+```tsx
+import { create } from "zustand";
+
+const useStore = create((set) => ({
+  count: 0,
+  increment: () => set((state) => ({ count: state.count + 1 })),
+}));
+```
+
+### WebSocket соединение
+
+Real-time обновления через Socket.io:
+
+- Синхронизация данных между устройствами
+- Уведомления о достижении целей
+- Live обновления статистики
+
+### Темная тема
+
+Автоматическое определение темы системы через `features/theme`:
+
+```tsx
+import { useTheme } from "@/features/theme";
+
+const { theme, setTheme } = useTheme();
+```
+
 ## Стек технологий
 
 - **Next.js** 15.5.6 — фреймворк (Pages Router + Turbopack)
@@ -68,26 +156,6 @@ npm run lint            # ESLint проверка
 - [ARCHITECTURE.md](./ARCHITECTURE.md) — система лайаутов и организация кода
 
 ## Установка
-
-### Требования
-
-- Node.js >= 18
-- npm >= 9
-
-### Быстрый старт
-
-```bash
-# Установка зависимостей
-npm install
-
-# Создать .env файл
-cp .env.example .env
-
-# Запуск dev сервера с Turbopack
-npm run dev
-```
-
-Приложение будет доступно на [http://localhost:3000](http://localhost:3000)
 
 ### Переменные окружения
 
@@ -278,84 +346,12 @@ export const Default: Story = {
 
 - [SPECIFICATIONS.md](./SPECIFICATIONS.md) — полная модель данных и API
 
-## Особенности
-
-### AI-парсинг приёмов пищи
-
-Пользователь вводит текст на естественном языке:
-
-```
-"завтрак: овсянка 50г с бананом и мёдом, кофе с молоком"
-```
-
-AI преобразует в структурированные данные:
-
-- Распознаёт продукты
-- Определяет количество
-- Рассчитывает калории и макронутриенты
-- Возвращает confidence level для проверки
-
-### Серверное состояние (React Query)
-
-```tsx
-import { useGetUserProfile } from "@/shared/api/generated";
-
-const { data, isLoading, error } = useGetUserProfile();
-```
-
-Конфигурация React Query в `@/shared/lib/react-query`.
-
-### Клиентское состояние (Zustand)
-
-```tsx
-import { create } from "zustand";
-
-const useStore = create((set) => ({
-  count: 0,
-  increment: () => set((state) => ({ count: state.count + 1 })),
-}));
-```
-
-### WebSocket соединение
-
-Real-time обновления через Socket.io:
-
-- Синхронизация данных между устройствами
-- Уведомления о достижении целей
-- Live обновления статистики
-
-### Темная тема
-
-Автоматическое определение темы системы через `features/theme`:
-
-```tsx
-import { useTheme } from "@/features/theme";
-
-const { theme, setTheme } = useTheme();
-```
-
 ## Документация
 
 - [SPECIFICATIONS.md](./SPECIFICATIONS.md) — бизнес-требования и API
 - [ARCHITECTURE.md](./ARCHITECTURE.md) — архитектура лайаутов
 - [src/shared/api/README.md](./src/shared/api/README.md) — работа с API
 - [GIT_FLOW.md](./GIT_FLOW.md) — git workflow
-
-## Библиотеки и плагины
-
-### UI компоненты
-
-- **@radix-ui/react-\*** — доступные примитивы
-- **lucide-react** — иконки
-
-### Утилиты
-
-- **nanoid** — генерация уникальных ID
-- **@faker-js/faker** — генерация тестовых данных
-
-### Dev инструменты
-
-- **@tanstack/react-query-devtools** — отладка запросов
 
 ## Лицензия
 
