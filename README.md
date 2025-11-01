@@ -240,9 +240,8 @@ import { cn } from "@/shared/lib/utils";
 **Паттерн использования:**
 
 1. **Примитивы** → `src/shared/ui/primitives/`
-   - Компоненты из shadcn/ui (Button, Select, Switch, Label и др.)
+   - Список компонентов: [components](https://ui.shadcn.com/docs/components)
    - Устанавливаются через CLI: `npx shadcn@latest add button`
-   - Низкоуровневые, настраиваемые компоненты
 
 2. **UI Kit** → `src/shared/ui/`
    - Композитные компоненты на основе примитивов
