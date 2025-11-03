@@ -80,15 +80,6 @@ Real-time обновления через Socket.io:
 - Уведомления о достижении целей
 - Live обновления статистики
 
-### Темная тема
-
-Автоматическое определение темы системы через `features/theme`:
-
-```tsx
-import { useTheme } from "@/features/theme";
-
-const { theme, setTheme } = useTheme();
-```
 
 ## Стек технологий
 
