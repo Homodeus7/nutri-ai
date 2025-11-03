@@ -7,7 +7,7 @@ export function PrivateProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <ComposeChildren>
-      <SocketProvider clientId={"session?.userId"} />
+      {/* <SocketProvider clientId={"session?.userId"} /> */}
       {children}
     </ComposeChildren>
   );
