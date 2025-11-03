@@ -36,6 +36,7 @@ export function AppLoader({
     // }
     setIsLoading(true);
     loadTheme();
+    setIsLoading(false);
 
     // api
     //   .getSession()
@@ -48,7 +49,7 @@ export function AppLoader({
 
   return (
     <>
-      <UiPageSpinner isLoading={isLoading} />
+      {/* <UiPageSpinner isLoading={false} /> */}
       {/* {!isLoading ? (
         <SessionProvider
           value={{
@@ -58,6 +59,7 @@ export function AppLoader({
           {children}
         </SessionProvider>
       ) : null} */}
+      {children}
     </>
   );
 }
