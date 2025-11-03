@@ -31,6 +31,7 @@ npm run dev
 Приложение будет доступно на [http://localhost:3000](http://localhost:3000)
 
 **Требования:**
+
 - Node.js >= 18
 - npm >= 9
 
@@ -80,7 +81,6 @@ Real-time обновления через Socket.io:
 - Уведомления о достижении целей
 - Live обновления статистики
 
-
 ## Стек технологий
 
 - **Next.js** 15.5.6 — фреймворк (Pages Router + Turbopack)
@@ -125,10 +125,12 @@ npm run lint            # ESLint проверка
 │   │   ├── loaders/      # Загрузчики данных
 │   │   ├── layouts/      # Компоненты лайаутов
 │   │   └── interceptors/ # HTTP interceptors
-│   ├── features/         # Фичи (theme, i18n)
 │   ├── pages/            # Бизнес-логика страниц
 │   │   ├── sign-in/      # Страница входа
 │   │   └── board/        # Доска (защищённая)
+|   ├── widget/           # Композитные компоненты
+│   ├── features/         # Фичи (theme, i18n)
+|   ├── entities/         # Бизнес-сущности
 │   └── shared/           # Общая инфраструктура
 │       ├── api/          # API клиент + Orval генерация
 │       ├── ui/           # UI компоненты
