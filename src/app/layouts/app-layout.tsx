@@ -4,8 +4,8 @@ import clsx from "clsx";
 export function AppLayout({ children }: { children?: React.ReactNode }) {
   const { theme } = useTheme();
   return (
-    <div className={clsx(theme)}>
-      <div className="text-slate-900 dark:text-white">{children}</div>
+    <div className={clsx(theme, "bg-background text-foreground min-h-screen")}>
+      {children}
     </div>
   );
 }

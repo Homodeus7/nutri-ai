@@ -19,7 +19,7 @@ export function UiPageSpinner({
   return (
     <div
       className={clsx(
-        "fixed left-0 top-0 right-0 bottom-0 flex justify-center items-center bg-primary-foreground",
+        "fixed left-0 top-0 right-0 bottom-0 flex justify-center items-center bg-background",
         className,
       )}
     >
