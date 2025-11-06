@@ -1,4 +1,4 @@
-import { UiText } from "@/shared/ui/ui-text";
+import { UiText } from "@/shared/ui";
 
 export function ForbiddenPage() {
   return (
