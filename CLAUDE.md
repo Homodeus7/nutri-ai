@@ -109,7 +109,7 @@ npx shadcn@latest add [component]  # Installs to src/shared/ui/primitives/
 - button, input, textarea, label, select, switch, separator, field, input-group, spinner, sonner
 
 **Custom components with stories:**
-- ui-button, ui-select, ui-spinner, ui-page-spinner, ui-typography, ui-input
+- ui-button, ui-select, ui-spinner, ui-page-spinner, ui-text, ui-input
 
 ### Styling
 

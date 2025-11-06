@@ -1,9 +1,9 @@
-import { UiTypography } from "@/shared/ui/ui-typography";
+import { UiText } from "@/shared/ui/ui-text";
 
 export function ForbiddenPage() {
   return (
-    <UiTypography variant="h1" align="center">
+    <UiText variant="h1" align="center">
       Forbidden
-    </UiTypography>
+    </UiText>
   );
 }

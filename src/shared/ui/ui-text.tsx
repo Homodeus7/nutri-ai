@@ -2,7 +2,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/shared/lib/utils";
 import { ComponentPropsWithoutRef, ElementType, ReactNode } from "react";
 
-const typographyVariants = cva("", {
+const textVariants = cva("", {
   variants: {
     variant: {
       h1: "scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl",
@@ -54,10 +54,10 @@ const variantElementMap = {
   muted: "p",
 } as const;
 
-export type TypographyVariant = keyof typeof variantElementMap;
+export type TextVariant = keyof typeof variantElementMap;
 
-export interface UiTypographyProps<T extends ElementType = ElementType>
-  extends VariantProps<typeof typographyVariants> {
+export interface UiTextProps<T extends ElementType = ElementType>
+  extends VariantProps<typeof textVariants> {
   /**
    * The HTML element or React component to render
    * If not provided, will default to the semantic element for the variant
@@ -74,27 +74,27 @@ export interface UiTypographyProps<T extends ElementType = ElementType>
 }
 
 /**
- * Universal typography component inspired by shadcn/ui
+ * Universal text component inspired by shadcn/ui
  *
  * @example
  * ```tsx
  * // Heading
- * <UiTypography variant="h1">Page Title</UiTypography>
+ * <UiText variant="h1">Page Title</UiText>
  *
  * // Paragraph with custom alignment
- * <UiTypography variant="p" align="center">Centered text</UiTypography>
+ * <UiText variant="p" align="center">Centered text</UiText>
  *
  * // Muted text
- * <UiTypography variant="muted">Secondary information</UiTypography>
+ * <UiText variant="muted">Secondary information</UiText>
  *
  * // Custom element with variant styles
- * <UiTypography variant="h2" as="div">Styled as h2, rendered as div</UiTypography>
+ * <UiText variant="h2" as="div">Styled as h2, rendered as div</UiText>
  *
  * // Override font weight
- * <UiTypography variant="p" weight="bold">Bold paragraph</UiTypography>
+ * <UiText variant="p" weight="bold">Bold paragraph</UiText>
  * ```
  */
-export function UiTypography<T extends ElementType = "p">({
+export function UiText<T extends ElementType = "p">({
   variant = "p",
   align,
   weight,
@@ -102,16 +102,16 @@ export function UiTypography<T extends ElementType = "p">({
   as,
   children,
   ...props
-}: UiTypographyProps<T> &
-  Omit<ComponentPropsWithoutRef<T>, keyof UiTypographyProps<T>>) {
+}: UiTextProps<T> &
+  Omit<ComponentPropsWithoutRef<T>, keyof UiTextProps<T>>) {
   // Use provided 'as' prop or default to semantic element for variant
   const Component = (as ||
-    variantElementMap[variant as TypographyVariant] ||
+    variantElementMap[variant as TextVariant] ||
     "p") as ElementType;
 
   return (
     <Component
-      className={cn(typographyVariants({ variant, align, weight }), className)}
+      className={cn(textVariants({ variant, align, weight }), className)}
       {...props}
     >
       {children}
