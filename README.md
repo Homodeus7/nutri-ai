@@ -146,7 +146,7 @@ npm run lint            # ESLint проверка
 
 **Подробнее:**
 
-- [ARCHITECTURE.md](./ARCHITECTURE.md) — система лайаутов и организация кода
+- [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) — система лайаутов и организация кода
 
 ## Установка
 
@@ -336,14 +336,17 @@ export const Default: Story = {
 
 **Подробнее:**
 
-- [SPECIFICATIONS.md](./SPECIFICATIONS.md) — полная модель данных и API
+- [docs/SPECIFICATIONS.md](./docs/SPECIFICATIONS.md) — полная модель данных и API
 
 ## Документация
 
-- [SPECIFICATIONS.md](./SPECIFICATIONS.md) — бизнес-требования и API
-- [ARCHITECTURE.md](./ARCHITECTURE.md) — архитектура лайаутов
-- [src/shared/api/README.md](./src/shared/api/README.md) — работа с API
-- [GIT_FLOW.md](./GIT_FLOW.md) — git workflow
+Полная документация находится в каталоге `/docs/`:
+
+- [docs/INDEX.md](./docs/INDEX.md) — навигация по всей документации
+- [docs/SPECIFICATIONS.md](./docs/SPECIFICATIONS.md) — бизнес-требования и API
+- [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) — архитектура лайаутов
+- [docs/API.md](./docs/API.md) — работа с API
+- [docs/GIT_FLOW.md](./docs/GIT_FLOW.md) — git workflow
 
 ## Лицензия
 

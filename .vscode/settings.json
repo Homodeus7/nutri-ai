@@ -1,0 +1,22 @@
+{
+  "tailwindCSS.experimental.configFile": "src/app/pub/globals.css",
+  "tailwindCSS.includeLanguages": {
+    "typescript": "javascript",
+    "typescriptreact": "javascript"
+  },
+  "tailwindCSS.classAttributes": [
+    "class",
+    "className",
+    "classList",
+    "ngClass"
+  ],
+  "tailwindCSS.experimental.classRegex": [
+    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
+    ["cn\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
+  ],
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+  "css.validate": false,
+  "css.customData": [".vscode/css_custom_data.json"]
+}
