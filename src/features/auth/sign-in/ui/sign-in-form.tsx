@@ -7,7 +7,7 @@ import { createSignInSchema } from "../model/sign-in.schema";
 import { useSignIn } from "../model/use-sign-in";
 import { UiButton } from "@/shared/ui/ui-button";
 import { UiCardLayout } from "@/shared/ui/ui-card-layout";
-import { UiTypography } from "@/shared/ui/ui-typography";
+import { UiText } from "@/shared/ui/ui-text";
 import { useI18n } from "../i18n";
 import { ROUTER_PATHS } from "@/shared/constants";
 
@@ -50,7 +50,7 @@ export function SignInForm({ title }: SignInFormProps) {
   return (
     <UiCardLayout
       header={{
-        title: <UiTypography variant="h3">{title}</UiTypography>,
+        title: <UiText variant="h3">{title}</UiText>,
       }}
     >
       <form
