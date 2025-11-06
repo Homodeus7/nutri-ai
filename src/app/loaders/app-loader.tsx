@@ -1,4 +1,4 @@
-import { UiPageSpinner } from "@/shared/ui/ui-page-spinner";
+import { UiPageSpinner } from "@/shared/ui";
 import { ReactNode, useEffect, useState } from "react";
 import { useApplayAppInterceptor } from "../interceptors/app-interceptor";
 import { useTheme } from "@/features/theme";

@@ -1,5 +1,5 @@
 import { ComposeChildren } from "@/shared/lib/react";
-import { UiPageSpinner } from "@/shared/ui/ui-page-spinner";
+import { UiPageSpinner } from "@/shared/ui";
 import { useState } from "react";
 
 export function BoardPage() {

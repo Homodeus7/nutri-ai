@@ -1,5 +1,5 @@
 import { Lang, useLang } from "../model/lang.store";
-import { UiSelect } from "@/shared/ui/ui-select";
+import { UiSelect } from "@/shared/ui";
 
 type LangOption = {
   id: Lang;

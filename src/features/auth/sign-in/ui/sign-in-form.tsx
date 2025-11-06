@@ -2,12 +2,15 @@
 
 import { useForm } from "@tanstack/react-form";
 import { toast } from "sonner";
-import { FormInputField, FormPasswordInput } from "@/shared/ui/form";
+import {
+  FormInputField,
+  FormPasswordInput,
+  UiButton,
+  UiCardLayout,
+  UiText,
+} from "@/shared/ui";
 import { createSignInSchema } from "../model/sign-in.schema";
 import { useSignIn } from "../model/use-sign-in";
-import { UiButton } from "@/shared/ui/ui-button";
-import { UiCardLayout } from "@/shared/ui/ui-card-layout";
-import { UiText } from "@/shared/ui/ui-text";
 import { useI18n } from "../i18n";
 import { ROUTER_PATHS } from "@/shared/constants";
 

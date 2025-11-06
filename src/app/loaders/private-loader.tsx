@@ -5,7 +5,7 @@
 import { api } from "@/shared/api";
 // import { ROUTER_PATHS } from "@/shared/constants";
 import { ComposeChildren, useEventCallback } from "@/shared/lib/react";
-import { UiPageSpinner } from "@/shared/ui/ui-page-spinner";
+import { UiPageSpinner } from "@/shared/ui";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
