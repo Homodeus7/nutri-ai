@@ -12,7 +12,7 @@ export function BoardPage() {
   return (
     <ComposeChildren>
       <div className="flex flex-col py-3 px-4 grow">
-        <h1 className="text-3xl mb-4 shrink-0 "></h1>
+        {/* TODO: Add page title */}
         <div className="shrink-0 mb-2 flex gap-5"></div>
       </div>
     </ComposeChildren>

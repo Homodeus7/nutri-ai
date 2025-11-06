@@ -1,3 +1,9 @@
+import { UiTypography } from "@/shared/ui/ui-typography";
+
 export function ForbiddenPage() {
-  return <div className="text-center">Forbidden</div>;
+  return (
+    <UiTypography variant="h1" align="center">
+      Forbidden
+    </UiTypography>
+  );
 }
