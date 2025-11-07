@@ -34,6 +34,13 @@
   - Генерация клиента
   - Конфигурация axios instance
 
+- **[TESTING.md](./TESTING.md)** — Руководство по тестированию
+  - Vitest (unit/integration тесты)
+  - Playwright (E2E тесты)
+  - React Testing Library
+  - Тестовая пирамида и best practices
+  - Структура тестов в FSD стиле
+
 - **[COLORS.md](./COLORS.md)** — Цветовая система и стилизация
   - Палитра цветов проекта
   - Использование Tailwind CSS v4
@@ -96,6 +103,10 @@
 
 → [GIT_FLOW.md](./GIT_FLOW.md) — стратегия ветвления и коммитов
 
+#### Написание тестов
+
+→ [TESTING.md](./TESTING.md) — unit, integration и E2E тесты
+
 ## Структура проекта
 
 ```
@@ -107,6 +118,7 @@
 │   ├── ARCHITECTURE.md          # Архитектура
 │   ├── SPECIFICATIONS.md        # Бизнес-требования
 │   ├── API.md                   # API слой
+│   ├── TESTING.md               # Тестирование
 │   ├── COLORS.md                # Цветовая система
 │   ├── QUICK_START.md           # Быстрый старт
 │   ├── MSW_SETUP.md             # Mock Service Worker

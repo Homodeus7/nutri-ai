@@ -24,6 +24,17 @@ npm run generate:api     # Generate React Query hooks from OpenAPI schema
 
 After editing `src/shared/api/schema.yml`, always run `npm run generate:api` to regenerate the API client.
 
+### Testing
+```bash
+npm test                 # Run unit tests in watch mode
+npm run test:run         # Run unit tests once
+npm run test:coverage    # Run tests with coverage report
+npm run test:e2e         # Run E2E tests with Playwright
+npm run test:e2e:ui      # Run E2E tests in UI mode (debugging)
+```
+
+See [docs/TESTING.md](./docs/TESTING.md) for complete testing guide.
+
 ## Architecture
 
 ### Directory Structure
@@ -169,13 +180,40 @@ MSWProvider → Toaster → QueryProvider → I18nProvider → children
 
 ### Testing
 
-- **Storybook**: Component documentation and visual testing
-  - Stories in `src/shared/ui/*.stories.tsx`
-  - Run: `npm run storybook`
-- **MSW**: API mocking for development
-  - Config: `src/shared/lib/msw/`
-  - Worker directory: `public/`
-- **No unit test framework** currently configured
+The project uses a **focused testing strategy** - test only business-critical code:
+
+**What to test:**
+- ✅ **Zod schemas** - Validation logic and error messages (Vitest)
+- ✅ **Zustand stores** - Complex state management (Vitest)
+- ✅ **Custom hooks** - Only hooks with business logic (Vitest)
+- ✅ **Critical flows** - Auth, core features, navigation (Playwright)
+- ✅ **Accessibility** - WCAG compliance with axe-core (Playwright)
+- ✅ **UI components** - Visual documentation (Storybook)
+
+**What NOT to test:**
+- ❌ UI components with unit tests (use Storybook)
+- ❌ Library wrappers (cn, simple utils)
+- ❌ Generated API code
+- ❌ Simple helpers without logic
+
+**Tools:**
+- **Vitest**: Business logic tests (`*.test.ts` next to source)
+- **Playwright**: E2E tests (`e2e/**/*.spec.ts`)
+- **Storybook**: UI component documentation and testing
+- **MSW**: API mocking (`src/shared/lib/msw/`)
+
+**Test structure:**
+```
+e2e/                    # E2E tests
+  auth/                 # Auth flows
+  app/                  # Navigation, accessibility
+src/features/auth/sign-in/
+  model/
+    sign-in.schema.ts
+    sign-in.schema.test.ts  # Schema validation tests
+```
+
+See [docs/TESTING.md](./docs/TESTING.md) for complete guide.
 
 ## Key Patterns
 
