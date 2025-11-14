@@ -19,8 +19,20 @@ export function createI18nModule<
     const lang = useStrictContext(langContext);
 
     return {
-      t: (key: keyof T) => {
-        return translations[key]?.[lang as string] ?? key;
+      t: (key: keyof T, params?: Record<string, string>) => {
+        let translation = translations[key]?.[lang as string] ?? String(key);
+
+        // Replace parameters in the format {paramName}
+        if (params) {
+          Object.entries(params).forEach(([paramKey, paramValue]) => {
+            translation = translation.replace(
+              new RegExp(`\\{${paramKey}\\}`, "g"),
+              paramValue,
+            );
+          });
+        }
+
+        return translation;
       },
     };
   };
