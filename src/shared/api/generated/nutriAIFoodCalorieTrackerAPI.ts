@@ -315,26 +315,20 @@ export type GetStatsParams = {
   to: string;
 };
 
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
-
 /**
  * @summary Регистрация нового пользователя
  */
 export const postAuthSignup = (
   signupRequest: BodyType<SignupRequest>,
-  options?: SecondParameter<typeof createInstance>,
   signal?: AbortSignal,
 ) => {
-  return createInstance<AuthResponse>(
-    {
-      url: `/auth/signup`,
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      data: signupRequest,
-      signal,
-    },
-    options,
-  );
+  return createInstance<AuthResponse>({
+    url: `/auth/signup`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: signupRequest,
+    signal,
+  });
 };
 
 export const getPostAuthSignupMutationOptions = <
@@ -347,7 +341,6 @@ export const getPostAuthSignupMutationOptions = <
     { data: BodyType<SignupRequest> },
     TContext
   >;
-  request?: SecondParameter<typeof createInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof postAuthSignup>>,
   TError,
@@ -355,13 +348,13 @@ export const getPostAuthSignupMutationOptions = <
   TContext
 > => {
   const mutationKey = ["postAuthSignup"];
-  const { mutation: mutationOptions, request: requestOptions } = options
+  const { mutation: mutationOptions } = options
     ? options.mutation &&
       "mutationKey" in options.mutation &&
       options.mutation.mutationKey
       ? options
       : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
+    : { mutation: { mutationKey } };
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof postAuthSignup>>,
@@ -369,7 +362,7 @@ export const getPostAuthSignupMutationOptions = <
   > = (props) => {
     const { data } = props ?? {};
 
-    return postAuthSignup(data, requestOptions);
+    return postAuthSignup(data);
   };
 
   return { mutationFn, ...mutationOptions };
@@ -395,7 +388,6 @@ export const usePostAuthSignup = <
       { data: BodyType<SignupRequest> },
       TContext
     >;
-    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseMutationResult<
@@ -414,19 +406,15 @@ export const usePostAuthSignup = <
  */
 export const postAuthLogin = (
   loginRequest: BodyType<LoginRequest>,
-  options?: SecondParameter<typeof createInstance>,
   signal?: AbortSignal,
 ) => {
-  return createInstance<AuthResponse>(
-    {
-      url: `/auth/login`,
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      data: loginRequest,
-      signal,
-    },
-    options,
-  );
+  return createInstance<AuthResponse>({
+    url: `/auth/login`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: loginRequest,
+    signal,
+  });
 };
 
 export const getPostAuthLoginMutationOptions = <
@@ -439,7 +427,6 @@ export const getPostAuthLoginMutationOptions = <
     { data: BodyType<LoginRequest> },
     TContext
   >;
-  request?: SecondParameter<typeof createInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof postAuthLogin>>,
   TError,
@@ -447,13 +434,13 @@ export const getPostAuthLoginMutationOptions = <
   TContext
 > => {
   const mutationKey = ["postAuthLogin"];
-  const { mutation: mutationOptions, request: requestOptions } = options
+  const { mutation: mutationOptions } = options
     ? options.mutation &&
       "mutationKey" in options.mutation &&
       options.mutation.mutationKey
       ? options
       : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
+    : { mutation: { mutationKey } };
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof postAuthLogin>>,
@@ -461,7 +448,7 @@ export const getPostAuthLoginMutationOptions = <
   > = (props) => {
     const { data } = props ?? {};
 
-    return postAuthLogin(data, requestOptions);
+    return postAuthLogin(data);
   };
 
   return { mutationFn, ...mutationOptions };
@@ -484,7 +471,6 @@ export const usePostAuthLogin = <TError = ErrorType<Error>, TContext = unknown>(
       { data: BodyType<LoginRequest> },
       TContext
     >;
-    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseMutationResult<
@@ -504,19 +490,15 @@ export const usePostAuthLogin = <TError = ErrorType<Error>, TContext = unknown>(
  */
 export const postAuthGoogle = (
   googleAuthRequest: BodyType<GoogleAuthRequest>,
-  options?: SecondParameter<typeof createInstance>,
   signal?: AbortSignal,
 ) => {
-  return createInstance<AuthResponse>(
-    {
-      url: `/auth/google`,
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      data: googleAuthRequest,
-      signal,
-    },
-    options,
-  );
+  return createInstance<AuthResponse>({
+    url: `/auth/google`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: googleAuthRequest,
+    signal,
+  });
 };
 
 export const getPostAuthGoogleMutationOptions = <
@@ -529,7 +511,6 @@ export const getPostAuthGoogleMutationOptions = <
     { data: BodyType<GoogleAuthRequest> },
     TContext
   >;
-  request?: SecondParameter<typeof createInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof postAuthGoogle>>,
   TError,
@@ -537,13 +518,13 @@ export const getPostAuthGoogleMutationOptions = <
   TContext
 > => {
   const mutationKey = ["postAuthGoogle"];
-  const { mutation: mutationOptions, request: requestOptions } = options
+  const { mutation: mutationOptions } = options
     ? options.mutation &&
       "mutationKey" in options.mutation &&
       options.mutation.mutationKey
       ? options
       : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
+    : { mutation: { mutationKey } };
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof postAuthGoogle>>,
@@ -551,7 +532,7 @@ export const getPostAuthGoogleMutationOptions = <
   > = (props) => {
     const { data } = props ?? {};
 
-    return postAuthGoogle(data, requestOptions);
+    return postAuthGoogle(data);
   };
 
   return { mutationFn, ...mutationOptions };
@@ -577,7 +558,6 @@ export const usePostAuthGoogle = <
       { data: BodyType<GoogleAuthRequest> },
       TContext
     >;
-    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseMutationResult<
@@ -596,13 +576,14 @@ export const usePostAuthGoogle = <
  */
 export const getCalendar = (
   params: GetCalendarParams,
-  options?: SecondParameter<typeof createInstance>,
   signal?: AbortSignal,
 ) => {
-  return createInstance<GetCalendar200>(
-    { url: `/calendar`, method: "GET", params, signal },
-    options,
-  );
+  return createInstance<GetCalendar200>({
+    url: `/calendar`,
+    method: "GET",
+    params,
+    signal,
+  });
 };
 
 export const getGetCalendarQueryKey = (params?: GetCalendarParams) => {
@@ -618,16 +599,15 @@ export const getGetCalendarQueryOptions = <
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getCalendar>>, TError, TData>
     >;
-    request?: SecondParameter<typeof createInstance>;
   },
 ) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
+  const { query: queryOptions } = options ?? {};
 
   const queryKey = queryOptions?.queryKey ?? getGetCalendarQueryKey(params);
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof getCalendar>>> = ({
     signal,
-  }) => getCalendar(params, requestOptions, signal);
+  }) => getCalendar(params, signal);
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof getCalendar>>,
@@ -658,7 +638,6 @@ export function useGetCalendar<
         >,
         "initialData"
       >;
-    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): DefinedUseQueryResult<TData, TError> & {
@@ -681,7 +660,6 @@ export function useGetCalendar<
         >,
         "initialData"
       >;
-    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
@@ -696,7 +674,6 @@ export function useGetCalendar<
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getCalendar>>, TError, TData>
     >;
-    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
@@ -715,7 +692,6 @@ export function useGetCalendar<
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getCalendar>>, TError, TData>
     >;
-    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
@@ -736,15 +712,12 @@ export function useGetCalendar<
 /**
  * @summary Получить данные за день
  */
-export const getDayDate = (
-  date: string,
-  options?: SecondParameter<typeof createInstance>,
-  signal?: AbortSignal,
-) => {
-  return createInstance<DayEntry>(
-    { url: `/day/${date}`, method: "GET", signal },
-    options,
-  );
+export const getDayDate = (date: string, signal?: AbortSignal) => {
+  return createInstance<DayEntry>({
+    url: `/day/${date}`,
+    method: "GET",
+    signal,
+  });
 };
 
 export const getGetDayDateQueryKey = (date?: string) => {
@@ -760,16 +733,15 @@ export const getGetDayDateQueryOptions = <
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getDayDate>>, TError, TData>
     >;
-    request?: SecondParameter<typeof createInstance>;
   },
 ) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
+  const { query: queryOptions } = options ?? {};
 
   const queryKey = queryOptions?.queryKey ?? getGetDayDateQueryKey(date);
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof getDayDate>>> = ({
     signal,
-  }) => getDayDate(date, requestOptions, signal);
+  }) => getDayDate(date, signal);
 
   return {
     queryKey,
@@ -807,7 +779,6 @@ export function useGetDayDate<
         >,
         "initialData"
       >;
-    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): DefinedUseQueryResult<TData, TError> & {
@@ -830,7 +801,6 @@ export function useGetDayDate<
         >,
         "initialData"
       >;
-    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
@@ -845,7 +815,6 @@ export function useGetDayDate<
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getDayDate>>, TError, TData>
     >;
-    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
@@ -864,7 +833,6 @@ export function useGetDayDate<
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getDayDate>>, TError, TData>
     >;
-    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
@@ -888,19 +856,15 @@ export function useGetDayDate<
 export const postDayDateMeals = (
   date: string,
   createMealRequest: BodyType<CreateMealRequest>,
-  options?: SecondParameter<typeof createInstance>,
   signal?: AbortSignal,
 ) => {
-  return createInstance<Meal>(
-    {
-      url: `/day/${date}/meals`,
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      data: createMealRequest,
-      signal,
-    },
-    options,
-  );
+  return createInstance<Meal>({
+    url: `/day/${date}/meals`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: createMealRequest,
+    signal,
+  });
 };
 
 export const getPostDayDateMealsMutationOptions = <
@@ -913,7 +877,6 @@ export const getPostDayDateMealsMutationOptions = <
     { date: string; data: BodyType<CreateMealRequest> },
     TContext
   >;
-  request?: SecondParameter<typeof createInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof postDayDateMeals>>,
   TError,
@@ -921,13 +884,13 @@ export const getPostDayDateMealsMutationOptions = <
   TContext
 > => {
   const mutationKey = ["postDayDateMeals"];
-  const { mutation: mutationOptions, request: requestOptions } = options
+  const { mutation: mutationOptions } = options
     ? options.mutation &&
       "mutationKey" in options.mutation &&
       options.mutation.mutationKey
       ? options
       : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
+    : { mutation: { mutationKey } };
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof postDayDateMeals>>,
@@ -935,7 +898,7 @@ export const getPostDayDateMealsMutationOptions = <
   > = (props) => {
     const { date, data } = props ?? {};
 
-    return postDayDateMeals(date, data, requestOptions);
+    return postDayDateMeals(date, data);
   };
 
   return { mutationFn, ...mutationOptions };
@@ -963,7 +926,6 @@ export const usePostDayDateMeals = <
       { date: string; data: BodyType<CreateMealRequest> },
       TContext
     >;
-    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseMutationResult<
@@ -983,17 +945,13 @@ export const usePostDayDateMeals = <
 export const putMealsId = (
   id: string,
   createMealRequest: BodyType<CreateMealRequest>,
-  options?: SecondParameter<typeof createInstance>,
 ) => {
-  return createInstance<Meal>(
-    {
-      url: `/meals/${id}`,
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      data: createMealRequest,
-    },
-    options,
-  );
+  return createInstance<Meal>({
+    url: `/meals/${id}`,
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    data: createMealRequest,
+  });
 };
 
 export const getPutMealsIdMutationOptions = <
@@ -1008,7 +966,6 @@ export const getPutMealsIdMutationOptions = <
     { id: string; data: BodyType<CreateMealRequest> },
     TContext
   >;
-  request?: SecondParameter<typeof createInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof putMealsId>>,
   TError,
@@ -1016,13 +973,13 @@ export const getPutMealsIdMutationOptions = <
   TContext
 > => {
   const mutationKey = ["putMealsId"];
-  const { mutation: mutationOptions, request: requestOptions } = options
+  const { mutation: mutationOptions } = options
     ? options.mutation &&
       "mutationKey" in options.mutation &&
       options.mutation.mutationKey
       ? options
       : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
+    : { mutation: { mutationKey } };
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof putMealsId>>,
@@ -1030,7 +987,7 @@ export const getPutMealsIdMutationOptions = <
   > = (props) => {
     const { id, data } = props ?? {};
 
-    return putMealsId(id, data, requestOptions);
+    return putMealsId(id, data);
   };
 
   return { mutationFn, ...mutationOptions };
@@ -1060,7 +1017,6 @@ export const usePutMealsId = <
       { id: string; data: BodyType<CreateMealRequest> },
       TContext
     >;
-    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseMutationResult<
@@ -1077,14 +1033,8 @@ export const usePutMealsId = <
 /**
  * @summary Удалить приём пищи
  */
-export const deleteMealsId = (
-  id: string,
-  options?: SecondParameter<typeof createInstance>,
-) => {
-  return createInstance<void>(
-    { url: `/meals/${id}`, method: "DELETE" },
-    options,
-  );
+export const deleteMealsId = (id: string) => {
+  return createInstance<void>({ url: `/meals/${id}`, method: "DELETE" });
 };
 
 export const getDeleteMealsIdMutationOptions = <
@@ -1097,7 +1047,6 @@ export const getDeleteMealsIdMutationOptions = <
     { id: string },
     TContext
   >;
-  request?: SecondParameter<typeof createInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof deleteMealsId>>,
   TError,
@@ -1105,13 +1054,13 @@ export const getDeleteMealsIdMutationOptions = <
   TContext
 > => {
   const mutationKey = ["deleteMealsId"];
-  const { mutation: mutationOptions, request: requestOptions } = options
+  const { mutation: mutationOptions } = options
     ? options.mutation &&
       "mutationKey" in options.mutation &&
       options.mutation.mutationKey
       ? options
       : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
+    : { mutation: { mutationKey } };
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof deleteMealsId>>,
@@ -1119,7 +1068,7 @@ export const getDeleteMealsIdMutationOptions = <
   > = (props) => {
     const { id } = props ?? {};
 
-    return deleteMealsId(id, requestOptions);
+    return deleteMealsId(id);
   };
 
   return { mutationFn, ...mutationOptions };
@@ -1147,7 +1096,6 @@ export const useDeleteMealsId = <
       { id: string },
       TContext
     >;
-    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseMutationResult<
@@ -1166,19 +1114,15 @@ export const useDeleteMealsId = <
  */
 export const postAiParseMeal = (
   aiParseMealRequest: BodyType<AiParseMealRequest>,
-  options?: SecondParameter<typeof createInstance>,
   signal?: AbortSignal,
 ) => {
-  return createInstance<AiParseMealResponse>(
-    {
-      url: `/ai/parse-meal`,
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      data: aiParseMealRequest,
-      signal,
-    },
-    options,
-  );
+  return createInstance<AiParseMealResponse>({
+    url: `/ai/parse-meal`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: aiParseMealRequest,
+    signal,
+  });
 };
 
 export const getPostAiParseMealMutationOptions = <
@@ -1191,7 +1135,6 @@ export const getPostAiParseMealMutationOptions = <
     { data: BodyType<AiParseMealRequest> },
     TContext
   >;
-  request?: SecondParameter<typeof createInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof postAiParseMeal>>,
   TError,
@@ -1199,13 +1142,13 @@ export const getPostAiParseMealMutationOptions = <
   TContext
 > => {
   const mutationKey = ["postAiParseMeal"];
-  const { mutation: mutationOptions, request: requestOptions } = options
+  const { mutation: mutationOptions } = options
     ? options.mutation &&
       "mutationKey" in options.mutation &&
       options.mutation.mutationKey
       ? options
       : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
+    : { mutation: { mutationKey } };
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof postAiParseMeal>>,
@@ -1213,7 +1156,7 @@ export const getPostAiParseMealMutationOptions = <
   > = (props) => {
     const { data } = props ?? {};
 
-    return postAiParseMeal(data, requestOptions);
+    return postAiParseMeal(data);
   };
 
   return { mutationFn, ...mutationOptions };
@@ -1241,7 +1184,6 @@ export const usePostAiParseMeal = <
       { data: BodyType<AiParseMealRequest> },
       TContext
     >;
-    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseMutationResult<
@@ -1258,14 +1200,8 @@ export const usePostAiParseMeal = <
 /**
  * @summary Получить список планов
  */
-export const getPlans = (
-  options?: SecondParameter<typeof createInstance>,
-  signal?: AbortSignal,
-) => {
-  return createInstance<GetPlans200>(
-    { url: `/plans`, method: "GET", signal },
-    options,
-  );
+export const getPlans = (signal?: AbortSignal) => {
+  return createInstance<GetPlans200>({ url: `/plans`, method: "GET", signal });
 };
 
 export const getGetPlansQueryKey = () => {
@@ -1279,15 +1215,14 @@ export const getGetPlansQueryOptions = <
   query?: Partial<
     UseQueryOptions<Awaited<ReturnType<typeof getPlans>>, TError, TData>
   >;
-  request?: SecondParameter<typeof createInstance>;
 }) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
+  const { query: queryOptions } = options ?? {};
 
   const queryKey = queryOptions?.queryKey ?? getGetPlansQueryKey();
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof getPlans>>> = ({
     signal,
-  }) => getPlans(requestOptions, signal);
+  }) => getPlans(signal);
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof getPlans>>,
@@ -1317,7 +1252,6 @@ export function useGetPlans<
         >,
         "initialData"
       >;
-    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): DefinedUseQueryResult<TData, TError> & {
@@ -1339,7 +1273,6 @@ export function useGetPlans<
         >,
         "initialData"
       >;
-    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
@@ -1353,7 +1286,6 @@ export function useGetPlans<
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getPlans>>, TError, TData>
     >;
-    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
@@ -1371,7 +1303,6 @@ export function useGetPlans<
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getPlans>>, TError, TData>
     >;
-    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
@@ -1395,13 +1326,14 @@ export function useGetPlans<
 export const postPlansIdApply = (
   id: string,
   params?: PostPlansIdApplyParams,
-  options?: SecondParameter<typeof createInstance>,
   signal?: AbortSignal,
 ) => {
-  return createInstance<PostPlansIdApply200>(
-    { url: `/plans/${id}/apply`, method: "POST", params, signal },
-    options,
-  );
+  return createInstance<PostPlansIdApply200>({
+    url: `/plans/${id}/apply`,
+    method: "POST",
+    params,
+    signal,
+  });
 };
 
 export const getPostPlansIdApplyMutationOptions = <
@@ -1414,7 +1346,6 @@ export const getPostPlansIdApplyMutationOptions = <
     { id: string; params?: PostPlansIdApplyParams },
     TContext
   >;
-  request?: SecondParameter<typeof createInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof postPlansIdApply>>,
   TError,
@@ -1422,13 +1353,13 @@ export const getPostPlansIdApplyMutationOptions = <
   TContext
 > => {
   const mutationKey = ["postPlansIdApply"];
-  const { mutation: mutationOptions, request: requestOptions } = options
+  const { mutation: mutationOptions } = options
     ? options.mutation &&
       "mutationKey" in options.mutation &&
       options.mutation.mutationKey
       ? options
       : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
+    : { mutation: { mutationKey } };
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof postPlansIdApply>>,
@@ -1436,7 +1367,7 @@ export const getPostPlansIdApplyMutationOptions = <
   > = (props) => {
     const { id, params } = props ?? {};
 
-    return postPlansIdApply(id, params, requestOptions);
+    return postPlansIdApply(id, params);
   };
 
   return { mutationFn, ...mutationOptions };
@@ -1464,7 +1395,6 @@ export const usePostPlansIdApply = <
       { id: string; params?: PostPlansIdApplyParams },
       TContext
     >;
-    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseMutationResult<
@@ -1481,15 +1411,13 @@ export const usePostPlansIdApply = <
 /**
  * @summary Статистика за период
  */
-export const getStats = (
-  params: GetStatsParams,
-  options?: SecondParameter<typeof createInstance>,
-  signal?: AbortSignal,
-) => {
-  return createInstance<StatsResponse>(
-    { url: `/stats`, method: "GET", params, signal },
-    options,
-  );
+export const getStats = (params: GetStatsParams, signal?: AbortSignal) => {
+  return createInstance<StatsResponse>({
+    url: `/stats`,
+    method: "GET",
+    params,
+    signal,
+  });
 };
 
 export const getGetStatsQueryKey = (params?: GetStatsParams) => {
@@ -1505,16 +1433,15 @@ export const getGetStatsQueryOptions = <
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getStats>>, TError, TData>
     >;
-    request?: SecondParameter<typeof createInstance>;
   },
 ) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
+  const { query: queryOptions } = options ?? {};
 
   const queryKey = queryOptions?.queryKey ?? getGetStatsQueryKey(params);
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof getStats>>> = ({
     signal,
-  }) => getStats(params, requestOptions, signal);
+  }) => getStats(params, signal);
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof getStats>>,
@@ -1547,7 +1474,6 @@ export function useGetStats<
         >,
         "initialData"
       >;
-    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): DefinedUseQueryResult<TData, TError> & {
@@ -1570,7 +1496,6 @@ export function useGetStats<
         >,
         "initialData"
       >;
-    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
@@ -1585,7 +1510,6 @@ export function useGetStats<
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getStats>>, TError, TData>
     >;
-    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
@@ -1604,7 +1528,6 @@ export function useGetStats<
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getStats>>, TError, TData>
     >;
-    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {

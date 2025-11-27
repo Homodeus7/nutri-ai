@@ -26,11 +26,16 @@ After editing `src/shared/api/schema.yml`, always run `npm run generate:api` to 
 
 ### Testing
 ```bash
-npm test                 # Run unit tests in watch mode
-npm run test:run         # Run unit tests once
-npm run test:coverage    # Run tests with coverage report
-npm run test:e2e         # Run E2E tests with Playwright
-npm run test:e2e:ui      # Run E2E tests in UI mode (debugging)
+npm test                   # Run unit tests in watch mode
+npm run test:run           # Run unit tests once
+npm run test:coverage      # Run tests with coverage report
+npm run test:ui            # Run unit tests with Vitest UI
+npm run test:e2e           # Run E2E tests with Playwright
+npm run test:e2e:ui        # Run E2E tests in UI mode (debugging)
+npm run test:e2e:headed    # Run E2E tests in headed mode
+npm run test:e2e:debug     # Run E2E tests in debug mode
+npm run test:e2e:chromium  # Run E2E tests in Chromium only
+npm run test:e2e:report    # Show Playwright test report
 ```
 
 See [docs/TESTING.md](./docs/TESTING.md) for complete testing guide.
@@ -356,3 +361,174 @@ Full documentation is in `/docs/`:
 - State: React Query (server) + Zustand (client)
 - UI: shadcn/ui primitives + custom components
 - Styling: Tailwind CSS v4 with theme system
+
+## Memory Bank Guidelines
+
+ВАЖНО: Активно используй MCP memory-bank для сохранения контекста и важной информации по проектам.
+
+### Имя проекта
+
+Имя проекта в memory-bank **всегда совпадает с именем рабочей директории**: `nutri-ai`
+
+### Когда сохранять в memory-bank
+
+Сохраняй информацию в следующих случаях:
+
+- После исследования кодовой базы — записывай найденные паттерны, структуру компонентов
+- Важные архитектурные решения и технические детали проекта
+- Прогресс по сложным многоэтапным задачам
+- Найденные проблемы и их решения
+- Зависимости между компонентами и модулями
+- Перед завершением длительной сессии — для продолжения работы позже
+- Контекст, который поможет в будущих сессиях
+
+### Рекомендуемая структура файлов
+
+Старайся, чтобы файлы в memory-bank не разрастались сильно, пиши по делу и в новых файлах.
+
+## Code Review Checklist
+
+Перед коммитом проверяй:
+
+### FSD & Architecture
+- ✅ Используется FSD Public API (импорты через `index.ts`)
+- ✅ Нет прямых импортов из `model/`, `ui/`, `lib/` извне модуля
+- ✅ Соблюдены layer boundaries (нижние слои не импортируют верхние)
+- ✅ Абсолютные импорты через `@/*` alias
+- ✅ Роутинг в `/pages/`, бизнес-логика в `/src/pages/`
+
+### Testing
+- ✅ Zod schemas покрыты тестами
+- ✅ Сложные Zustand stores протестированы
+- ✅ Кастомные хуки с бизнес-логикой протестированы
+- ✅ UI компоненты задокументированы в Storybook
+- ✅ Критические флоу покрыты E2E тестами
+
+### API & Data
+- ✅ После изменения `schema.yml` выполнен `npm run generate:api`
+- ✅ Используются только generated React Query hooks
+- ✅ Формы используют TanStack Form + Zod validation
+
+### UI & Styling
+- ✅ Используется `cn()` для слияния классов
+- ✅ Новые UI примитивы добавлены через `npx shadcn@latest add`
+- ✅ Компоненты используют cva для вариантов
+
+### Accessibility
+- ✅ Semantic HTML
+- ✅ ARIA attributes где необходимо
+- ✅ Keyboard navigation
+- ✅ Focus management
+
+## Common Pitfalls
+
+Типичные ошибки, которых нужно избегать:
+
+### ❌ Прямые импорты из internal folders
+```tsx
+// ❌ WRONG
+import { SignInForm } from "@/features/auth/sign-in/ui/sign-in-form";
+import { useAuthStore } from "@/features/auth/sign-in/model/use-auth-store";
+
+// ✅ CORRECT
+import { SignInForm, useAuthStore } from "@/features/auth/sign-in";
+```
+
+### ❌ Unit тесты для UI компонентов
+```tsx
+// ❌ WRONG - не пиши unit тесты для UI
+describe("Button", () => {
+  it("renders correctly", () => { ... });
+});
+
+// ✅ CORRECT - используй Storybook
+export const Primary: Story = { args: { variant: "primary" } };
+```
+
+### ❌ Пропуск генерации API
+```bash
+# ❌ WRONG - редактируешь schema.yml и забываешь регенерировать
+vim src/shared/api/schema.yml
+
+# ✅ CORRECT - всегда регенерируй после изменений
+vim src/shared/api/schema.yml
+npm run generate:api
+```
+
+### ❌ Нарушение FSD layer boundaries
+```tsx
+// ❌ WRONG - features импортирует из pages
+// src/features/auth/sign-in/ui/form.tsx
+import { BoardPage } from "@/pages/board";
+
+// ✅ CORRECT - используй shared или entities
+import { useAuthRedirect } from "@/shared/lib/auth";
+```
+
+### ❌ Создание ненужных файлов
+```bash
+# ❌ WRONG - создаешь новую утилиту для одной операции
+src/shared/lib/format-email.ts
+
+# ✅ CORRECT - используй inline или существующую утилиту
+const email = value.toLowerCase().trim();
+```
+
+## Performance Considerations
+
+### Tree-shaking через Public API
+```tsx
+// ✅ CORRECT - экспортируй только необходимое
+// features/analytics/index.ts
+export { useTrackEvent } from "./model/use-track-event";
+export type { TrackEventOptions } from "./model/use-track-event";
+// НЕ экспортируй internal helpers, они не попадут в bundle
+
+// ❌ WRONG - экспорт всего подряд увеличивает bundle
+export * from "./model";
+export * from "./ui";
+export * from "./lib";
+```
+
+### Dynamic imports для тяжелых компонентов
+```tsx
+// ✅ CORRECT - lazy load тяжелых компонентов
+import dynamic from "next/dynamic";
+
+const ChartWidget = dynamic(() => import("@/widgets/chart-widget"), {
+  loading: () => <Spinner />,
+});
+```
+
+### React Query optimistic updates
+```tsx
+// ✅ CORRECT - используй optimistic updates для лучшего UX
+const { mutate } = useUpdateMeal({
+  onMutate: async (newData) => {
+    await queryClient.cancelQueries({ queryKey: ["meals"] });
+    const previous = queryClient.getQueryData(["meals"]);
+    queryClient.setQueryData(["meals"], (old) => ({ ...old, ...newData }));
+    return { previous };
+  },
+  onError: (err, newData, context) => {
+    queryClient.setQueryData(["meals"], context.previous);
+  },
+});
+```
+
+### Avoid unnecessary re-renders
+```tsx
+// ✅ CORRECT - используй селекторы в Zustand
+const theme = useThemeStore((state) => state.theme);
+
+// ❌ WRONG - подписка на весь store
+const store = useThemeStore();
+const theme = store.theme;
+```
+
+### Code splitting по роутам
+```tsx
+// ✅ CORRECT - Next.js автоматически делает code splitting
+// pages/board/index.tsx → отдельный chunk
+// pages/sign-in/index.tsx → отдельный chunk
+```
