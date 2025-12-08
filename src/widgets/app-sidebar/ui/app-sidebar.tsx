@@ -10,7 +10,9 @@ import { UiText } from "@/shared/ui/ui-text";
 import { UiButton } from "@/shared/ui/ui-button";
 import { useI18n } from "../i18n";
 
-const getNavItems = (t: (key: string) => string) => [
+type TranslateFn = (key: "lunch" | "meals" | "appName" | "board" | "boost" | "more") => string;
+
+const getNavItems = (t: TranslateFn) => [
   { name: t("board"), href: "/board", icon: Home, color: "bg-orange-500" },
   { name: t("meals"), href: "/meals", icon: Square, color: "bg-blue-500" },
   { name: t("boost"), href: "/boost", icon: Zap, color: "bg-yellow-500" },

@@ -4,12 +4,14 @@ import { Card, CardContent } from "@/shared/ui/primitives/card";
 import { UiText } from "@/shared/ui/ui-text";
 import { useI18n } from "../i18n";
 
+type TranslateFn = (key: "waterIntake" | "steps" | "ofGoal", params?: Record<string, string>) => string;
+
 interface StatCardProps {
   label: string;
   value: string;
   goal: string;
   bgColor: string;
-  t: (key: string, params?: Record<string, string>) => string;
+  t: TranslateFn;
 }
 
 function StatCard({ label, value, goal, bgColor, t }: StatCardProps) {

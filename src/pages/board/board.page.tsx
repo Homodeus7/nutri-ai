@@ -7,6 +7,7 @@ import { DatePicker } from "@/widgets/date-picker";
 import { Card, CardContent } from "@/shared/ui/primitives/card";
 import { UiText } from "@/shared/ui/ui-text";
 import { useI18n } from "./i18n";
+import { FoodDiary } from "@/widgets/food-diary";
 
 export function BoardPage() {
   const { t } = useI18n();
@@ -45,6 +46,7 @@ export function BoardPage() {
           />
         </div>
       </div>
+      <FoodDiary />
 
       <div>
         <UiText variant="h3" weight="bold" className="mb-6">
