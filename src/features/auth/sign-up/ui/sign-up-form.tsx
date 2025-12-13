@@ -14,33 +14,42 @@ import {
 } from "@/shared/ui/primitives/form";
 import { Input } from "@/shared/ui/primitives/input";
 import { Button } from "@/shared/ui/primitives/button";
-import { useSignIn } from "../model/use-sign-in";
+import { useSignUp } from "../model/use-sign-up";
 import { useI18n } from "../i18n";
 import { ROUTER_PATHS } from "@/shared/constants";
 
-export function SignInForm() {
+export function SignUpForm() {
   const { t } = useI18n();
 
   // Zod schema with i18n translations
-  const signInSchema = z.object({
-    email: z.string().min(1, t("emailRequired")).email(t("emailInvalid")),
-    password: z
-      .string()
-      .min(1, t("passwordRequired"))
-      .min(8, t("passwordMinLength")),
-  });
+  const signUpSchema = z
+    .object({
+      email: z.string().min(1, t("emailRequired")).email(t("emailInvalid")),
+      password: z
+        .string()
+        .min(1, t("passwordRequired"))
+        .min(8, t("passwordMinLength")),
+      confirmPassword: z.string().min(1, t("confirmPasswordRequired")),
+      displayName: z.string().optional(),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: t("passwordsDoNotMatch"),
+      path: ["confirmPassword"],
+    });
 
-  type SignInFormData = z.infer<typeof signInSchema>;
+  type SignUpFormData = z.infer<typeof signUpSchema>;
 
-  const form = useForm<SignInFormData>({
-    resolver: zodResolver(signInSchema),
+  const form = useForm<SignUpFormData>({
+    resolver: zodResolver(signUpSchema),
     defaultValues: {
       email: "",
       password: "",
+      confirmPassword: "",
+      displayName: "",
     },
   });
 
-  const { signIn, isPending } = useSignIn({
+  const { signUp, isPending } = useSignUp({
     redirectTo: ROUTER_PATHS.BOARD,
     onSuccess: () => {
       toast.success(t("successMessage"));
@@ -51,7 +60,7 @@ export function SignInForm() {
   });
 
   const onSubmit = form.handleSubmit((data) => {
-    signIn(data);
+    signUp(data);
   });
 
   return (
@@ -78,6 +87,25 @@ export function SignInForm() {
 
         <FormField
           control={form.control}
+          name="displayName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("displayNameLabel")}</FormLabel>
+              <FormControl>
+                <Input
+                  type="text"
+                  placeholder={t("displayNamePlaceholder")}
+                  autoComplete="name"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
           name="password"
           render={({ field }) => (
             <FormItem>
@@ -86,7 +114,26 @@ export function SignInForm() {
                 <Input
                   type="password"
                   placeholder={t("passwordPlaceholder")}
-                  autoComplete="current-password"
+                  autoComplete="new-password"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="confirmPassword"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("confirmPasswordLabel")}</FormLabel>
+              <FormControl>
+                <Input
+                  type="password"
+                  placeholder={t("confirmPasswordPlaceholder")}
+                  autoComplete="new-password"
                   {...field}
                 />
               </FormControl>

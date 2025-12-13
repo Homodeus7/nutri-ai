@@ -17,17 +17,33 @@ export const useI18n = createI18nModule({
     en: "Enter your password",
     ru: "Введите пароль",
   },
+  confirmPasswordLabel: {
+    en: "Confirm Password",
+    ru: "Подтвердите пароль",
+  },
+  confirmPasswordPlaceholder: {
+    en: "Confirm your password",
+    ru: "Подтвердите ваш пароль",
+  },
+  displayNameLabel: {
+    en: "Display Name (optional)",
+    ru: "Отображаемое имя (опционально)",
+  },
+  displayNamePlaceholder: {
+    en: "John Doe",
+    ru: "Иван Иванов",
+  },
   submitButton: {
-    en: "Sign In",
-    ru: "Войти",
+    en: "Sign Up",
+    ru: "Зарегистрироваться",
   },
   successMessage: {
-    en: "Successfully signed in!",
-    ru: "Вы успешно вошли!",
+    en: "Successfully signed up!",
+    ru: "Регистрация прошла успешно!",
   },
   errorMessage: {
-    en: "Failed to sign in",
-    ru: "Не удалось войти",
+    en: "Failed to sign up",
+    ru: "Не удалось зарегистрироваться",
   },
   validationError: {
     en: "Please fix the validation errors",
@@ -49,5 +65,13 @@ export const useI18n = createI18nModule({
   passwordMinLength: {
     en: "Password must be at least 8 characters",
     ru: "Пароль должен содержать минимум 8 символов",
+  },
+  confirmPasswordRequired: {
+    en: "Please confirm your password",
+    ru: "Пожалуйста, подтвердите пароль",
+  },
+  passwordsDoNotMatch: {
+    en: "Passwords do not match",
+    ru: "Пароли не совпадают",
   },
 } as const);

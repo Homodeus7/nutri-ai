@@ -1,11 +1,11 @@
 "use client";
 
 import { useI18n } from "../i18n";
-import { SignInForm, AuthLayout } from "@/features/auth";
+import { SignUpForm, AuthLayout } from "@/features/auth";
 import { ROUTER_PATHS } from "@/shared/constants";
 import Link from "next/link";
 
-export function SignInPage() {
+export function SignUpPage() {
   const { t } = useI18n();
 
   return (
@@ -16,10 +16,10 @@ export function SignInPage() {
         footerText={
           <>
             {t("footerText")}{" "}
-            <Link href={ROUTER_PATHS.SIGN_UP}>{t("signUpLink")}</Link>
+            <Link href={ROUTER_PATHS.SIGN_IN}>{t("signInLink")}</Link>
           </>
         }
-        form={<SignInForm />}
+        form={<SignUpForm />}
       />
     </div>
   );

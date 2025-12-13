@@ -44,7 +44,7 @@ test.describe("Sign In", () => {
   test("should navigate to sign up page", async ({ page }) => {
     await page.goto("/sign-in");
     // Adjust selector based on your UI
-    await page.click('text=/sign up/i');
+    await page.click("text=/sign up/i");
     await expect(page).toHaveURL(/sign-up/);
   });
 });
