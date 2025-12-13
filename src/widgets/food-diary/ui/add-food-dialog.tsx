@@ -46,11 +46,7 @@ export function AddFoodDialog({ mealName, onAddFood }: AddFoodDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-10 w-10 rounded-full bg-background/50 hover:bg-background/80"
-        >
+        <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full">
           <Plus className="size-6 text-chart-2" />
         </Button>
       </DialogTrigger>

@@ -29,7 +29,7 @@ export function useAppearanceDelay(
     defaultValue?: boolean;
     appearenceDelay?: number;
     minDisplay?: number;
-  }
+  },
 ) {
   const {
     minDisplay = 500,
@@ -66,7 +66,7 @@ export function ComposeChildren({ children }: { children: ReactNode }) {
           isValidElement(element)
             ? createElement(element.type, element.props, child)
             : child,
-        last
+        last,
       )}
     </>
   );
@@ -85,6 +85,6 @@ export function useEventCallback<A extends any[], R>(fn: Fn<A, R>): Fn<A, R> {
         const { current } = ref;
         return current(...args);
       },
-    []
+    [],
   );
 }

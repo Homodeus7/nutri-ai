@@ -1,5 +1,8 @@
+"use client";
+
 import { Lang, useLang } from "../model/lang.store";
 import { UiSelect } from "@/shared/ui";
+import { useEffect } from "react";
 
 type LangOption = {
   id: Lang;
@@ -12,7 +15,11 @@ const langOptions: LangOption[] = [
 ];
 
 export function UpdateLang({ className }: { className?: string }) {
-  const { lang, setLang } = useLang();
+  const { lang, setLang, loadLang } = useLang();
+
+  useEffect(() => {
+    loadLang();
+  }, [loadLang]);
 
   const langOption = langOptions.find((option) => option.id === lang);
   const onChangeLang = (lang: LangOption) => {

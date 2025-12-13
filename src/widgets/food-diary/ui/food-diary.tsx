@@ -1,6 +1,11 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/primitives/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/shared/ui/primitives/card";
 import { MealCard } from "./meal-card";
 import { useFoodDiary } from "../model/use-food-diary";
 import { useI18n } from "../i18n";

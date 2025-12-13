@@ -1,7 +1,5 @@
-import { UiPageSpinner } from "@/shared/ui";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode } from "react";
 import { useApplayAppInterceptor } from "../interceptors/app-interceptor";
-import { useTheme } from "@/features/theme";
 // import { api } from "@/shared/api";
 
 export const loadAppLoaderData = async () => {
@@ -24,28 +22,21 @@ export function AppLoader({
   // const [session, setSession] = useState<Session | undefined>(data?.session);
   // const isData = !!session;
 
-  const loadTheme = useTheme((s) => s.loadTheme);
-
-  const [isLoading, setIsLoading] = useState(false);
-
   useApplayAppInterceptor();
 
-  useEffect(() => {
-    // if (isData) {
-    //   return;
-    // }
-    setIsLoading(true);
-    loadTheme();
-    setIsLoading(false);
-
-    // api
-    //   .getSession()
-    //   .then(setSession)
-    //   .finally(() => {
-    //     setIsLoading(false);
-    //   })
-    //   .catch(() => {});
-  }, [loadTheme /*, loadLang, isData*/]);
+  // useEffect(() => {
+  //   if (isData) {
+  //     return;
+  //   }
+  //   setIsLoading(true);
+  //   api
+  //     .getSession()
+  //     .then(setSession)
+  //     .finally(() => {
+  //       setIsLoading(false);
+  //     })
+  //     .catch(() => {});
+  // }, [isData]);
 
   return (
     <>

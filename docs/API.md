@@ -15,24 +15,28 @@ src/shared/api/
 ## Флоу работы
 
 ### 1. Редактируешь схему
+
 Обновляешь `schema.yml` — добавляешь эндпоинты, модели.
 
 ### 2. Генерируешь клиент
+
 ```bash
 npm run generate:api
 ```
+
 Orval создаст React Query хуки для всех эндпоинтов.
 
 ### 3. Используешь хуки
+
 ```tsx
-import { api } from '@/shared/api';
+import { api } from "@/shared/api";
 
 // GET запрос
-const { data, isLoading } = api.useGetCalendar({ month: '2025-10' });
+const { data, isLoading } = api.useGetCalendar({ month: "2025-10" });
 
 // POST мутация
 const { mutate } = api.usePostDayDateMeals();
-mutate({ date: '2025-10-20', data: { type: 'breakfast', totalKcal: 350 } });
+mutate({ date: "2025-10-20", data: { type: "breakfast", totalKcal: 350 } });
 ```
 
 ## Конфигурация

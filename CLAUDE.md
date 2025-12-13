@@ -9,6 +9,7 @@ Nutri AI is a web application for calorie tracking with AI-powered meal parsing,
 ## Commands
 
 ### Development
+
 ```bash
 npm run dev              # Start dev server with Turbopack
 npm run build            # Production build with Turbopack
@@ -18,6 +19,7 @@ npm run build-storybook  # Build static Storybook
 ```
 
 ### Code Generation
+
 ```bash
 npm run generate:api     # Generate React Query hooks from OpenAPI schema
 ```
@@ -25,6 +27,7 @@ npm run generate:api     # Generate React Query hooks from OpenAPI schema
 After editing `src/shared/api/schema.yml`, always run `npm run generate:api` to regenerate the API client.
 
 ### Testing
+
 ```bash
 npm test                   # Run unit tests in watch mode
 npm run test:run           # Run unit tests once
@@ -80,6 +83,7 @@ export default setPageLayout(SignInPage, getOpenLayout);
 ```
 
 Available layouts:
+
 - `getOpenLayout` - Public pages (sign-in, landing)
 - `getPrivateLayout` - Protected pages with authentication
 
@@ -98,12 +102,14 @@ API client is auto-generated from OpenAPI schema:
 3. Use generated React Query hooks from `src/shared/api/generated/`
 
 **Configuration** (orval.config.ts):
+
 - Input: `src/shared/api/schema.yml`
 - Output: `src/shared/api/generated/` (React Query client)
 - Mutator: `src/shared/api/api-instance.ts` (Axios with credentials)
 - Server output: `server/generated.ts`
 
 **Axios instance** (api-instance.ts):
+
 - Base URL: `/api` (rewrites to `BASE_API_URL` in next.config.ts)
 - Credentials: `withCredentials: true` for cookie-based auth
 
@@ -117,14 +123,17 @@ UI components use shadcn/ui primitives + custom wrappers:
 - **Forms** (`src/shared/ui/form/`) - React Form integrated components
 
 **Adding a new primitive:**
+
 ```bash
 npx shadcn@latest add [component]  # Installs to src/shared/ui/primitives/
 ```
 
 **Existing primitives:**
+
 - button, input, textarea, label, select, switch, separator, field, input-group, spinner, sonner
 
 **Custom components with stories:**
+
 - ui-button, ui-select, ui-spinner, ui-page-spinner, ui-text, ui-input
 
 ### Styling
@@ -137,6 +146,7 @@ npx shadcn@latest add [component]  # Installs to src/shared/ui/primitives/
 ### Routing
 
 **Current routes:**
+
 - `/` → redirects to `/board`
 - `/sign-in` - Sign-in page (public)
 - `/board` - Board page (private)
@@ -146,6 +156,7 @@ npx shadcn@latest add [component]  # Installs to src/shared/ui/primitives/
 
 1. Create component in `/src/pages/[name]/`
 2. Create route in `/pages/[name]/index.tsx`:
+
    ```tsx
    import { getOpenLayout } from "@/app/pub/get-open-layout";
    import { MyPage } from "@/pages/my-page";
@@ -153,6 +164,7 @@ npx shadcn@latest add [component]  # Installs to src/shared/ui/primitives/
 
    export default setPageLayout(MyPage, getOpenLayout);
    ```
+
 3. For private pages, use `getPrivateLayout` instead
 
 ### Provider Composition
@@ -188,6 +200,7 @@ MSWProvider → Toaster → QueryProvider → I18nProvider → children
 The project uses a **focused testing strategy** - test only business-critical code:
 
 **What to test:**
+
 - ✅ **Zod schemas** - Validation logic and error messages (Vitest)
 - ✅ **Zustand stores** - Complex state management (Vitest)
 - ✅ **Custom hooks** - Only hooks with business logic (Vitest)
@@ -196,18 +209,21 @@ The project uses a **focused testing strategy** - test only business-critical co
 - ✅ **UI components** - Visual documentation (Storybook)
 
 **What NOT to test:**
+
 - ❌ UI components with unit tests (use Storybook)
 - ❌ Library wrappers (cn, simple utils)
 - ❌ Generated API code
 - ❌ Simple helpers without logic
 
 **Tools:**
+
 - **Vitest**: Business logic tests (`*.test.ts` next to source)
 - **Playwright**: E2E tests (`e2e/**/*.spec.ts`)
 - **Storybook**: UI component documentation and testing
 - **MSW**: API mocking (`src/shared/lib/msw/`)
 
 **Test structure:**
+
 ```
 e2e/                    # E2E tests
   auth/                 # Auth flows
@@ -291,6 +307,7 @@ const { data, isLoading, error } = useGetUserProfile();
 ```
 
 For mutations:
+
 ```tsx
 import { usePostAuth } from "@/shared/api/generated";
 
@@ -308,20 +325,24 @@ mutate({ email, password });
 ### Dependencies
 
 **Core:**
+
 - Next.js 15.5.6 (Pages Router + Turbopack)
 - React 19.1.0
 - TypeScript 5
 
 **State & Data:**
+
 - TanStack React Query 5.90.5 (server state)
 - Zustand 5.0.8 (client state)
 - Axios 1.12.2 (HTTP client)
 
 **Forms & Validation:**
+
 - TanStack React Form 1.23.8
 - Zod 3.25.76
 
 **UI:**
+
 - Radix UI components
 - Tailwind CSS 4
 - Lucide React 0.546 (icons)
@@ -329,6 +350,7 @@ mutate({ email, password });
 - next-themes 0.4.6
 
 **Dev Tools:**
+
 - Orval 7.14.0 (OpenAPI codegen)
 - MSW 2.11.6 (API mocking)
 - Storybook 10.0.2
@@ -354,6 +376,7 @@ Full documentation is in `/docs/`:
 - [docs/GIT_FLOW.md](./docs/GIT_FLOW.md) - Git workflow
 
 **Quick reference:**
+
 - Architecture: Feature-Sliced Design with Pages Router
 - Layouts: Per-page layouts pattern
 - API: OpenAPI → Orval → React Query hooks
@@ -391,6 +414,7 @@ Full documentation is in `/docs/`:
 Перед коммитом проверяй:
 
 ### FSD & Architecture
+
 - ✅ Используется FSD Public API (импорты через `index.ts`)
 - ✅ Нет прямых импортов из `model/`, `ui/`, `lib/` извне модуля
 - ✅ Соблюдены layer boundaries (нижние слои не импортируют верхние)
@@ -398,6 +422,7 @@ Full documentation is in `/docs/`:
 - ✅ Роутинг в `/pages/`, бизнес-логика в `/src/pages/`
 
 ### Testing
+
 - ✅ Zod schemas покрыты тестами
 - ✅ Сложные Zustand stores протестированы
 - ✅ Кастомные хуки с бизнес-логикой протестированы
@@ -405,16 +430,19 @@ Full documentation is in `/docs/`:
 - ✅ Критические флоу покрыты E2E тестами
 
 ### API & Data
+
 - ✅ После изменения `schema.yml` выполнен `npm run generate:api`
 - ✅ Используются только generated React Query hooks
 - ✅ Формы используют TanStack Form + Zod validation
 
 ### UI & Styling
+
 - ✅ Используется `cn()` для слияния классов
 - ✅ Новые UI примитивы добавлены через `npx shadcn@latest add`
 - ✅ Компоненты используют cva для вариантов
 
 ### Accessibility
+
 - ✅ Semantic HTML
 - ✅ ARIA attributes где необходимо
 - ✅ Keyboard navigation
@@ -425,6 +453,7 @@ Full documentation is in `/docs/`:
 Типичные ошибки, которых нужно избегать:
 
 ### ❌ Прямые импорты из internal folders
+
 ```tsx
 // ❌ WRONG
 import { SignInForm } from "@/features/auth/sign-in/ui/sign-in-form";
@@ -435,6 +464,7 @@ import { SignInForm, useAuthStore } from "@/features/auth/sign-in";
 ```
 
 ### ❌ Unit тесты для UI компонентов
+
 ```tsx
 // ❌ WRONG - не пиши unit тесты для UI
 describe("Button", () => {
@@ -446,6 +476,7 @@ export const Primary: Story = { args: { variant: "primary" } };
 ```
 
 ### ❌ Пропуск генерации API
+
 ```bash
 # ❌ WRONG - редактируешь schema.yml и забываешь регенерировать
 vim src/shared/api/schema.yml
@@ -456,6 +487,7 @@ npm run generate:api
 ```
 
 ### ❌ Нарушение FSD layer boundaries
+
 ```tsx
 // ❌ WRONG - features импортирует из pages
 // src/features/auth/sign-in/ui/form.tsx
@@ -466,6 +498,7 @@ import { useAuthRedirect } from "@/shared/lib/auth";
 ```
 
 ### ❌ Создание ненужных файлов
+
 ```bash
 # ❌ WRONG - создаешь новую утилиту для одной операции
 src/shared/lib/format-email.ts
@@ -477,6 +510,7 @@ const email = value.toLowerCase().trim();
 ## Performance Considerations
 
 ### Tree-shaking через Public API
+
 ```tsx
 // ✅ CORRECT - экспортируй только необходимое
 // features/analytics/index.ts
@@ -491,6 +525,7 @@ export * from "./lib";
 ```
 
 ### Dynamic imports для тяжелых компонентов
+
 ```tsx
 // ✅ CORRECT - lazy load тяжелых компонентов
 import dynamic from "next/dynamic";
@@ -501,6 +536,7 @@ const ChartWidget = dynamic(() => import("@/widgets/chart-widget"), {
 ```
 
 ### React Query optimistic updates
+
 ```tsx
 // ✅ CORRECT - используй optimistic updates для лучшего UX
 const { mutate } = useUpdateMeal({
@@ -517,6 +553,7 @@ const { mutate } = useUpdateMeal({
 ```
 
 ### Avoid unnecessary re-renders
+
 ```tsx
 // ✅ CORRECT - используй селекторы в Zustand
 const theme = useThemeStore((state) => state.theme);
@@ -527,6 +564,7 @@ const theme = store.theme;
 ```
 
 ### Code splitting по роутам
+
 ```tsx
 // ✅ CORRECT - Next.js автоматически делает code splitting
 // pages/board/index.tsx → отдельный chunk

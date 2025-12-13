@@ -1,4 +1,3 @@
-
 import { AppHeader } from "@/widgets/app-header";
 import { AppSidebar } from "@/widgets/app-sidebar";
 

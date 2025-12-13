@@ -3,14 +3,16 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { Home, Square, Zap, Utensils, Settings } from "lucide-react";
-import { cn } from "@/shared/lib/utils";
+import { cn } from "@/shared/lib/css";
 import { UpdateLang } from "@/features/i18n";
 import { UpdateTheme } from "@/features/theme";
 import { UiText } from "@/shared/ui/ui-text";
 import { UiButton } from "@/shared/ui/ui-button";
 import { useI18n } from "../i18n";
 
-type TranslateFn = (key: "lunch" | "meals" | "appName" | "board" | "boost" | "more") => string;
+type TranslateFn = (
+  key: "lunch" | "meals" | "appName" | "board" | "boost" | "more",
+) => string;
 
 const getNavItems = (t: TranslateFn) => [
   { name: t("board"), href: "/board", icon: Home, color: "bg-orange-500" },
@@ -48,7 +50,7 @@ export function AppSidebar() {
               className={cn(
                 "px-4 py-3 rounded-lg transition-all duration-300 flex items-center gap-3 font-medium",
                 isActive
-                  ? `${item.color} text-white shadow-lg`
+                  ? `${item.color} shadow-lg`
                   : "bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white",
               )}
             >

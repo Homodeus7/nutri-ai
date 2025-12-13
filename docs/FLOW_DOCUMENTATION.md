@@ -104,14 +104,14 @@ Claude Response:
 STEP 2: Поиск каждого item в базе
 ────────────────────────────────────────
 For each item:
-  1. SELECT * FROM products 
+  1. SELECT * FROM products
      WHERE normalizedName LIKE '%{parsedName}%'
      ORDER BY usageCount DESC, isVerified DESC
      LIMIT 3
 
   2. Если найдено:
      → suggestions = [{ productId, name, kcalPer100g, matchScore }]
-  
+
   3. Если НЕ найдено:
      → aiFallback = null (на этом этапе)
 
@@ -119,8 +119,8 @@ For each item:
 STEP 3: Поиск в рецептах пользователя
 ────────────────────────────────────────
 For each item:
-  SELECT * FROM recipes 
-  WHERE userId = currentUserId 
+  SELECT * FROM recipes
+  WHERE userId = currentUserId
     AND normalizedName LIKE '%{parsedName}%'
   ORDER BY usageCount DESC
   LIMIT 3
@@ -132,11 +132,11 @@ For each item:
 STEP 4: AI Fallback для пустых результатов
 ────────────────────────────────────────
 For items where suggestions.length == 0:
-  
+
   Вызвать Claude API повторно:
   """
   Для продукта "{parsedName}" верни КБЖУ на 100г в JSON:
-  { 
+  {
     "name": "...",
     "kcalPer100g": ...,
     "proteinPer100g": ...,
@@ -145,7 +145,7 @@ For items where suggestions.length == 0:
     "confidence": 0.0-1.0
   }
   """
-  
+
   → aiFallback = { ...response }
 
 
@@ -240,20 +240,20 @@ Backend Logic:
 ────────────────────────────────────────
 
 1. For each item:
-   
+
    IF productId exists:
      - Fetch product from DB
      - Calculate: kcal = product.kcalPer100g * quantity / 100
      - Calculate: protein, fat, carbs аналогично
-   
+
    IF productId is null AND _aiFallback exists:
      - Create new product:
        INSERT INTO products (
-         name, 
-         normalizedName, 
-         kcalPer100g, 
-         proteinPer100g, 
-         fatPer100g, 
+         name,
+         normalizedName,
+         kcalPer100g,
+         proteinPer100g,
+         fatPer100g,
          carbsPer100g,
          source = 'ai',
          createdBy = currentUserId,
@@ -270,11 +270,11 @@ Backend Logic:
    INSERT INTO food_items (mealId, productId, name, quantity, unit, kcal, ...)
 
 4. Update day_entry:
-   UPDATE day_entries 
+   UPDATE day_entries
    SET consumedKcal = consumedKcal + meal.totalKcal
 
 5. Update product usage:
-   UPDATE products 
+   UPDATE products
    SET usageCount = usageCount + 1,
        lastUsedAt = NOW()
    WHERE id IN (...)
@@ -315,11 +315,11 @@ Backend Logic:
      ingredient.kcal = product.kcalPer100g * quantity / 100
      ingredient.protein = product.proteinPer100g * quantity / 100
      ...
-   
+
    recipe.totalKcal = SUM(ingredients.kcal)
    recipe.totalProtein = SUM(ingredients.protein)
    ...
-   
+
    recipe.kcalPerServing = totalKcal / servings
    recipe.proteinPerServing = totalProtein / servings
    ...
@@ -382,13 +382,13 @@ Backend Logic:
    )
 
 6. Update recipe usage:
-   UPDATE recipes 
+   UPDATE recipes
    SET usageCount = usageCount + 1,
        lastUsedAt = NOW()
    WHERE id = recipeId
 
 7. Update day_entry:
-   UPDATE day_entries 
+   UPDATE day_entries
    SET consumedKcal = consumedKcal + kcal
 
 Response:
@@ -421,15 +421,15 @@ LIMIT 10
 function calculateMatchScore(productName, parsedName) {
   const p = normalize(productName);
   const q = normalize(parsedName);
-  
+
   if (p === q) return 1.0;
   if (p.startsWith(q) || q.startsWith(p)) return 0.9;
   if (p.includes(q) || q.includes(p)) return 0.8;
-  
+
   // Levenshtein distance
   const distance = levenshtein(p, q);
   const maxLen = Math.max(p.length, q.length);
-  return 1 - (distance / maxLen);
+  return 1 - distance / maxLen;
 }
 ```
 
@@ -440,8 +440,8 @@ function calculateMatchScore(productName, parsedName) {
 ### Автоматическое создание продуктов
 
 ```
-Правило: 
-Если product использован из aiFallback и пользователь не отредактировал - 
+Правило:
+Если product использован из aiFallback и пользователь не отредактировал -
 создать product автоматически при создании meal.
 
 Преимущества:
@@ -461,7 +461,7 @@ IF product используется в рецептах:
   3. Пересчитать perServing значения
   4. UPDATE recipes
 
-Опционально: 
+Опционально:
 Пересчитать meals содержащие эти recipes (если актуальность важна)
 ```
 
@@ -494,38 +494,38 @@ async function findProductByBarcode(barcode) {
   // 1. Check local DB
   const local = await db.products.findByBarcode(barcode);
   if (local) return local;
-  
+
   // 2. Query OpenFoodFacts
   const response = await fetch(
     `https://world.openfoodfacts.org/api/v2/product/${barcode}.json`,
-    { headers: { 'User-Agent': 'NutriAI/1.0 (contact@nutri-ai.app)' } }
+    { headers: { "User-Agent": "NutriAI/1.0 (contact@nutri-ai.app)" } },
   );
-  
+
   if (response.status === 404) {
     return null;
   }
-  
+
   const data = await response.json();
   if (data.status !== 1) {
     return null;
   }
-  
+
   // 3. Map to our schema
   const product = {
     name: data.product.product_name || data.product.product_name_ru,
     barcode: barcode,
-    kcalPer100g: data.product.nutriments['energy-kcal_100g'],
+    kcalPer100g: data.product.nutriments["energy-kcal_100g"],
     proteinPer100g: data.product.nutriments.proteins_100g,
     fatPer100g: data.product.nutriments.fat_100g,
     carbsPer100g: data.product.nutriments.carbohydrates_100g,
     brand: data.product.brands,
-    source: 'openfoodfacts',
-    isVerified: true
+    source: "openfoodfacts",
+    isVerified: true,
   };
-  
+
   // 4. Save to DB
   await db.products.create(product);
-  
+
   return product;
 }
 ```
@@ -555,7 +555,7 @@ IF Claude API timeout or error:
       }
     }
   }
-  
+
 Frontend: показать форму ручного ввода
 ```
 
@@ -598,6 +598,7 @@ FoodItem может быть в одном из состояний:
 ## Summary
 
 **Ключевые принципы:**
+
 1. Всегда ищем в базе ПЕРЕД AI
 2. AI результаты автоматически кэшируются
 3. Рецепты = набор ссылок на products
@@ -606,6 +607,7 @@ FoodItem может быть в одном из состояний:
 6. Normalize для улучшения поиска
 
 **Оптимизации:**
+
 - Batch запросы к AI (несколько items за раз)
 - Кэширование popular products в Redis
 - Background job для OpenFoodFacts sync

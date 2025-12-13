@@ -17,7 +17,9 @@ interface DatePickerProps {
   onDateChange?: (index: number) => void;
 }
 
-type TranslateFn = (key: "mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun") => string;
+type TranslateFn = (
+  key: "mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun",
+) => string;
 
 const getDefaultDays = (t: TranslateFn): DayData[] => [
   { day: t("mon"), date: 8 },

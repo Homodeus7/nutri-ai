@@ -46,12 +46,8 @@ export const Headings: Story = {
   },
   render: () => (
     <div className="space-y-4">
-      <UiText variant="h1">
-        Taxing Laughter: The Joke Tax Chronicles
-      </UiText>
-      <UiText variant="h2">
-        The People of the Kingdom
-      </UiText>
+      <UiText variant="h1">Taxing Laughter: The Joke Tax Chronicles</UiText>
+      <UiText variant="h2">The People of the Kingdom</UiText>
       <UiText variant="h3">The Joke Tax</UiText>
       <UiText variant="h4">People stopped telling jokes</UiText>
       <UiText variant="p">
@@ -141,29 +137,21 @@ export const Large: Story = {
   args: {
     children: "Default text",
   },
-  render: () => (
-    <UiText variant="large">
-      Are you absolutely sure?
-    </UiText>
-  ),
+  render: () => <UiText variant="large">Are you absolutely sure?</UiText>,
 };
 
 export const Small: Story = {
   args: {
     children: "Default text",
   },
-  render: () => (
-    <UiText variant="small">Email address</UiText>
-  ),
+  render: () => <UiText variant="small">Email address</UiText>,
 };
 
 export const Muted: Story = {
   args: {
     children: "Default text",
   },
-  render: () => (
-    <UiText variant="muted">Enter your email address.</UiText>
-  ),
+  render: () => <UiText variant="muted">Enter your email address.</UiText>,
 };
 
 export const TextAlignment: Story = {
@@ -182,9 +170,8 @@ export const TextAlignment: Story = {
         Right aligned text
       </UiText>
       <UiText variant="p" align="justify">
-        Justified text. Lorem ipsum dolor sit amet, consectetur adipiscing
-        elit. Sed do eiusmod tempor incididunt ut labore et dolore magna
-        aliqua.
+        Justified text. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
       </UiText>
     </div>
   ),
@@ -249,9 +236,7 @@ export const CompleteExample: Story = {
   },
   render: () => (
     <article className="max-w-3xl space-y-6">
-      <UiText variant="h1">
-        The Joke Tax Chronicles
-      </UiText>
+      <UiText variant="h1">The Joke Tax Chronicles</UiText>
 
       <UiText variant="lead">
         Once upon a time, in a far-off land, there was a very lazy king who
@@ -312,8 +297,8 @@ export const CompleteExample: Story = {
 
       <UiText variant="p">
         The king, seeing how much happier his subjects were, realized the error
-        of his ways and repealed the joke tax. Jokester was declared a hero,
-        and the kingdom lived happily ever after.
+        of his ways and repealed the joke tax. Jokester was declared a hero, and
+        the kingdom lived happily ever after.
       </UiText>
 
       <UiText variant="muted">

@@ -5,6 +5,7 @@
 MSW перехватывает API запросы в браузере и возвращает mock данные, позволяя разрабатывать frontend без backend.
 
 **Как работает:**
+
 ```
 Browser Request → Service Worker → MSW Handlers → Mock Response (faker data)
 ```
@@ -28,10 +29,10 @@ NEXT_PUBLIC_API_BASE_URL=https://your-api.com/api
 
 ### Два режима работы
 
-| Режим | USE_MOCK_API | Описание |
-|-------|--------------|----------|
-| **Mock** | `true` | Все запросы перехватываются MSW, возвращаются faker данные, backend не нужен |
-| **Production** | `false` | MSW выключен, запросы идут на real API, нужен backend |
+| Режим          | USE_MOCK_API | Описание                                                                     |
+| -------------- | ------------ | ---------------------------------------------------------------------------- |
+| **Mock**       | `true`       | Все запросы перехватываются MSW, возвращаются faker данные, backend не нужен |
+| **Production** | `false`      | MSW выключен, запросы идут на real API, нужен backend                        |
 
 ---
 
@@ -87,11 +88,13 @@ npm run generate:api
 ```
 
 Orval создает:
+
 - API типы и React Query hooks
 - Mock response generators (faker)
 - MSW handlers для всех endpoints
 
 **Доступные handlers** (в `nutriAIFoodCalorieTrackerAPI.ts`):
+
 ```typescript
 export const getNutriAIFoodCalorieTrackerAPIMock = () => [
   getPostAuthSignupMockHandler(),
@@ -109,6 +112,7 @@ export const getNutriAIFoodCalorieTrackerAPIMock = () => [
 ### Проверка статуса MSW
 
 **Консоль с моками:**
+
 ```
 🔧 Mock API mode enabled
 ✅ MSW started successfully
@@ -116,6 +120,7 @@ export const getNutriAIFoodCalorieTrackerAPIMock = () => [
 ```
 
 **Консоль без моков:**
+
 ```
 📡 Using real API: http://localhost:3333/api
 ```
@@ -123,22 +128,26 @@ export const getNutriAIFoodCalorieTrackerAPIMock = () => [
 ### Типичные проблемы
 
 **"Failed to fetch mockServiceWorker.js"**
+
 ```bash
 npx msw init public/
 ```
 
 **MSW не перехватывает запросы**
+
 - Проверь `.env`: `NEXT_PUBLIC_USE_MOCK_API=true`
 - Hard refresh: `Cmd+Shift+R` (Mac) или `Ctrl+Shift+R` (Windows)
 - Перезапусти dev сервер
 
 **Build fails with MSW error**
+
 - Используй динамические импорты (как в `browser.ts`)
 - Не импортируй MSW напрямую
 
 ### Инспекция mock данных
 
 MSW логирует все перехваченные запросы:
+
 ```
 [MSW] POST /auth/login (200 OK)
 ```
@@ -160,6 +169,7 @@ MSW логирует все перехваченные запросы:
 ## Production
 
 В production:
+
 - Установи `NEXT_PUBLIC_USE_MOCK_API=false`
 - MSW полностью выключен
 - Нет performance impact
