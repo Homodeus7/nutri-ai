@@ -10,7 +10,9 @@
 // This ensures setupWorker is never called on the server
 export async function getWorker() {
   if (typeof window === "undefined") {
-    throw new Error("MSW browser worker can only be used in browser environment");
+    throw new Error(
+      "MSW browser worker can only be used in browser environment",
+    );
   }
 
   const { setupWorker } = await import("msw/browser");

@@ -11,35 +11,15 @@ import {
 } from "@/shared/ui/primitives/card";
 
 interface UiCardLayoutProps extends React.ComponentProps<typeof Card> {
-  /** Header section content */
   header?: {
     title?: React.ReactNode;
     description?: React.ReactNode;
     action?: React.ReactNode;
   };
-  /** Main content */
   children: React.ReactNode;
-  /** Footer section content */
   footer?: React.ReactNode;
 }
 
-/**
- * Universal card layout for modals, forms, and content sections.
- *
- * @example
- * ```tsx
- * <UiCardLayout
- *   header={{
- *     title: "Sign In",
- *     description: "Enter your credentials",
- *     action: <CloseButton />
- *   }}
- *   footer={<Button>Submit</Button>}
- * >
- *   <FormContent />
- * </UiCardLayout>
- * ```
- */
 export function UiCardLayout({
   header,
   children,

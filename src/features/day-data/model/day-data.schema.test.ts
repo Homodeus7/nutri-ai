@@ -15,19 +15,19 @@ describe("dayDateSchema", () => {
 
   it("rejects invalid date formats", () => {
     expect(() => dayDateSchema.parse("2025-1-1")).toThrow(
-      "Date must be in format YYYY-MM-DD"
+      "Date must be in format YYYY-MM-DD",
     );
     expect(() => dayDateSchema.parse("25-10-20")).toThrow(
-      "Date must be in format YYYY-MM-DD"
+      "Date must be in format YYYY-MM-DD",
     );
     expect(() => dayDateSchema.parse("2025/10/20")).toThrow(
-      "Date must be in format YYYY-MM-DD"
+      "Date must be in format YYYY-MM-DD",
     );
     expect(() => dayDateSchema.parse("20-10-2025")).toThrow(
-      "Date must be in format YYYY-MM-DD"
+      "Date must be in format YYYY-MM-DD",
     );
     expect(() => dayDateSchema.parse("")).toThrow(
-      "Date must be in format YYYY-MM-DD"
+      "Date must be in format YYYY-MM-DD",
     );
   });
 

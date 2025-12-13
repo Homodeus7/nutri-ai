@@ -1,10 +1,11 @@
 "use client";
 
-import { Theme, useTheme } from "../model/theme.store";
+import { useTheme } from "next-themes";
 import { UiSelect } from "@/shared/ui";
+import { useEffect, useState } from "react";
 
 type ThemeOption = {
-  id: Theme;
+  id: "light" | "dark";
   label: string;
 };
 
@@ -15,6 +16,15 @@ const themeOptions: ThemeOption[] = [
 
 export function UpdateTheme({ className }: { className?: string }) {
   const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null;
+  }
 
   const themeOption = themeOptions.find((option) => option.id === theme);
   const onChangeTheme = (theme: ThemeOption) => {

@@ -5,6 +5,7 @@
 ## Философия
 
 **Что тестируем:**
+
 - ✅ Zod схемы - валидация и сообщения об ошибках
 - ✅ Zustand stores - сложная логика состояния
 - ✅ Кастомные хуки - только с бизнес-логикой
@@ -12,6 +13,7 @@
 - ✅ Accessibility - WCAG compliance
 
 **Что НЕ тестируем:**
+
 - ❌ UI компоненты (используем Storybook)
 - ❌ Обёртки над библиотеками (cn, utils)
 - ❌ Генерированный API код
@@ -39,6 +41,7 @@ nutri-ai/
 ```
 
 **Правила именования:**
+
 - Юнит-тесты: `*.test.ts` (рядом с файлом)
 - E2E тесты: `*.spec.ts` (в папке `/e2e/`)
 
@@ -97,19 +100,19 @@ describe("signInSchema", () => {
 ### Zustand stores
 
 ```typescript
-// src/features/theme/model/theme.store.test.ts
+// src/features/i18n/model/lang.store.test.ts
 import { describe, expect, it, beforeEach } from "vitest";
-import { useThemeStore } from "./theme.store";
+import { useLang } from "./lang.store";
 
-describe("useThemeStore", () => {
+describe("useLang", () => {
   beforeEach(() => {
-    useThemeStore.setState({ theme: "light" });
+    useLang.setState({ lang: "en" });
   });
 
-  it("должен переключить тему", () => {
-    const { toggleTheme } = useThemeStore.getState();
-    toggleTheme();
-    expect(useThemeStore.getState().theme).toBe("dark");
+  it("должен переключить язык", () => {
+    const { setLang } = useLang.getState();
+    setLang("ru");
+    expect(useLang.getState().lang).toBe("ru");
   });
 });
 ```
@@ -182,11 +185,13 @@ test("не должен иметь проблем с доступностью", 
 ## Отладка
 
 **Vitest:**
+
 ```bash
 npm run test:ui  # Интерактивная отладка
 ```
 
 **Playwright:**
+
 ```bash
 npm run test:e2e:debug    # Inspector
 npm run test:e2e:ui       # UI режим
@@ -199,10 +204,13 @@ await page.pause();  // Пауза для отладки
 ## Частые проблемы
 
 **Cannot find module '@/...'**
+
 - Проверь `vitest.config.ts` → `resolve.alias`
 
 **ReferenceError: document is not defined**
+
 - Добавь `environment: "jsdom"` в `vitest.config.ts`
 
 **Playwright timeout**
+
 - Увеличь `timeout` в `playwright.config.ts`

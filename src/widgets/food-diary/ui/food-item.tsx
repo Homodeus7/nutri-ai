@@ -14,7 +14,9 @@ export function FoodItem({ item, onRemove }: FoodItemProps) {
 
   return (
     <div className="flex items-center justify-between bg-background/50 rounded-lg px-3 py-2 text-sm">
-      <UiText as="span" variant="small" className="truncate flex-1">{item.name}</UiText>
+      <UiText as="span" variant="small" className="truncate flex-1">
+        {item.name}
+      </UiText>
       <div className="flex items-center gap-2">
         <UiText variant="muted" className="text-sm">
           {item.calories} {t("kcal")}

@@ -1,5 +1,5 @@
-import type { Preview } from '@storybook/nextjs';
-import '../src/app/pub/globals.css';
+import type { Preview } from "@storybook/nextjs";
+import "../src/app/pub/globals.css";
 
 const preview: Preview = {
   parameters: {
@@ -10,10 +10,10 @@ const preview: Preview = {
       },
     },
     backgrounds: {
-      default: 'light',
+      default: "light",
       values: [
-        { name: 'light', value: '#ffffff' },
-        { name: 'dark', value: '#0a0a0a' },
+        { name: "light", value: "#ffffff" },
+        { name: "dark", value: "#0a0a0a" },
       ],
     },
   },

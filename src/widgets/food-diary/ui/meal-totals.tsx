@@ -27,7 +27,9 @@ function NutrientProgress({
 
   return (
     <div className="text-center">
-      <UiText variant="muted" className="text-xs">{label}</UiText>
+      <UiText variant="muted" className="text-xs">
+        {label}
+      </UiText>
       <Progress value={percentage} className={`h-1.5 mt-1 ${colorClass}`} />
       <UiText variant="small" weight="medium" className="mt-1">
         {value}
@@ -43,7 +45,9 @@ export function MealTotals({ totals }: MealTotalsProps) {
   return (
     <div className="bg-background/70 rounded-lg p-3 space-y-2">
       <div className="flex justify-between">
-        <UiText variant="small" weight="medium">{t("totalCalories")}</UiText>
+        <UiText variant="small" weight="medium">
+          {t("totalCalories")}
+        </UiText>
         <UiText variant="small" weight="medium">
           {totals.calories} {t("kcal")}
         </UiText>

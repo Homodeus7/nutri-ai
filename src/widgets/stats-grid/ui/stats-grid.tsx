@@ -4,7 +4,10 @@ import { Card, CardContent } from "@/shared/ui/primitives/card";
 import { UiText } from "@/shared/ui/ui-text";
 import { useI18n } from "../i18n";
 
-type TranslateFn = (key: "waterIntake" | "steps" | "ofGoal", params?: Record<string, string>) => string;
+type TranslateFn = (
+  key: "waterIntake" | "steps" | "ofGoal",
+  params?: Record<string, string>,
+) => string;
 
 interface StatCardProps {
   label: string;

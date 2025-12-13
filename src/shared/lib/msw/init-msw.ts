@@ -1,11 +1,5 @@
 import { API_CONFIG } from "../config/api-config";
 
-/**
- * Initialize MSW (Mock Service Worker) for API mocking
- * Only starts in browser when USE_MOCK_API is true
- *
- * @returns Promise that resolves when MSW is ready or immediately if not needed
- */
 export async function initMSW(): Promise<void> {
   // Only run in browser
   if (typeof window === "undefined") {

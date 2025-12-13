@@ -1,5 +1,5 @@
 import { cva, type VariantProps } from "class-variance-authority";
-import { cn } from "@/shared/lib/utils";
+import { cn } from "@/shared/lib/css";
 import { ComponentPropsWithoutRef, ElementType, ReactNode } from "react";
 
 const textVariants = cva("", {
@@ -38,7 +38,6 @@ const textVariants = cva("", {
   },
 });
 
-// Mapping variants to default HTML elements
 const variantElementMap = {
   h1: "h1",
   h2: "h2",
@@ -58,42 +57,11 @@ export type TextVariant = keyof typeof variantElementMap;
 
 export interface UiTextProps<T extends ElementType = ElementType>
   extends VariantProps<typeof textVariants> {
-  /**
-   * The HTML element or React component to render
-   * If not provided, will default to the semantic element for the variant
-   */
   as?: T;
-  /**
-   * Additional CSS classes
-   */
   className?: string;
-  /**
-   * The content to render
-   */
   children: ReactNode;
 }
 
-/**
- * Universal text component inspired by shadcn/ui
- *
- * @example
- * ```tsx
- * // Heading
- * <UiText variant="h1">Page Title</UiText>
- *
- * // Paragraph with custom alignment
- * <UiText variant="p" align="center">Centered text</UiText>
- *
- * // Muted text
- * <UiText variant="muted">Secondary information</UiText>
- *
- * // Custom element with variant styles
- * <UiText variant="h2" as="div">Styled as h2, rendered as div</UiText>
- *
- * // Override font weight
- * <UiText variant="p" weight="bold">Bold paragraph</UiText>
- * ```
- */
 export function UiText<T extends ElementType = "p">({
   variant = "p",
   align,
@@ -102,9 +70,7 @@ export function UiText<T extends ElementType = "p">({
   as,
   children,
   ...props
-}: UiTextProps<T> &
-  Omit<ComponentPropsWithoutRef<T>, keyof UiTextProps<T>>) {
-  // Use provided 'as' prop or default to semantic element for variant
+}: UiTextProps<T> & Omit<ComponentPropsWithoutRef<T>, keyof UiTextProps<T>>) {
   const Component = (as ||
     variantElementMap[variant as TextVariant] ||
     "p") as ElementType;

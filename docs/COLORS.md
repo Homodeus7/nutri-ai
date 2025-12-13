@@ -10,45 +10,45 @@
 
 ### Базовые цвета
 
-| Tailwind класс                           | Назначение                        |
-|------------------------------------------|-----------------------------------|
-| `bg-background` / `text-foreground`      | Основной фон и текст приложения   |
-| `bg-card` / `text-card-foreground`       | Карточки и панели                 |
-| `bg-popover` / `text-popover-foreground` | Всплывающие окна, дропдауны       |
+| Tailwind класс                           | Назначение                      |
+| ---------------------------------------- | ------------------------------- |
+| `bg-background` / `text-foreground`      | Основной фон и текст приложения |
+| `bg-card` / `text-card-foreground`       | Карточки и панели               |
+| `bg-popover` / `text-popover-foreground` | Всплывающие окна, дропдауны     |
 
 ### Семантические цвета
 
-| Tailwind класс                                | Когда использовать                                     |
-|-----------------------------------------------|--------------------------------------------------------|
-| `bg-primary` / `text-primary-foreground`      | Основные кнопки, активные элементы, главные акценты    |
-| `bg-secondary` / `text-secondary-foreground`  | Вторичные кнопки, дополнительные элементы              |
-| `bg-accent` / `text-accent-foreground`        | Hover-эффекты, подсветка, выделение                    |
-| `bg-muted` / `text-muted-foreground`          | Неактивные элементы, вспомогательный текст             |
+| Tailwind класс                                   | Когда использовать                                  |
+| ------------------------------------------------ | --------------------------------------------------- |
+| `bg-primary` / `text-primary-foreground`         | Основные кнопки, активные элементы, главные акценты |
+| `bg-secondary` / `text-secondary-foreground`     | Вторичные кнопки, дополнительные элементы           |
+| `bg-accent` / `text-accent-foreground`           | Hover-эффекты, подсветка, выделение                 |
+| `bg-muted` / `text-muted-foreground`             | Неактивные элементы, вспомогательный текст          |
 | `bg-destructive` / `text-destructive-foreground` | Кнопки удаления, ошибки, предупреждения             |
 
 ### Функциональные цвета
 
-| Tailwind класс  | Назначение                   |
-|-----------------|------------------------------|
-| `border-border` | Границы всех элементов       |
-| `border-input`  | Границы полей ввода          |
-| `ring-ring`     | Обводка фокуса (focus ring)  |
+| Tailwind класс  | Назначение                  |
+| --------------- | --------------------------- |
+| `border-border` | Границы всех элементов      |
+| `border-input`  | Границы полей ввода         |
+| `ring-ring`     | Обводка фокуса (focus ring) |
 
 ### Sidebar (боковая панель)
 
-| Tailwind класс                                        | Назначение               |
-|-------------------------------------------------------|--------------------------|
-| `bg-sidebar` / `text-sidebar-foreground`              | Фон и текст sidebar      |
-| `bg-sidebar-primary` / `text-sidebar-primary-foreground` | Активные пункты меню  |
+| Tailwind класс                                           | Назначение              |
+| -------------------------------------------------------- | ----------------------- |
+| `bg-sidebar` / `text-sidebar-foreground`                 | Фон и текст sidebar     |
+| `bg-sidebar-primary` / `text-sidebar-primary-foreground` | Активные пункты меню    |
 | `bg-sidebar-accent` / `text-sidebar-accent-foreground`   | Hover-эффекты в sidebar |
-| `border-sidebar-border`                               | Границы в sidebar        |
-| `ring-sidebar-ring`                                   | Focus ring в sidebar     |
+| `border-sidebar-border`                                  | Границы в sidebar       |
+| `ring-sidebar-ring`                                      | Focus ring в sidebar    |
 
 ### Цвета графиков
 
-| Tailwind класс               | Назначение                                                                    |
-|------------------------------|-------------------------------------------------------------------------------|
-| `bg-chart-1` до `bg-chart-5` | Цвета для графиков и диаграмм (автоматически меняются в темной теме)         |
+| Tailwind класс               | Назначение                                                           |
+| ---------------------------- | -------------------------------------------------------------------- |
+| `bg-chart-1` до `bg-chart-5` | Цвета для графиков и диаграмм (автоматически меняются в темной теме) |
 
 ## Примеры использования
 
@@ -134,9 +134,7 @@
 
 ```tsx
 // Автоматически адаптируется под тему!
-<div className="bg-background text-foreground">
-  Контент
-</div>
+<div className="bg-background text-foreground">Контент</div>
 ```
 
 Если нужно задать разные стили для разных тем:
