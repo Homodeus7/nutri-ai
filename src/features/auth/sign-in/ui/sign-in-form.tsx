@@ -16,7 +16,7 @@ import { Input } from "@/shared/ui/primitives/input";
 import { Button } from "@/shared/ui/primitives/button";
 import { useSignIn } from "../model/use-sign-in";
 import { useI18n } from "../i18n";
-import { ROUTER_PATHS } from "@/shared/constants";
+import { ROUTER_PATHS } from "@/shared/constants/routes";
 
 export function SignInForm() {
   const { t } = useI18n();
