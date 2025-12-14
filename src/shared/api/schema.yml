@@ -21,6 +21,10 @@ tags:
     description: Управление приёмами пищи
   - name: AI
     description: AI-парсинг текстовых описаний еды
+  - name: Products
+    description: Управление базой продуктов
+  - name: Recipes
+    description: Управление рецептами (кулинарная книга)
   - name: Plans
     description: Планы питания и диеты
   - name: Stats
@@ -164,11 +168,23 @@ components:
         mealId:
           type: string
           format: uuid
+        # Либо productId, либо recipeId
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+          description: "Ссылка на Product"
+        recipeId:
+          type: string
+          format: uuid
+          nullable: true
+          description: "Ссылка на Recipe"
         name:
           type: string
         quantity:
           type: number
           format: float
+          description: "Для продукта - граммы, для рецепта - количество порций"
         unit:
           type: string
           example: g
@@ -186,6 +202,212 @@ components:
           format: float
         source:
           type: string
+          description: "Откуда взят item (product, recipe, ai)"
+
+    Product:
+      type: object
+      required:
+        - id
+        - name
+        - kcalPer100g
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: "Овсянка"
+        normalizedName:
+          type: string
+          example: "ovsyanka"
+          description: "Нормализованное название для поиска"
+        kcalPer100g:
+          type: integer
+          example: 343
+        proteinPer100g:
+          type: number
+          format: float
+          example: 12.6
+        fatPer100g:
+          type: number
+          format: float
+          example: 3.3
+        carbsPer100g:
+          type: number
+          format: float
+          example: 62.1
+        fiberPer100g:
+          type: number
+          format: float
+          nullable: true
+        sugarPer100g:
+          type: number
+          format: float
+          nullable: true
+        source:
+          type: string
+          enum: [manual, ai, openfoodfacts, user]
+          description: "Источник данных"
+        isVerified:
+          type: boolean
+          default: false
+          description: "Проверенный продукт"
+        usageCount:
+          type: integer
+          default: 0
+          description: "Сколько раз использовали"
+        createdBy:
+          type: string
+          format: uuid
+          nullable: true
+          description: "ID пользователя, если создал пользователь"
+        barcode:
+          type: string
+          nullable: true
+          description: "EAN/UPC штрихкод"
+        brand:
+          type: string
+          nullable: true
+        category:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Recipe:
+      type: object
+      required:
+        - id
+        - userId
+        - name
+        - servings
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: "Борщ домашний"
+        description:
+          type: string
+          example: "Мой любимый рецепт борща от бабушки"
+        servings:
+          type: integer
+          minimum: 1
+          example: 4
+          description: "Количество порций в рецепте"
+        category:
+          type: string
+          enum: [breakfast, lunch, dinner, snack, dessert, drink, other]
+        ingredients:
+          type: array
+          items:
+            $ref: "#/components/schemas/RecipeIngredient"
+        # Рассчитанные значения (на весь рецепт)
+        totalKcal:
+          type: integer
+          minimum: 0
+        totalProtein:
+          type: number
+          format: float
+        totalFat:
+          type: number
+          format: float
+        totalCarbs:
+          type: number
+          format: float
+        # На одну порцию (для удобства)
+        kcalPerServing:
+          type: integer
+        proteinPerServing:
+          type: number
+          format: float
+        fatPerServing:
+          type: number
+          format: float
+        carbsPerServing:
+          type: number
+          format: float
+        # Метаданные
+        imageUrl:
+          type: string
+          nullable: true
+        cookingTime:
+          type: integer
+          description: "Время приготовления в минутах"
+          nullable: true
+        usageCount:
+          type: integer
+          default: 0
+          description: "Сколько раз использовали"
+        lastUsedAt:
+          type: string
+          format: date-time
+          nullable: true
+        isPublic:
+          type: boolean
+          default: false
+          description: "Поделиться с другими пользователями"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    RecipeIngredient:
+      type: object
+      required:
+        - productId
+        - quantity
+        - unit
+      properties:
+        id:
+          type: string
+          format: uuid
+        recipeId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+          description: "Ссылка на Product"
+        productName:
+          type: string
+          description: "Закэшированное название для быстрого отображения"
+        quantity:
+          type: number
+          format: float
+          example: 200
+        unit:
+          type: string
+          example: "g"
+        # Рассчитанные значения для этого ингредиента
+        kcal:
+          type: integer
+        protein:
+          type: number
+          format: float
+        fat:
+          type: number
+          format: float
+        carbs:
+          type: number
+          format: float
+        notes:
+          type: string
+          example: "Можно заменить на курицу"
+          nullable: true
 
     DietPlan:
       type: object
@@ -349,22 +571,30 @@ components:
               - unit
               - kcal
             properties:
+              productId:
+                type: string
+                format: uuid
+              recipeId:
+                type: string
+                format: uuid
               name:
                 type: string
               quantity:
                 type: number
+                format: float
               unit:
                 type: string
               kcal:
                 type: integer
               protein:
                 type: number
+                format: float
               fat:
                 type: number
+                format: float
               carbs:
                 type: number
-              source:
-                type: string
+                format: float
         totalKcal:
           type: integer
           minimum: 0
@@ -373,79 +603,298 @@ components:
           enum: [manual, ai]
         aiConfidence:
           type: number
-          minimum: 0
-          maximum: 1
+          format: float
+
+    CreateProductRequest:
+      type: object
+      required:
+        - name
+        - kcalPer100g
+      properties:
+        name:
+          type: string
+        kcalPer100g:
+          type: integer
+        proteinPer100g:
+          type: number
+          format: float
+        fatPer100g:
+          type: number
+          format: float
+        carbsPer100g:
+          type: number
+          format: float
+        fiberPer100g:
+          type: number
+          format: float
+        sugarPer100g:
+          type: number
+          format: float
+        barcode:
+          type: string
+        brand:
+          type: string
+        category:
+          type: string
+        source:
+          type: string
+          enum: [manual, ai, openfoodfacts]
+          default: manual
+
+    UpdateProductRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        kcalPer100g:
+          type: integer
+        proteinPer100g:
+          type: number
+          format: float
+        fatPer100g:
+          type: number
+          format: float
+        carbsPer100g:
+          type: number
+          format: float
+        fiberPer100g:
+          type: number
+          format: float
+        sugarPer100g:
+          type: number
+          format: float
+        barcode:
+          type: string
+        brand:
+          type: string
+        category:
+          type: string
+
+    CreateRecipeRequest:
+      type: object
+      required:
+        - name
+        - servings
+        - ingredients
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        servings:
+          type: integer
+          minimum: 1
+        category:
+          type: string
+          enum: [breakfast, lunch, dinner, snack, dessert, drink, other]
+        ingredients:
+          type: array
+          items:
+            type: object
+            required:
+              - productId
+              - quantity
+              - unit
+            properties:
+              productId:
+                type: string
+                format: uuid
+              quantity:
+                type: number
+                format: float
+              unit:
+                type: string
+              notes:
+                type: string
+        cookingTime:
+          type: integer
+        imageUrl:
+          type: string
+        isPublic:
+          type: boolean
+
+    UpdateRecipeRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        servings:
+          type: integer
+          minimum: 1
+        category:
+          type: string
+        ingredients:
+          type: array
+          items:
+            type: object
+            properties:
+              productId:
+                type: string
+                format: uuid
+              quantity:
+                type: number
+                format: float
+              unit:
+                type: string
+              notes:
+                type: string
+        cookingTime:
+          type: integer
+        imageUrl:
+          type: string
+        isPublic:
+          type: boolean
+
+    AddRecipeToMealRequest:
+      type: object
+      required:
+        - date
+        - mealType
+        - servings
+      properties:
+        date:
+          type: string
+          format: date
+          example: "2025-12-03"
+        mealType:
+          type: string
+          enum: [breakfast, lunch, dinner, snack, other]
+        servings:
+          type: number
+          format: float
+          example: 1.5
+          description: "Количество порций (можно дробное)"
+        time:
+          type: string
+          pattern: "^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$"
 
     AiParseMealRequest:
       type: object
       required:
         - text
       properties:
-        userId:
-          type: string
-          format: uuid
-        date:
-          type: string
-          format: date
-          example: "2025-10-20"
         text:
           type: string
-          maxLength: 2048
           example: "завтрак: овсянка 50 г с бананом и мёдом, кофе с молоком"
 
     AiParseMealResponse:
       type: object
       properties:
-        parsedItems:
-          type: array
-          items:
-            type: object
-            properties:
-              name:
-                type: string
-              quantity:
-                type: number
-              unit:
-                type: string
-              kcal:
-                type: integer
-              protein:
-                type: number
-              fat:
-                type: number
-              carbs:
-                type: number
-              confidence:
-                type: number
-                minimum: 0
-                maximum: 1
-        totalKcal:
-          type: integer
-          minimum: 0
-        warnings:
+        parsed:
+          type: object
+          properties:
+            type:
+              type: string
+              enum: [breakfast, lunch, dinner, snack, other]
+            items:
+              type: array
+              items:
+                type: object
+                properties:
+                  rawText:
+                    type: string
+                  parsedName:
+                    type: string
+                  quantity:
+                    type: number
+                    format: float
+                  unit:
+                    type: string
+                  productSuggestions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        productId:
+                          type: string
+                          format: uuid
+                        name:
+                          type: string
+                        kcalPer100g:
+                          type: integer
+                        source:
+                          type: string
+                        matchScore:
+                          type: number
+                          format: float
+                  recipeSuggestions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        recipeId:
+                          type: string
+                          format: uuid
+                        name:
+                          type: string
+                        kcalPerServing:
+                          type: integer
+                        servings:
+                          type: integer
+                        usageCount:
+                          type: integer
+                        matchScore:
+                          type: number
+                          format: float
+                  aiFallback:
+                    type: object
+                    nullable: true
+                    properties:
+                      name:
+                        type: string
+                      kcalPer100g:
+                        type: integer
+                      proteinPer100g:
+                        type: number
+                        format: float
+                      fatPer100g:
+                        type: number
+                        format: float
+                      carbsPer100g:
+                        type: number
+                        format: float
+                      confidence:
+                        type: number
+                        format: float
+        needsReview:
           type: array
           items:
             type: string
+          description: "Список items с низким confidence"
 
     StatsResponse:
       type: object
       properties:
-        from:
-          type: string
-          format: date
-        to:
-          type: string
-          format: date
-        totalKcal:
-          type: integer
+        period:
+          type: object
+          properties:
+            from:
+              type: string
+              format: date
+            to:
+              type: string
+              format: date
         averageKcal:
           type: number
-        averageGoalCompletion:
-          type: number
-        days:
-          type: array
-          items:
-            $ref: "#/components/schemas/CalendarDay"
+          format: float
+        totalKcal:
+          type: integer
+        daysTracked:
+          type: integer
+        averageMacros:
+          type: object
+          properties:
+            protein:
+              type: number
+              format: float
+            fat:
+              type: number
+              format: float
+            carbs:
+              type: number
+              format: float
 
     Error:
       type: object
@@ -458,26 +907,29 @@ components:
           type: object
 
   responses:
+    BadRequest:
+      description: Некорректные данные
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
     Unauthorized:
-      description: Не авторизован
+      description: Требуется авторизация
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/Error"
     NotFound:
-      description: Не найдено
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/Error"
-    BadRequest:
-      description: Некорректный запрос
+      description: Ресурс не найден
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/Error"
 
 paths:
+  # ========================================
+  # AUTH
+  # ========================================
   /auth/signup:
     post:
       tags:
@@ -554,6 +1006,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
+  # ========================================
+  # CALENDAR
+  # ========================================
   /calendar:
     get:
       tags:
@@ -586,6 +1041,9 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
 
+  # ========================================
+  # DAY
+  # ========================================
   /day/{date}:
     get:
       tags:
@@ -646,6 +1104,9 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
 
+  # ========================================
+  # MEALS
+  # ========================================
   /meals/{id}:
     put:
       tags:
@@ -701,6 +1162,9 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
 
+  # ========================================
+  # AI
+  # ========================================
   /ai/parse-meal:
     post:
       tags:
@@ -732,6 +1196,485 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
+  # ========================================
+  # PRODUCTS
+  # ========================================
+  /products:
+    get:
+      tags:
+        - Products
+      summary: Получить список продуктов
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: "Поиск по названию"
+        - in: query
+          name: category
+          schema:
+            type: string
+        - in: query
+          name: source
+          schema:
+            type: string
+            enum: [manual, ai, openfoodfacts, user]
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: Список продуктов
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  products:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Product"
+                  total:
+                    type: integer
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+    post:
+      tags:
+        - Products
+      summary: Создать новый продукт
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProductRequest"
+      responses:
+        "201":
+          description: Продукт создан
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /products/search:
+    get:
+      tags:
+        - Products
+      summary: Поиск продуктов (для автокомплита)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: q
+          required: true
+          schema:
+            type: string
+          example: "овся"
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: Список найденных продуктов
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  products:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Product"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /products/{id}:
+    get:
+      tags:
+        - Products
+      summary: Получить продукт по ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Данные продукта
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    put:
+      tags:
+        - Products
+      summary: Обновить продукт
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProductRequest"
+      responses:
+        "200":
+          description: Продукт обновлён
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    delete:
+      tags:
+        - Products
+      summary: Удалить продукт
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Продукт удалён
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /products/barcode/{barcode}:
+    get:
+      tags:
+        - Products
+      summary: Поиск продукта по штрихкоду
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: barcode
+          required: true
+          schema:
+            type: string
+          example: "4607065597009"
+      responses:
+        "200":
+          description: Продукт найден
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "404":
+          description: Продукт не найден
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  # ========================================
+  # RECIPES
+  # ========================================
+  /recipes:
+    get:
+      tags:
+        - Recipes
+      summary: Получить список рецептов пользователя
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: category
+          schema:
+            type: string
+            enum: [breakfast, lunch, dinner, snack, dessert, drink, other]
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: "Поиск по названию"
+        - in: query
+          name: sort
+          schema:
+            type: string
+            enum: [recent, popular, name]
+            default: recent
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: Список рецептов
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  recipes:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Recipe"
+                  total:
+                    type: integer
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+    post:
+      tags:
+        - Recipes
+      summary: Создать новый рецепт
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateRecipeRequest"
+      responses:
+        "201":
+          description: Рецепт создан
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Recipe"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /recipes/{id}:
+    get:
+      tags:
+        - Recipes
+      summary: Получить рецепт
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Данные рецепта
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Recipe"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    put:
+      tags:
+        - Recipes
+      summary: Обновить рецепт
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateRecipeRequest"
+      responses:
+        "200":
+          description: Рецепт обновлён
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Recipe"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    delete:
+      tags:
+        - Recipes
+      summary: Удалить рецепт
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Рецепт удалён
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /recipes/{id}/duplicate:
+    post:
+      tags:
+        - Recipes
+      summary: Дублировать рецепт (для редактирования чужого)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "201":
+          description: Копия создана
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Recipe"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /recipes/{id}/add-to-meal:
+    post:
+      tags:
+        - Recipes
+      summary: Добавить рецепт в приём пищи
+      description: "Создаёт meal из рецепта с указанным количеством порций"
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddRecipeToMealRequest"
+      responses:
+        "201":
+          description: Meal создан
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Meal"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /recipes/public:
+    get:
+      tags:
+        - Recipes
+      summary: Поиск публичных рецептов
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: search
+          schema:
+            type: string
+        - in: query
+          name: category
+          schema:
+            type: string
+        - in: query
+          name: maxKcal
+          schema:
+            type: integer
+          description: "Фильтр по калориям на порцию"
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: Публичные рецепты
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  recipes:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Recipe"
+
+  # ========================================
+  # PLANS
+  # ========================================
   /plans:
     get:
       tags:
@@ -791,6 +1734,9 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
 
+  # ========================================
+  # STATS
+  # ========================================
   /stats:
     get:
       tags:
