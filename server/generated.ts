@@ -75,7 +75,18 @@ export interface Meal {
 export interface FoodItem {
   id: string;
   mealId: string;
+  /**
+   * Ссылка на Product
+   * @nullable
+   */
+  productId?: string | null;
+  /**
+   * Ссылка на Recipe
+   * @nullable
+   */
+  recipeId?: string | null;
   name: string;
+  /** Для продукта - граммы, для рецепта - количество порций */
   quantity: number;
   unit: string;
   /** @minimum 0 */
@@ -83,7 +94,127 @@ export interface FoodItem {
   protein?: number;
   fat?: number;
   carbs?: number;
+  /** Откуда взят item (product, recipe, ai) */
   source?: string;
+}
+
+/**
+ * Источник данных
+ */
+export type ProductSource = (typeof ProductSource)[keyof typeof ProductSource];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ProductSource = {
+  manual: "manual",
+  ai: "ai",
+  openfoodfacts: "openfoodfacts",
+  user: "user",
+} as const;
+
+export interface Product {
+  id: string;
+  name: string;
+  /** Нормализованное название для поиска */
+  normalizedName?: string;
+  kcalPer100g: number;
+  proteinPer100g?: number;
+  fatPer100g?: number;
+  carbsPer100g?: number;
+  /** @nullable */
+  fiberPer100g?: number | null;
+  /** @nullable */
+  sugarPer100g?: number | null;
+  /** Источник данных */
+  source?: ProductSource;
+  /** Проверенный продукт */
+  isVerified?: boolean;
+  /** Сколько раз использовали */
+  usageCount?: number;
+  /**
+   * ID пользователя, если создал пользователь
+   * @nullable
+   */
+  createdBy?: string | null;
+  /**
+   * EAN/UPC штрихкод
+   * @nullable
+   */
+  barcode?: string | null;
+  /** @nullable */
+  brand?: string | null;
+  /** @nullable */
+  category?: string | null;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export type RecipeCategory =
+  (typeof RecipeCategory)[keyof typeof RecipeCategory];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const RecipeCategory = {
+  breakfast: "breakfast",
+  lunch: "lunch",
+  dinner: "dinner",
+  snack: "snack",
+  dessert: "dessert",
+  drink: "drink",
+  other: "other",
+} as const;
+
+export interface Recipe {
+  id: string;
+  userId: string;
+  name: string;
+  description?: string;
+  /**
+   * Количество порций в рецепте
+   * @minimum 1
+   */
+  servings: number;
+  category?: RecipeCategory;
+  ingredients?: RecipeIngredient[];
+  /** @minimum 0 */
+  totalKcal?: number;
+  totalProtein?: number;
+  totalFat?: number;
+  totalCarbs?: number;
+  kcalPerServing?: number;
+  proteinPerServing?: number;
+  fatPerServing?: number;
+  carbsPerServing?: number;
+  /** @nullable */
+  imageUrl?: string | null;
+  /**
+   * Время приготовления в минутах
+   * @nullable
+   */
+  cookingTime?: number | null;
+  /** Сколько раз использовали */
+  usageCount?: number;
+  /** @nullable */
+  lastUsedAt?: string | null;
+  /** Поделиться с другими пользователями */
+  isPublic?: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RecipeIngredient {
+  id?: string;
+  recipeId?: string;
+  /** Ссылка на Product */
+  productId: string;
+  /** Закэшированное название для быстрого отображения */
+  productName?: string;
+  quantity: number;
+  unit: string;
+  kcal?: number;
+  protein?: number;
+  fat?: number;
+  carbs?: number;
+  /** @nullable */
+  notes?: string | null;
 }
 
 export type DietPlanMacros = {
@@ -169,6 +300,8 @@ export const CreateMealRequestType = {
 } as const;
 
 export type CreateMealRequestItemsItem = {
+  productId?: string;
+  recipeId?: string;
   name: string;
   quantity: number;
   unit: string;
@@ -176,7 +309,6 @@ export type CreateMealRequestItemsItem = {
   protein?: number;
   fat?: number;
   carbs?: number;
-  source?: string;
 };
 
 export type CreateMealRequestSource =
@@ -197,49 +329,203 @@ export interface CreateMealRequest {
   /** @minimum 0 */
   totalKcal: number;
   source: CreateMealRequestSource;
-  /**
-   * @minimum 0
-   * @maximum 1
-   */
   aiConfidence?: number;
 }
 
+export type CreateProductRequestSource =
+  (typeof CreateProductRequestSource)[keyof typeof CreateProductRequestSource];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CreateProductRequestSource = {
+  manual: "manual",
+  ai: "ai",
+  openfoodfacts: "openfoodfacts",
+} as const;
+
+export interface CreateProductRequest {
+  name: string;
+  kcalPer100g: number;
+  proteinPer100g?: number;
+  fatPer100g?: number;
+  carbsPer100g?: number;
+  fiberPer100g?: number;
+  sugarPer100g?: number;
+  barcode?: string;
+  brand?: string;
+  category?: string;
+  source?: CreateProductRequestSource;
+}
+
+export interface UpdateProductRequest {
+  name?: string;
+  kcalPer100g?: number;
+  proteinPer100g?: number;
+  fatPer100g?: number;
+  carbsPer100g?: number;
+  fiberPer100g?: number;
+  sugarPer100g?: number;
+  barcode?: string;
+  brand?: string;
+  category?: string;
+}
+
+export type CreateRecipeRequestCategory =
+  (typeof CreateRecipeRequestCategory)[keyof typeof CreateRecipeRequestCategory];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CreateRecipeRequestCategory = {
+  breakfast: "breakfast",
+  lunch: "lunch",
+  dinner: "dinner",
+  snack: "snack",
+  dessert: "dessert",
+  drink: "drink",
+  other: "other",
+} as const;
+
+export type CreateRecipeRequestIngredientsItem = {
+  productId: string;
+  quantity: number;
+  unit: string;
+  notes?: string;
+};
+
+export interface CreateRecipeRequest {
+  name: string;
+  description?: string;
+  /** @minimum 1 */
+  servings: number;
+  category?: CreateRecipeRequestCategory;
+  ingredients: CreateRecipeRequestIngredientsItem[];
+  cookingTime?: number;
+  imageUrl?: string;
+  isPublic?: boolean;
+}
+
+export type UpdateRecipeRequestIngredientsItem = {
+  productId?: string;
+  quantity?: number;
+  unit?: string;
+  notes?: string;
+};
+
+export interface UpdateRecipeRequest {
+  name?: string;
+  description?: string;
+  /** @minimum 1 */
+  servings?: number;
+  category?: string;
+  ingredients?: UpdateRecipeRequestIngredientsItem[];
+  cookingTime?: number;
+  imageUrl?: string;
+  isPublic?: boolean;
+}
+
+export type AddRecipeToMealRequestMealType =
+  (typeof AddRecipeToMealRequestMealType)[keyof typeof AddRecipeToMealRequestMealType];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const AddRecipeToMealRequestMealType = {
+  breakfast: "breakfast",
+  lunch: "lunch",
+  dinner: "dinner",
+  snack: "snack",
+  other: "other",
+} as const;
+
+export interface AddRecipeToMealRequest {
+  date: string;
+  mealType: AddRecipeToMealRequestMealType;
+  /** Количество порций (можно дробное) */
+  servings: number;
+  /** @pattern ^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$ */
+  time?: string;
+}
+
 export interface AiParseMealRequest {
-  userId?: string;
-  date?: string;
-  /** @maxLength 2048 */
   text: string;
 }
 
-export type AiParseMealResponseParsedItemsItem = {
+export type AiParseMealResponseParsedType =
+  (typeof AiParseMealResponseParsedType)[keyof typeof AiParseMealResponseParsedType];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const AiParseMealResponseParsedType = {
+  breakfast: "breakfast",
+  lunch: "lunch",
+  dinner: "dinner",
+  snack: "snack",
+  other: "other",
+} as const;
+
+export type AiParseMealResponseParsedItemsItemProductSuggestionsItem = {
+  productId?: string;
   name?: string;
+  kcalPer100g?: number;
+  source?: string;
+  matchScore?: number;
+};
+
+export type AiParseMealResponseParsedItemsItemRecipeSuggestionsItem = {
+  recipeId?: string;
+  name?: string;
+  kcalPerServing?: number;
+  servings?: number;
+  usageCount?: number;
+  matchScore?: number;
+};
+
+/**
+ * @nullable
+ */
+export type AiParseMealResponseParsedItemsItemAiFallback = {
+  name?: string;
+  kcalPer100g?: number;
+  proteinPer100g?: number;
+  fatPer100g?: number;
+  carbsPer100g?: number;
+  confidence?: number;
+} | null;
+
+export type AiParseMealResponseParsedItemsItem = {
+  rawText?: string;
+  parsedName?: string;
   quantity?: number;
   unit?: string;
-  kcal?: number;
-  protein?: number;
-  fat?: number;
-  carbs?: number;
-  /**
-   * @minimum 0
-   * @maximum 1
-   */
-  confidence?: number;
+  productSuggestions?: AiParseMealResponseParsedItemsItemProductSuggestionsItem[];
+  recipeSuggestions?: AiParseMealResponseParsedItemsItemRecipeSuggestionsItem[];
+  /** @nullable */
+  aiFallback?: AiParseMealResponseParsedItemsItemAiFallback;
+};
+
+export type AiParseMealResponseParsed = {
+  type?: AiParseMealResponseParsedType;
+  items?: AiParseMealResponseParsedItemsItem[];
 };
 
 export interface AiParseMealResponse {
-  parsedItems?: AiParseMealResponseParsedItemsItem[];
-  /** @minimum 0 */
-  totalKcal?: number;
-  warnings?: string[];
+  parsed?: AiParseMealResponseParsed;
+  /** Список items с низким confidence */
+  needsReview?: string[];
 }
 
-export interface StatsResponse {
+export type StatsResponsePeriod = {
   from?: string;
   to?: string;
-  totalKcal?: number;
+};
+
+export type StatsResponseAverageMacros = {
+  protein?: number;
+  fat?: number;
+  carbs?: number;
+};
+
+export interface StatsResponse {
+  period?: StatsResponsePeriod;
   averageKcal?: number;
-  averageGoalCompletion?: number;
-  days?: CalendarDay[];
+  totalKcal?: number;
+  daysTracked?: number;
+  averageMacros?: StatsResponseAverageMacros;
 }
 
 export type ErrorDetails = { [key: string]: unknown };
@@ -251,19 +537,19 @@ export interface Error {
 }
 
 /**
- * Не авторизован
+ * Некорректные данные
+ */
+export type BadRequestResponse = Error;
+
+/**
+ * Требуется авторизация
  */
 export type UnauthorizedResponse = Error;
 
 /**
- * Не найдено
+ * Ресурс не найден
  */
 export type NotFoundResponse = Error;
-
-/**
- * Некорректный запрос
- */
-export type BadRequestResponse = Error;
 
 export type GetCalendarParams = {
   /**
@@ -275,6 +561,96 @@ export type GetCalendarParams = {
 export type GetCalendar200 = {
   month?: string;
   days?: CalendarDay[];
+};
+
+export type GetProductsParams = {
+  /**
+   * Поиск по названию
+   */
+  search?: string;
+  category?: string;
+  source?: GetProductsSource;
+  limit?: number;
+  offset?: number;
+};
+
+export type GetProductsSource =
+  (typeof GetProductsSource)[keyof typeof GetProductsSource];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const GetProductsSource = {
+  manual: "manual",
+  ai: "ai",
+  openfoodfacts: "openfoodfacts",
+  user: "user",
+} as const;
+
+export type GetProducts200 = {
+  products?: Product[];
+  total?: number;
+};
+
+export type GetProductsSearchParams = {
+  q: string;
+  limit?: number;
+};
+
+export type GetProductsSearch200 = {
+  products?: Product[];
+};
+
+export type GetRecipesParams = {
+  category?: GetRecipesCategory;
+  /**
+   * Поиск по названию
+   */
+  search?: string;
+  sort?: GetRecipesSort;
+  limit?: number;
+  offset?: number;
+};
+
+export type GetRecipesCategory =
+  (typeof GetRecipesCategory)[keyof typeof GetRecipesCategory];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const GetRecipesCategory = {
+  breakfast: "breakfast",
+  lunch: "lunch",
+  dinner: "dinner",
+  snack: "snack",
+  dessert: "dessert",
+  drink: "drink",
+  other: "other",
+} as const;
+
+export type GetRecipesSort =
+  (typeof GetRecipesSort)[keyof typeof GetRecipesSort];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const GetRecipesSort = {
+  recent: "recent",
+  popular: "popular",
+  name: "name",
+} as const;
+
+export type GetRecipes200 = {
+  recipes?: Recipe[];
+  total?: number;
+};
+
+export type GetRecipesPublicParams = {
+  search?: string;
+  category?: string;
+  /**
+   * Фильтр по калориям на порцию
+   */
+  maxKcal?: number;
+  limit?: number;
+};
+
+export type GetRecipesPublic200 = {
+  recipes?: Recipe[];
 };
 
 export type GetPlans200 = {
@@ -392,6 +768,176 @@ export const postAiParseMeal = <TData = AxiosResponse<AiParseMealResponse>>(
 };
 
 /**
+ * @summary Получить список продуктов
+ */
+export const getProducts = <TData = AxiosResponse<GetProducts200>>(
+  params?: GetProductsParams,
+  options?: AxiosRequestConfig,
+): Promise<TData> => {
+  return axios.get(`/products`, {
+    ...options,
+    params: { ...params, ...options?.params },
+  });
+};
+
+/**
+ * @summary Создать новый продукт
+ */
+export const postProducts = <TData = AxiosResponse<Product>>(
+  createProductRequest: CreateProductRequest,
+  options?: AxiosRequestConfig,
+): Promise<TData> => {
+  return axios.post(`/products`, createProductRequest, options);
+};
+
+/**
+ * @summary Поиск продуктов (для автокомплита)
+ */
+export const getProductsSearch = <TData = AxiosResponse<GetProductsSearch200>>(
+  params: GetProductsSearchParams,
+  options?: AxiosRequestConfig,
+): Promise<TData> => {
+  return axios.get(`/products/search`, {
+    ...options,
+    params: { ...params, ...options?.params },
+  });
+};
+
+/**
+ * @summary Получить продукт по ID
+ */
+export const getProductsId = <TData = AxiosResponse<Product>>(
+  id: string,
+  options?: AxiosRequestConfig,
+): Promise<TData> => {
+  return axios.get(`/products/${id}`, options);
+};
+
+/**
+ * @summary Обновить продукт
+ */
+export const putProductsId = <TData = AxiosResponse<Product>>(
+  id: string,
+  updateProductRequest: UpdateProductRequest,
+  options?: AxiosRequestConfig,
+): Promise<TData> => {
+  return axios.put(`/products/${id}`, updateProductRequest, options);
+};
+
+/**
+ * @summary Удалить продукт
+ */
+export const deleteProductsId = <TData = AxiosResponse<void>>(
+  id: string,
+  options?: AxiosRequestConfig,
+): Promise<TData> => {
+  return axios.delete(`/products/${id}`, options);
+};
+
+/**
+ * @summary Поиск продукта по штрихкоду
+ */
+export const getProductsBarcodeBarcode = <TData = AxiosResponse<Product>>(
+  barcode: string,
+  options?: AxiosRequestConfig,
+): Promise<TData> => {
+  return axios.get(`/products/barcode/${barcode}`, options);
+};
+
+/**
+ * @summary Получить список рецептов пользователя
+ */
+export const getRecipes = <TData = AxiosResponse<GetRecipes200>>(
+  params?: GetRecipesParams,
+  options?: AxiosRequestConfig,
+): Promise<TData> => {
+  return axios.get(`/recipes`, {
+    ...options,
+    params: { ...params, ...options?.params },
+  });
+};
+
+/**
+ * @summary Создать новый рецепт
+ */
+export const postRecipes = <TData = AxiosResponse<Recipe>>(
+  createRecipeRequest: CreateRecipeRequest,
+  options?: AxiosRequestConfig,
+): Promise<TData> => {
+  return axios.post(`/recipes`, createRecipeRequest, options);
+};
+
+/**
+ * @summary Получить рецепт
+ */
+export const getRecipesId = <TData = AxiosResponse<Recipe>>(
+  id: string,
+  options?: AxiosRequestConfig,
+): Promise<TData> => {
+  return axios.get(`/recipes/${id}`, options);
+};
+
+/**
+ * @summary Обновить рецепт
+ */
+export const putRecipesId = <TData = AxiosResponse<Recipe>>(
+  id: string,
+  updateRecipeRequest: UpdateRecipeRequest,
+  options?: AxiosRequestConfig,
+): Promise<TData> => {
+  return axios.put(`/recipes/${id}`, updateRecipeRequest, options);
+};
+
+/**
+ * @summary Удалить рецепт
+ */
+export const deleteRecipesId = <TData = AxiosResponse<void>>(
+  id: string,
+  options?: AxiosRequestConfig,
+): Promise<TData> => {
+  return axios.delete(`/recipes/${id}`, options);
+};
+
+/**
+ * @summary Дублировать рецепт (для редактирования чужого)
+ */
+export const postRecipesIdDuplicate = <TData = AxiosResponse<Recipe>>(
+  id: string,
+  options?: AxiosRequestConfig,
+): Promise<TData> => {
+  return axios.post(`/recipes/${id}/duplicate`, undefined, options);
+};
+
+/**
+ * Создаёт meal из рецепта с указанным количеством порций
+ * @summary Добавить рецепт в приём пищи
+ */
+export const postRecipesIdAddToMeal = <TData = AxiosResponse<Meal>>(
+  id: string,
+  addRecipeToMealRequest: AddRecipeToMealRequest,
+  options?: AxiosRequestConfig,
+): Promise<TData> => {
+  return axios.post(
+    `/recipes/${id}/add-to-meal`,
+    addRecipeToMealRequest,
+    options,
+  );
+};
+
+/**
+ * @summary Поиск публичных рецептов
+ */
+export const getRecipesPublic = <TData = AxiosResponse<GetRecipesPublic200>>(
+  params?: GetRecipesPublicParams,
+  options?: AxiosRequestConfig,
+): Promise<TData> => {
+  return axios.get(`/recipes/public`, {
+    ...options,
+    params: { ...params, ...options?.params },
+  });
+};
+
+/**
  * @summary Получить список планов
  */
 export const getPlans = <TData = AxiosResponse<GetPlans200>>(
@@ -436,6 +982,21 @@ export type PostDayDateMealsResult = AxiosResponse<Meal>;
 export type PutMealsIdResult = AxiosResponse<Meal>;
 export type DeleteMealsIdResult = AxiosResponse<void>;
 export type PostAiParseMealResult = AxiosResponse<AiParseMealResponse>;
+export type GetProductsResult = AxiosResponse<GetProducts200>;
+export type PostProductsResult = AxiosResponse<Product>;
+export type GetProductsSearchResult = AxiosResponse<GetProductsSearch200>;
+export type GetProductsIdResult = AxiosResponse<Product>;
+export type PutProductsIdResult = AxiosResponse<Product>;
+export type DeleteProductsIdResult = AxiosResponse<void>;
+export type GetProductsBarcodeBarcodeResult = AxiosResponse<Product>;
+export type GetRecipesResult = AxiosResponse<GetRecipes200>;
+export type PostRecipesResult = AxiosResponse<Recipe>;
+export type GetRecipesIdResult = AxiosResponse<Recipe>;
+export type PutRecipesIdResult = AxiosResponse<Recipe>;
+export type DeleteRecipesIdResult = AxiosResponse<void>;
+export type PostRecipesIdDuplicateResult = AxiosResponse<Recipe>;
+export type PostRecipesIdAddToMealResult = AxiosResponse<Meal>;
+export type GetRecipesPublicResult = AxiosResponse<GetRecipesPublic200>;
 export type GetPlansResult = AxiosResponse<GetPlans200>;
 export type PostPlansIdApplyResult = AxiosResponse<PostPlansIdApply200>;
 export type GetStatsResult = AxiosResponse<StatsResponse>;
