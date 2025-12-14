@@ -2,7 +2,7 @@
 
 import { useI18n } from "../i18n";
 import { SignUpForm, AuthLayout } from "@/features/auth";
-import { ROUTER_PATHS } from "@/shared/constants";
+import { ROUTER_PATHS } from "@/shared/constants/routes";
 import Link from "next/link";
 
 export function SignUpPage() {

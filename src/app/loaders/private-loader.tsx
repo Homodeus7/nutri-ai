@@ -3,7 +3,7 @@
 // import { TasksProvider } from "@/entities/task";
 // import { UsersProvider } from "@/entities/user";
 import { api } from "@/shared/api";
-// import { ROUTER_PATHS } from "@/shared/constants";
+// import { ROUTER_PATHS } from "@/shared/constants/routes";
 import { ComposeChildren, useEventCallback } from "@/shared/lib/react";
 import { UiPageSpinner } from "@/shared/ui";
 import { useRouter } from "next/router";

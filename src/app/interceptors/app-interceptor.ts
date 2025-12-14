@@ -1,5 +1,5 @@
 import { apiInstance } from "@/shared/api/api-instance";
-import { ROUTER_PATHS } from "@/shared/constants";
+import { ROUTER_PATHS } from "@/shared/constants/routes";
 import { useEventCallback } from "@/shared/lib/react";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
