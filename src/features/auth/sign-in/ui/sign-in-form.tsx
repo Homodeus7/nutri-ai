@@ -17,9 +17,11 @@ import { Button } from "@/shared/ui/primitives/button";
 import { useSignIn } from "../model/use-sign-in";
 import { useI18n } from "../i18n";
 import { ROUTER_PATHS } from "@/shared/constants";
+import { useTimezone } from "@/shared/lib/use-timezone";
 
 export function SignInForm() {
   const { t } = useI18n();
+  const timezone = useTimezone();
 
   // Zod schema with i18n translations
   const signInSchema = z.object({
@@ -51,7 +53,7 @@ export function SignInForm() {
   });
 
   const onSubmit = form.handleSubmit((data) => {
-    signIn(data);
+    signIn({ ...data, timezone });
   });
 
   return (

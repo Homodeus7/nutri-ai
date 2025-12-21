@@ -528,6 +528,9 @@ components:
         password:
           type: string
           format: password
+        timezone:
+          type: string
+          example: Europe/Moscow
 
     GoogleAuthRequest:
       type: object
@@ -537,6 +540,9 @@ components:
         idToken:
           type: string
           description: Google ID token from Gmail OAuth
+        timezone:
+          type: string
+          example: Europe/Moscow
 
     AuthResponse:
       type: object
