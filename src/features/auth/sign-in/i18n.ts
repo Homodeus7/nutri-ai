@@ -50,4 +50,8 @@ export const useI18n = createI18nModule({
     en: "Password must be at least 8 characters",
     ru: "Пароль должен содержать минимум 8 символов",
   },
+  or: {
+    en: "or",
+    ru: "или",
+  },
 } as const);

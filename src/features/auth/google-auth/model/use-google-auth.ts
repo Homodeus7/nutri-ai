@@ -1,25 +1,20 @@
-import { usePostAuthLogin } from "@/shared/api/generated/nutriAIFoodCalorieTrackerAPI";
+import { usePostAuthGoogle } from "@/shared/api/generated/nutriAIFoodCalorieTrackerAPI";
 import { useAuthStore } from "@/entities/auth";
 import { useRouter } from "next/navigation";
+import { CredentialResponse } from "@react-oauth/google";
 
-export interface SignInFormData {
-  email: string;
-  password: string;
-  timezone?: string;
-}
-
-export interface UseSignInOptions {
+export interface UseGoogleAuthOptions {
   onSuccess?: () => void;
   onError?: (error: Error) => void;
   redirectTo?: string;
 }
 
-export function useSignIn(options?: UseSignInOptions) {
+export function useGoogleAuth(options?: UseGoogleAuthOptions) {
   const { onSuccess, onError, redirectTo = "/" } = options || {};
   const router = useRouter();
   const setAuth = useAuthStore((state) => state.setAuth);
 
-  const mutation = usePostAuthLogin({
+  const mutation = usePostAuthGoogle({
     mutation: {
       onSuccess: (response) => {
         if (response?.token && response?.user) {
@@ -35,18 +30,25 @@ export function useSignIn(options?: UseSignInOptions) {
     },
   });
 
-  const signIn = async (data: SignInFormData) => {
+  const handleGoogleLogin = async (
+    credentialResponse: CredentialResponse,
+    timezone?: string
+  ) => {
+    if (!credentialResponse.credential) {
+      onError?.(new Error("No credential received from Google"));
+      return;
+    }
+
     return mutation.mutate({
       data: {
-        email: data.email,
-        password: data.password,
-        timezone: data.timezone,
+        idToken: credentialResponse.credential,
+        timezone,
       },
     });
   };
 
   return {
-    signIn,
+    handleGoogleLogin,
     isPending: mutation.isPending,
     isError: mutation.isError,
     error: mutation.error,

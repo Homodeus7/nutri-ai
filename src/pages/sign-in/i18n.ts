@@ -17,4 +17,8 @@ export const useI18n = createI18nModule({
     en: "Sign up",
     ru: "Зарегистрироваться",
   },
+  or: {
+    en: "or",
+    ru: "или",
+  },
 } as const);
