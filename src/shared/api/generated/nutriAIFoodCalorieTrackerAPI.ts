@@ -95,7 +95,18 @@ export interface Meal {
 export interface FoodItem {
   id: string;
   mealId: string;
+  /**
+   * Ссылка на Product
+   * @nullable
+   */
+  productId?: string | null;
+  /**
+   * Ссылка на Recipe
+   * @nullable
+   */
+  recipeId?: string | null;
   name: string;
+  /** Для продукта - граммы, для рецепта - количество порций */
   quantity: number;
   unit: string;
   /** @minimum 0 */
@@ -103,7 +114,127 @@ export interface FoodItem {
   protein?: number;
   fat?: number;
   carbs?: number;
+  /** Откуда взят item (product, recipe, ai) */
   source?: string;
+}
+
+/**
+ * Источник данных
+ */
+export type ProductSource = (typeof ProductSource)[keyof typeof ProductSource];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ProductSource = {
+  manual: "manual",
+  ai: "ai",
+  openfoodfacts: "openfoodfacts",
+  user: "user",
+} as const;
+
+export interface Product {
+  id: string;
+  name: string;
+  /** Нормализованное название для поиска */
+  normalizedName?: string;
+  kcalPer100g: number;
+  proteinPer100g?: number;
+  fatPer100g?: number;
+  carbsPer100g?: number;
+  /** @nullable */
+  fiberPer100g?: number | null;
+  /** @nullable */
+  sugarPer100g?: number | null;
+  /** Источник данных */
+  source?: ProductSource;
+  /** Проверенный продукт */
+  isVerified?: boolean;
+  /** Сколько раз использовали */
+  usageCount?: number;
+  /**
+   * ID пользователя, если создал пользователь
+   * @nullable
+   */
+  createdBy?: string | null;
+  /**
+   * EAN/UPC штрихкод
+   * @nullable
+   */
+  barcode?: string | null;
+  /** @nullable */
+  brand?: string | null;
+  /** @nullable */
+  category?: string | null;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export type RecipeCategory =
+  (typeof RecipeCategory)[keyof typeof RecipeCategory];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const RecipeCategory = {
+  breakfast: "breakfast",
+  lunch: "lunch",
+  dinner: "dinner",
+  snack: "snack",
+  dessert: "dessert",
+  drink: "drink",
+  other: "other",
+} as const;
+
+export interface Recipe {
+  id: string;
+  userId: string;
+  name: string;
+  description?: string;
+  /**
+   * Количество порций в рецепте
+   * @minimum 1
+   */
+  servings: number;
+  category?: RecipeCategory;
+  ingredients?: RecipeIngredient[];
+  /** @minimum 0 */
+  totalKcal?: number;
+  totalProtein?: number;
+  totalFat?: number;
+  totalCarbs?: number;
+  kcalPerServing?: number;
+  proteinPerServing?: number;
+  fatPerServing?: number;
+  carbsPerServing?: number;
+  /** @nullable */
+  imageUrl?: string | null;
+  /**
+   * Время приготовления в минутах
+   * @nullable
+   */
+  cookingTime?: number | null;
+  /** Сколько раз использовали */
+  usageCount?: number;
+  /** @nullable */
+  lastUsedAt?: string | null;
+  /** Поделиться с другими пользователями */
+  isPublic?: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RecipeIngredient {
+  id?: string;
+  recipeId?: string;
+  /** Ссылка на Product */
+  productId: string;
+  /** Закэшированное название для быстрого отображения */
+  productName?: string;
+  quantity: number;
+  unit: string;
+  kcal?: number;
+  protein?: number;
+  fat?: number;
+  carbs?: number;
+  /** @nullable */
+  notes?: string | null;
 }
 
 export type DietPlanMacros = {
@@ -164,11 +295,13 @@ export interface SignupRequest {
 export interface LoginRequest {
   email: string;
   password: string;
+  timezone?: string;
 }
 
 export interface GoogleAuthRequest {
   /** Google ID token from Gmail OAuth */
   idToken: string;
+  timezone?: string;
 }
 
 export interface AuthResponse {
@@ -189,6 +322,8 @@ export const CreateMealRequestType = {
 } as const;
 
 export type CreateMealRequestItemsItem = {
+  productId?: string;
+  recipeId?: string;
   name: string;
   quantity: number;
   unit: string;
@@ -196,7 +331,6 @@ export type CreateMealRequestItemsItem = {
   protein?: number;
   fat?: number;
   carbs?: number;
-  source?: string;
 };
 
 export type CreateMealRequestSource =
@@ -217,49 +351,203 @@ export interface CreateMealRequest {
   /** @minimum 0 */
   totalKcal: number;
   source: CreateMealRequestSource;
-  /**
-   * @minimum 0
-   * @maximum 1
-   */
   aiConfidence?: number;
 }
 
+export type CreateProductRequestSource =
+  (typeof CreateProductRequestSource)[keyof typeof CreateProductRequestSource];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CreateProductRequestSource = {
+  manual: "manual",
+  ai: "ai",
+  openfoodfacts: "openfoodfacts",
+} as const;
+
+export interface CreateProductRequest {
+  name: string;
+  kcalPer100g: number;
+  proteinPer100g?: number;
+  fatPer100g?: number;
+  carbsPer100g?: number;
+  fiberPer100g?: number;
+  sugarPer100g?: number;
+  barcode?: string;
+  brand?: string;
+  category?: string;
+  source?: CreateProductRequestSource;
+}
+
+export interface UpdateProductRequest {
+  name?: string;
+  kcalPer100g?: number;
+  proteinPer100g?: number;
+  fatPer100g?: number;
+  carbsPer100g?: number;
+  fiberPer100g?: number;
+  sugarPer100g?: number;
+  barcode?: string;
+  brand?: string;
+  category?: string;
+}
+
+export type CreateRecipeRequestCategory =
+  (typeof CreateRecipeRequestCategory)[keyof typeof CreateRecipeRequestCategory];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CreateRecipeRequestCategory = {
+  breakfast: "breakfast",
+  lunch: "lunch",
+  dinner: "dinner",
+  snack: "snack",
+  dessert: "dessert",
+  drink: "drink",
+  other: "other",
+} as const;
+
+export type CreateRecipeRequestIngredientsItem = {
+  productId: string;
+  quantity: number;
+  unit: string;
+  notes?: string;
+};
+
+export interface CreateRecipeRequest {
+  name: string;
+  description?: string;
+  /** @minimum 1 */
+  servings: number;
+  category?: CreateRecipeRequestCategory;
+  ingredients: CreateRecipeRequestIngredientsItem[];
+  cookingTime?: number;
+  imageUrl?: string;
+  isPublic?: boolean;
+}
+
+export type UpdateRecipeRequestIngredientsItem = {
+  productId?: string;
+  quantity?: number;
+  unit?: string;
+  notes?: string;
+};
+
+export interface UpdateRecipeRequest {
+  name?: string;
+  description?: string;
+  /** @minimum 1 */
+  servings?: number;
+  category?: string;
+  ingredients?: UpdateRecipeRequestIngredientsItem[];
+  cookingTime?: number;
+  imageUrl?: string;
+  isPublic?: boolean;
+}
+
+export type AddRecipeToMealRequestMealType =
+  (typeof AddRecipeToMealRequestMealType)[keyof typeof AddRecipeToMealRequestMealType];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const AddRecipeToMealRequestMealType = {
+  breakfast: "breakfast",
+  lunch: "lunch",
+  dinner: "dinner",
+  snack: "snack",
+  other: "other",
+} as const;
+
+export interface AddRecipeToMealRequest {
+  date: string;
+  mealType: AddRecipeToMealRequestMealType;
+  /** Количество порций (можно дробное) */
+  servings: number;
+  /** @pattern ^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$ */
+  time?: string;
+}
+
 export interface AiParseMealRequest {
-  userId?: string;
-  date?: string;
-  /** @maxLength 2048 */
   text: string;
 }
 
-export type AiParseMealResponseParsedItemsItem = {
+export type AiParseMealResponseParsedType =
+  (typeof AiParseMealResponseParsedType)[keyof typeof AiParseMealResponseParsedType];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const AiParseMealResponseParsedType = {
+  breakfast: "breakfast",
+  lunch: "lunch",
+  dinner: "dinner",
+  snack: "snack",
+  other: "other",
+} as const;
+
+export type AiParseMealResponseParsedItemsItemProductSuggestionsItem = {
+  productId?: string;
   name?: string;
+  kcalPer100g?: number;
+  source?: string;
+  matchScore?: number;
+};
+
+export type AiParseMealResponseParsedItemsItemRecipeSuggestionsItem = {
+  recipeId?: string;
+  name?: string;
+  kcalPerServing?: number;
+  servings?: number;
+  usageCount?: number;
+  matchScore?: number;
+};
+
+/**
+ * @nullable
+ */
+export type AiParseMealResponseParsedItemsItemAiFallback = {
+  name?: string;
+  kcalPer100g?: number;
+  proteinPer100g?: number;
+  fatPer100g?: number;
+  carbsPer100g?: number;
+  confidence?: number;
+} | null;
+
+export type AiParseMealResponseParsedItemsItem = {
+  rawText?: string;
+  parsedName?: string;
   quantity?: number;
   unit?: string;
-  kcal?: number;
-  protein?: number;
-  fat?: number;
-  carbs?: number;
-  /**
-   * @minimum 0
-   * @maximum 1
-   */
-  confidence?: number;
+  productSuggestions?: AiParseMealResponseParsedItemsItemProductSuggestionsItem[];
+  recipeSuggestions?: AiParseMealResponseParsedItemsItemRecipeSuggestionsItem[];
+  /** @nullable */
+  aiFallback?: AiParseMealResponseParsedItemsItemAiFallback;
+};
+
+export type AiParseMealResponseParsed = {
+  type?: AiParseMealResponseParsedType;
+  items?: AiParseMealResponseParsedItemsItem[];
 };
 
 export interface AiParseMealResponse {
-  parsedItems?: AiParseMealResponseParsedItemsItem[];
-  /** @minimum 0 */
-  totalKcal?: number;
-  warnings?: string[];
+  parsed?: AiParseMealResponseParsed;
+  /** Список items с низким confidence */
+  needsReview?: string[];
 }
 
-export interface StatsResponse {
+export type StatsResponsePeriod = {
   from?: string;
   to?: string;
-  totalKcal?: number;
+};
+
+export type StatsResponseAverageMacros = {
+  protein?: number;
+  fat?: number;
+  carbs?: number;
+};
+
+export interface StatsResponse {
+  period?: StatsResponsePeriod;
   averageKcal?: number;
-  averageGoalCompletion?: number;
-  days?: CalendarDay[];
+  totalKcal?: number;
+  daysTracked?: number;
+  averageMacros?: StatsResponseAverageMacros;
 }
 
 export type ErrorDetails = { [key: string]: unknown };
@@ -271,19 +559,19 @@ export interface Error {
 }
 
 /**
- * Не авторизован
+ * Некорректные данные
+ */
+export type BadRequestResponse = Error;
+
+/**
+ * Требуется авторизация
  */
 export type UnauthorizedResponse = Error;
 
 /**
- * Не найдено
+ * Ресурс не найден
  */
 export type NotFoundResponse = Error;
-
-/**
- * Некорректный запрос
- */
-export type BadRequestResponse = Error;
 
 export type GetCalendarParams = {
   /**
@@ -295,6 +583,96 @@ export type GetCalendarParams = {
 export type GetCalendar200 = {
   month?: string;
   days?: CalendarDay[];
+};
+
+export type GetProductsParams = {
+  /**
+   * Поиск по названию
+   */
+  search?: string;
+  category?: string;
+  source?: GetProductsSource;
+  limit?: number;
+  offset?: number;
+};
+
+export type GetProductsSource =
+  (typeof GetProductsSource)[keyof typeof GetProductsSource];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const GetProductsSource = {
+  manual: "manual",
+  ai: "ai",
+  openfoodfacts: "openfoodfacts",
+  user: "user",
+} as const;
+
+export type GetProducts200 = {
+  products?: Product[];
+  total?: number;
+};
+
+export type GetProductsSearchParams = {
+  q: string;
+  limit?: number;
+};
+
+export type GetProductsSearch200 = {
+  products?: Product[];
+};
+
+export type GetRecipesParams = {
+  category?: GetRecipesCategory;
+  /**
+   * Поиск по названию
+   */
+  search?: string;
+  sort?: GetRecipesSort;
+  limit?: number;
+  offset?: number;
+};
+
+export type GetRecipesCategory =
+  (typeof GetRecipesCategory)[keyof typeof GetRecipesCategory];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const GetRecipesCategory = {
+  breakfast: "breakfast",
+  lunch: "lunch",
+  dinner: "dinner",
+  snack: "snack",
+  dessert: "dessert",
+  drink: "drink",
+  other: "other",
+} as const;
+
+export type GetRecipesSort =
+  (typeof GetRecipesSort)[keyof typeof GetRecipesSort];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const GetRecipesSort = {
+  recent: "recent",
+  popular: "popular",
+  name: "name",
+} as const;
+
+export type GetRecipes200 = {
+  recipes?: Recipe[];
+  total?: number;
+};
+
+export type GetRecipesPublicParams = {
+  search?: string;
+  category?: string;
+  /**
+   * Фильтр по калориям на порцию
+   */
+  maxKcal?: number;
+  limit?: number;
+};
+
+export type GetRecipesPublic200 = {
+  recipes?: Recipe[];
 };
 
 export type GetPlans200 = {
@@ -315,20 +693,26 @@ export type GetStatsParams = {
   to: string;
 };
 
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
 /**
  * @summary Регистрация нового пользователя
  */
 export const postAuthSignup = (
   signupRequest: BodyType<SignupRequest>,
+  options?: SecondParameter<typeof createInstance>,
   signal?: AbortSignal,
 ) => {
-  return createInstance<AuthResponse>({
-    url: `/auth/signup`,
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    data: signupRequest,
-    signal,
-  });
+  return createInstance<AuthResponse>(
+    {
+      url: `/auth/signup`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: signupRequest,
+      signal,
+    },
+    options,
+  );
 };
 
 export const getPostAuthSignupMutationOptions = <
@@ -341,6 +725,7 @@ export const getPostAuthSignupMutationOptions = <
     { data: BodyType<SignupRequest> },
     TContext
   >;
+  request?: SecondParameter<typeof createInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof postAuthSignup>>,
   TError,
@@ -348,13 +733,13 @@ export const getPostAuthSignupMutationOptions = <
   TContext
 > => {
   const mutationKey = ["postAuthSignup"];
-  const { mutation: mutationOptions } = options
+  const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation &&
       "mutationKey" in options.mutation &&
       options.mutation.mutationKey
       ? options
       : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey } };
+    : { mutation: { mutationKey }, request: undefined };
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof postAuthSignup>>,
@@ -362,7 +747,7 @@ export const getPostAuthSignupMutationOptions = <
   > = (props) => {
     const { data } = props ?? {};
 
-    return postAuthSignup(data);
+    return postAuthSignup(data, requestOptions);
   };
 
   return { mutationFn, ...mutationOptions };
@@ -388,6 +773,7 @@ export const usePostAuthSignup = <
       { data: BodyType<SignupRequest> },
       TContext
     >;
+    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseMutationResult<
@@ -406,15 +792,19 @@ export const usePostAuthSignup = <
  */
 export const postAuthLogin = (
   loginRequest: BodyType<LoginRequest>,
+  options?: SecondParameter<typeof createInstance>,
   signal?: AbortSignal,
 ) => {
-  return createInstance<AuthResponse>({
-    url: `/auth/login`,
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    data: loginRequest,
-    signal,
-  });
+  return createInstance<AuthResponse>(
+    {
+      url: `/auth/login`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: loginRequest,
+      signal,
+    },
+    options,
+  );
 };
 
 export const getPostAuthLoginMutationOptions = <
@@ -427,6 +817,7 @@ export const getPostAuthLoginMutationOptions = <
     { data: BodyType<LoginRequest> },
     TContext
   >;
+  request?: SecondParameter<typeof createInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof postAuthLogin>>,
   TError,
@@ -434,13 +825,13 @@ export const getPostAuthLoginMutationOptions = <
   TContext
 > => {
   const mutationKey = ["postAuthLogin"];
-  const { mutation: mutationOptions } = options
+  const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation &&
       "mutationKey" in options.mutation &&
       options.mutation.mutationKey
       ? options
       : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey } };
+    : { mutation: { mutationKey }, request: undefined };
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof postAuthLogin>>,
@@ -448,7 +839,7 @@ export const getPostAuthLoginMutationOptions = <
   > = (props) => {
     const { data } = props ?? {};
 
-    return postAuthLogin(data);
+    return postAuthLogin(data, requestOptions);
   };
 
   return { mutationFn, ...mutationOptions };
@@ -471,6 +862,7 @@ export const usePostAuthLogin = <TError = ErrorType<Error>, TContext = unknown>(
       { data: BodyType<LoginRequest> },
       TContext
     >;
+    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseMutationResult<
@@ -490,15 +882,19 @@ export const usePostAuthLogin = <TError = ErrorType<Error>, TContext = unknown>(
  */
 export const postAuthGoogle = (
   googleAuthRequest: BodyType<GoogleAuthRequest>,
+  options?: SecondParameter<typeof createInstance>,
   signal?: AbortSignal,
 ) => {
-  return createInstance<AuthResponse>({
-    url: `/auth/google`,
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    data: googleAuthRequest,
-    signal,
-  });
+  return createInstance<AuthResponse>(
+    {
+      url: `/auth/google`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: googleAuthRequest,
+      signal,
+    },
+    options,
+  );
 };
 
 export const getPostAuthGoogleMutationOptions = <
@@ -511,6 +907,7 @@ export const getPostAuthGoogleMutationOptions = <
     { data: BodyType<GoogleAuthRequest> },
     TContext
   >;
+  request?: SecondParameter<typeof createInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof postAuthGoogle>>,
   TError,
@@ -518,13 +915,13 @@ export const getPostAuthGoogleMutationOptions = <
   TContext
 > => {
   const mutationKey = ["postAuthGoogle"];
-  const { mutation: mutationOptions } = options
+  const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation &&
       "mutationKey" in options.mutation &&
       options.mutation.mutationKey
       ? options
       : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey } };
+    : { mutation: { mutationKey }, request: undefined };
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof postAuthGoogle>>,
@@ -532,7 +929,7 @@ export const getPostAuthGoogleMutationOptions = <
   > = (props) => {
     const { data } = props ?? {};
 
-    return postAuthGoogle(data);
+    return postAuthGoogle(data, requestOptions);
   };
 
   return { mutationFn, ...mutationOptions };
@@ -558,6 +955,7 @@ export const usePostAuthGoogle = <
       { data: BodyType<GoogleAuthRequest> },
       TContext
     >;
+    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseMutationResult<
@@ -576,14 +974,13 @@ export const usePostAuthGoogle = <
  */
 export const getCalendar = (
   params: GetCalendarParams,
+  options?: SecondParameter<typeof createInstance>,
   signal?: AbortSignal,
 ) => {
-  return createInstance<GetCalendar200>({
-    url: `/calendar`,
-    method: "GET",
-    params,
-    signal,
-  });
+  return createInstance<GetCalendar200>(
+    { url: `/calendar`, method: "GET", params, signal },
+    options,
+  );
 };
 
 export const getGetCalendarQueryKey = (params?: GetCalendarParams) => {
@@ -599,15 +996,16 @@ export const getGetCalendarQueryOptions = <
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getCalendar>>, TError, TData>
     >;
+    request?: SecondParameter<typeof createInstance>;
   },
 ) => {
-  const { query: queryOptions } = options ?? {};
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
   const queryKey = queryOptions?.queryKey ?? getGetCalendarQueryKey(params);
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof getCalendar>>> = ({
     signal,
-  }) => getCalendar(params, signal);
+  }) => getCalendar(params, requestOptions, signal);
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof getCalendar>>,
@@ -638,6 +1036,7 @@ export function useGetCalendar<
         >,
         "initialData"
       >;
+    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): DefinedUseQueryResult<TData, TError> & {
@@ -660,6 +1059,7 @@ export function useGetCalendar<
         >,
         "initialData"
       >;
+    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
@@ -674,6 +1074,7 @@ export function useGetCalendar<
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getCalendar>>, TError, TData>
     >;
+    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
@@ -692,6 +1093,7 @@ export function useGetCalendar<
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getCalendar>>, TError, TData>
     >;
+    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
@@ -712,12 +1114,15 @@ export function useGetCalendar<
 /**
  * @summary Получить данные за день
  */
-export const getDayDate = (date: string, signal?: AbortSignal) => {
-  return createInstance<DayEntry>({
-    url: `/day/${date}`,
-    method: "GET",
-    signal,
-  });
+export const getDayDate = (
+  date: string,
+  options?: SecondParameter<typeof createInstance>,
+  signal?: AbortSignal,
+) => {
+  return createInstance<DayEntry>(
+    { url: `/day/${date}`, method: "GET", signal },
+    options,
+  );
 };
 
 export const getGetDayDateQueryKey = (date?: string) => {
@@ -733,15 +1138,16 @@ export const getGetDayDateQueryOptions = <
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getDayDate>>, TError, TData>
     >;
+    request?: SecondParameter<typeof createInstance>;
   },
 ) => {
-  const { query: queryOptions } = options ?? {};
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
   const queryKey = queryOptions?.queryKey ?? getGetDayDateQueryKey(date);
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof getDayDate>>> = ({
     signal,
-  }) => getDayDate(date, signal);
+  }) => getDayDate(date, requestOptions, signal);
 
   return {
     queryKey,
@@ -779,6 +1185,7 @@ export function useGetDayDate<
         >,
         "initialData"
       >;
+    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): DefinedUseQueryResult<TData, TError> & {
@@ -801,6 +1208,7 @@ export function useGetDayDate<
         >,
         "initialData"
       >;
+    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
@@ -815,6 +1223,7 @@ export function useGetDayDate<
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getDayDate>>, TError, TData>
     >;
+    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
@@ -833,6 +1242,7 @@ export function useGetDayDate<
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getDayDate>>, TError, TData>
     >;
+    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
@@ -856,15 +1266,19 @@ export function useGetDayDate<
 export const postDayDateMeals = (
   date: string,
   createMealRequest: BodyType<CreateMealRequest>,
+  options?: SecondParameter<typeof createInstance>,
   signal?: AbortSignal,
 ) => {
-  return createInstance<Meal>({
-    url: `/day/${date}/meals`,
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    data: createMealRequest,
-    signal,
-  });
+  return createInstance<Meal>(
+    {
+      url: `/day/${date}/meals`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: createMealRequest,
+      signal,
+    },
+    options,
+  );
 };
 
 export const getPostDayDateMealsMutationOptions = <
@@ -877,6 +1291,7 @@ export const getPostDayDateMealsMutationOptions = <
     { date: string; data: BodyType<CreateMealRequest> },
     TContext
   >;
+  request?: SecondParameter<typeof createInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof postDayDateMeals>>,
   TError,
@@ -884,13 +1299,13 @@ export const getPostDayDateMealsMutationOptions = <
   TContext
 > => {
   const mutationKey = ["postDayDateMeals"];
-  const { mutation: mutationOptions } = options
+  const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation &&
       "mutationKey" in options.mutation &&
       options.mutation.mutationKey
       ? options
       : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey } };
+    : { mutation: { mutationKey }, request: undefined };
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof postDayDateMeals>>,
@@ -898,7 +1313,7 @@ export const getPostDayDateMealsMutationOptions = <
   > = (props) => {
     const { date, data } = props ?? {};
 
-    return postDayDateMeals(date, data);
+    return postDayDateMeals(date, data, requestOptions);
   };
 
   return { mutationFn, ...mutationOptions };
@@ -926,6 +1341,7 @@ export const usePostDayDateMeals = <
       { date: string; data: BodyType<CreateMealRequest> },
       TContext
     >;
+    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseMutationResult<
@@ -945,13 +1361,17 @@ export const usePostDayDateMeals = <
 export const putMealsId = (
   id: string,
   createMealRequest: BodyType<CreateMealRequest>,
+  options?: SecondParameter<typeof createInstance>,
 ) => {
-  return createInstance<Meal>({
-    url: `/meals/${id}`,
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    data: createMealRequest,
-  });
+  return createInstance<Meal>(
+    {
+      url: `/meals/${id}`,
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      data: createMealRequest,
+    },
+    options,
+  );
 };
 
 export const getPutMealsIdMutationOptions = <
@@ -966,6 +1386,7 @@ export const getPutMealsIdMutationOptions = <
     { id: string; data: BodyType<CreateMealRequest> },
     TContext
   >;
+  request?: SecondParameter<typeof createInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof putMealsId>>,
   TError,
@@ -973,13 +1394,13 @@ export const getPutMealsIdMutationOptions = <
   TContext
 > => {
   const mutationKey = ["putMealsId"];
-  const { mutation: mutationOptions } = options
+  const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation &&
       "mutationKey" in options.mutation &&
       options.mutation.mutationKey
       ? options
       : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey } };
+    : { mutation: { mutationKey }, request: undefined };
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof putMealsId>>,
@@ -987,7 +1408,7 @@ export const getPutMealsIdMutationOptions = <
   > = (props) => {
     const { id, data } = props ?? {};
 
-    return putMealsId(id, data);
+    return putMealsId(id, data, requestOptions);
   };
 
   return { mutationFn, ...mutationOptions };
@@ -1017,6 +1438,7 @@ export const usePutMealsId = <
       { id: string; data: BodyType<CreateMealRequest> },
       TContext
     >;
+    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseMutationResult<
@@ -1033,8 +1455,14 @@ export const usePutMealsId = <
 /**
  * @summary Удалить приём пищи
  */
-export const deleteMealsId = (id: string) => {
-  return createInstance<void>({ url: `/meals/${id}`, method: "DELETE" });
+export const deleteMealsId = (
+  id: string,
+  options?: SecondParameter<typeof createInstance>,
+) => {
+  return createInstance<void>(
+    { url: `/meals/${id}`, method: "DELETE" },
+    options,
+  );
 };
 
 export const getDeleteMealsIdMutationOptions = <
@@ -1047,6 +1475,7 @@ export const getDeleteMealsIdMutationOptions = <
     { id: string },
     TContext
   >;
+  request?: SecondParameter<typeof createInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof deleteMealsId>>,
   TError,
@@ -1054,13 +1483,13 @@ export const getDeleteMealsIdMutationOptions = <
   TContext
 > => {
   const mutationKey = ["deleteMealsId"];
-  const { mutation: mutationOptions } = options
+  const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation &&
       "mutationKey" in options.mutation &&
       options.mutation.mutationKey
       ? options
       : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey } };
+    : { mutation: { mutationKey }, request: undefined };
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof deleteMealsId>>,
@@ -1068,7 +1497,7 @@ export const getDeleteMealsIdMutationOptions = <
   > = (props) => {
     const { id } = props ?? {};
 
-    return deleteMealsId(id);
+    return deleteMealsId(id, requestOptions);
   };
 
   return { mutationFn, ...mutationOptions };
@@ -1096,6 +1525,7 @@ export const useDeleteMealsId = <
       { id: string },
       TContext
     >;
+    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseMutationResult<
@@ -1114,15 +1544,19 @@ export const useDeleteMealsId = <
  */
 export const postAiParseMeal = (
   aiParseMealRequest: BodyType<AiParseMealRequest>,
+  options?: SecondParameter<typeof createInstance>,
   signal?: AbortSignal,
 ) => {
-  return createInstance<AiParseMealResponse>({
-    url: `/ai/parse-meal`,
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    data: aiParseMealRequest,
-    signal,
-  });
+  return createInstance<AiParseMealResponse>(
+    {
+      url: `/ai/parse-meal`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: aiParseMealRequest,
+      signal,
+    },
+    options,
+  );
 };
 
 export const getPostAiParseMealMutationOptions = <
@@ -1135,6 +1569,7 @@ export const getPostAiParseMealMutationOptions = <
     { data: BodyType<AiParseMealRequest> },
     TContext
   >;
+  request?: SecondParameter<typeof createInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof postAiParseMeal>>,
   TError,
@@ -1142,13 +1577,13 @@ export const getPostAiParseMealMutationOptions = <
   TContext
 > => {
   const mutationKey = ["postAiParseMeal"];
-  const { mutation: mutationOptions } = options
+  const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation &&
       "mutationKey" in options.mutation &&
       options.mutation.mutationKey
       ? options
       : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey } };
+    : { mutation: { mutationKey }, request: undefined };
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof postAiParseMeal>>,
@@ -1156,7 +1591,7 @@ export const getPostAiParseMealMutationOptions = <
   > = (props) => {
     const { data } = props ?? {};
 
-    return postAiParseMeal(data);
+    return postAiParseMeal(data, requestOptions);
   };
 
   return { mutationFn, ...mutationOptions };
@@ -1184,6 +1619,7 @@ export const usePostAiParseMeal = <
       { data: BodyType<AiParseMealRequest> },
       TContext
     >;
+    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseMutationResult<
@@ -1198,10 +1634,1845 @@ export const usePostAiParseMeal = <
 };
 
 /**
+ * @summary Получить список продуктов
+ */
+export const getProducts = (
+  params?: GetProductsParams,
+  options?: SecondParameter<typeof createInstance>,
+  signal?: AbortSignal,
+) => {
+  return createInstance<GetProducts200>(
+    { url: `/products`, method: "GET", params, signal },
+    options,
+  );
+};
+
+export const getGetProductsQueryKey = (params?: GetProductsParams) => {
+  return [`/products`, ...(params ? [params] : [])] as const;
+};
+
+export const getGetProductsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getProducts>>,
+  TError = ErrorType<UnauthorizedResponse>,
+>(
+  params?: GetProductsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getProducts>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetProductsQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getProducts>>> = ({
+    signal,
+  }) => getProducts(params, requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getProducts>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetProductsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getProducts>>
+>;
+export type GetProductsQueryError = ErrorType<UnauthorizedResponse>;
+
+export function useGetProducts<
+  TData = Awaited<ReturnType<typeof getProducts>>,
+  TError = ErrorType<UnauthorizedResponse>,
+>(
+  params: undefined | GetProductsParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getProducts>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getProducts>>,
+          TError,
+          Awaited<ReturnType<typeof getProducts>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetProducts<
+  TData = Awaited<ReturnType<typeof getProducts>>,
+  TError = ErrorType<UnauthorizedResponse>,
+>(
+  params?: GetProductsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getProducts>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getProducts>>,
+          TError,
+          Awaited<ReturnType<typeof getProducts>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetProducts<
+  TData = Awaited<ReturnType<typeof getProducts>>,
+  TError = ErrorType<UnauthorizedResponse>,
+>(
+  params?: GetProductsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getProducts>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Получить список продуктов
+ */
+
+export function useGetProducts<
+  TData = Awaited<ReturnType<typeof getProducts>>,
+  TError = ErrorType<UnauthorizedResponse>,
+>(
+  params?: GetProductsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getProducts>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetProductsQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary Создать новый продукт
+ */
+export const postProducts = (
+  createProductRequest: BodyType<CreateProductRequest>,
+  options?: SecondParameter<typeof createInstance>,
+  signal?: AbortSignal,
+) => {
+  return createInstance<Product>(
+    {
+      url: `/products`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: createProductRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostProductsMutationOptions = <
+  TError = ErrorType<BadRequestResponse | UnauthorizedResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postProducts>>,
+    TError,
+    { data: BodyType<CreateProductRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof createInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postProducts>>,
+  TError,
+  { data: BodyType<CreateProductRequest> },
+  TContext
+> => {
+  const mutationKey = ["postProducts"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postProducts>>,
+    { data: BodyType<CreateProductRequest> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postProducts(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostProductsMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postProducts>>
+>;
+export type PostProductsMutationBody = BodyType<CreateProductRequest>;
+export type PostProductsMutationError = ErrorType<
+  BadRequestResponse | UnauthorizedResponse
+>;
+
+/**
+ * @summary Создать новый продукт
+ */
+export const usePostProducts = <
+  TError = ErrorType<BadRequestResponse | UnauthorizedResponse>,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postProducts>>,
+      TError,
+      { data: BodyType<CreateProductRequest> },
+      TContext
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postProducts>>,
+  TError,
+  { data: BodyType<CreateProductRequest> },
+  TContext
+> => {
+  const mutationOptions = getPostProductsMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Поиск продуктов (для автокомплита)
+ */
+export const getProductsSearch = (
+  params: GetProductsSearchParams,
+  options?: SecondParameter<typeof createInstance>,
+  signal?: AbortSignal,
+) => {
+  return createInstance<GetProductsSearch200>(
+    { url: `/products/search`, method: "GET", params, signal },
+    options,
+  );
+};
+
+export const getGetProductsSearchQueryKey = (
+  params?: GetProductsSearchParams,
+) => {
+  return [`/products/search`, ...(params ? [params] : [])] as const;
+};
+
+export const getGetProductsSearchQueryOptions = <
+  TData = Awaited<ReturnType<typeof getProductsSearch>>,
+  TError = ErrorType<UnauthorizedResponse>,
+>(
+  params: GetProductsSearchParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getProductsSearch>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetProductsSearchQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getProductsSearch>>
+  > = ({ signal }) => getProductsSearch(params, requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getProductsSearch>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetProductsSearchQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getProductsSearch>>
+>;
+export type GetProductsSearchQueryError = ErrorType<UnauthorizedResponse>;
+
+export function useGetProductsSearch<
+  TData = Awaited<ReturnType<typeof getProductsSearch>>,
+  TError = ErrorType<UnauthorizedResponse>,
+>(
+  params: GetProductsSearchParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getProductsSearch>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getProductsSearch>>,
+          TError,
+          Awaited<ReturnType<typeof getProductsSearch>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetProductsSearch<
+  TData = Awaited<ReturnType<typeof getProductsSearch>>,
+  TError = ErrorType<UnauthorizedResponse>,
+>(
+  params: GetProductsSearchParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getProductsSearch>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getProductsSearch>>,
+          TError,
+          Awaited<ReturnType<typeof getProductsSearch>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetProductsSearch<
+  TData = Awaited<ReturnType<typeof getProductsSearch>>,
+  TError = ErrorType<UnauthorizedResponse>,
+>(
+  params: GetProductsSearchParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getProductsSearch>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Поиск продуктов (для автокомплита)
+ */
+
+export function useGetProductsSearch<
+  TData = Awaited<ReturnType<typeof getProductsSearch>>,
+  TError = ErrorType<UnauthorizedResponse>,
+>(
+  params: GetProductsSearchParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getProductsSearch>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetProductsSearchQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary Получить продукт по ID
+ */
+export const getProductsId = (
+  id: string,
+  options?: SecondParameter<typeof createInstance>,
+  signal?: AbortSignal,
+) => {
+  return createInstance<Product>(
+    { url: `/products/${id}`, method: "GET", signal },
+    options,
+  );
+};
+
+export const getGetProductsIdQueryKey = (id?: string) => {
+  return [`/products/${id}`] as const;
+};
+
+export const getGetProductsIdQueryOptions = <
+  TData = Awaited<ReturnType<typeof getProductsId>>,
+  TError = ErrorType<UnauthorizedResponse | NotFoundResponse>,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getProductsId>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetProductsIdQueryKey(id);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getProductsId>>> = ({
+    signal,
+  }) => getProductsId(id, requestOptions, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!id,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getProductsId>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetProductsIdQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getProductsId>>
+>;
+export type GetProductsIdQueryError = ErrorType<
+  UnauthorizedResponse | NotFoundResponse
+>;
+
+export function useGetProductsId<
+  TData = Awaited<ReturnType<typeof getProductsId>>,
+  TError = ErrorType<UnauthorizedResponse | NotFoundResponse>,
+>(
+  id: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getProductsId>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getProductsId>>,
+          TError,
+          Awaited<ReturnType<typeof getProductsId>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetProductsId<
+  TData = Awaited<ReturnType<typeof getProductsId>>,
+  TError = ErrorType<UnauthorizedResponse | NotFoundResponse>,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getProductsId>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getProductsId>>,
+          TError,
+          Awaited<ReturnType<typeof getProductsId>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetProductsId<
+  TData = Awaited<ReturnType<typeof getProductsId>>,
+  TError = ErrorType<UnauthorizedResponse | NotFoundResponse>,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getProductsId>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Получить продукт по ID
+ */
+
+export function useGetProductsId<
+  TData = Awaited<ReturnType<typeof getProductsId>>,
+  TError = ErrorType<UnauthorizedResponse | NotFoundResponse>,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getProductsId>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetProductsIdQueryOptions(id, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary Обновить продукт
+ */
+export const putProductsId = (
+  id: string,
+  updateProductRequest: BodyType<UpdateProductRequest>,
+  options?: SecondParameter<typeof createInstance>,
+) => {
+  return createInstance<Product>(
+    {
+      url: `/products/${id}`,
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      data: updateProductRequest,
+    },
+    options,
+  );
+};
+
+export const getPutProductsIdMutationOptions = <
+  TError = ErrorType<
+    BadRequestResponse | UnauthorizedResponse | NotFoundResponse
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof putProductsId>>,
+    TError,
+    { id: string; data: BodyType<UpdateProductRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof createInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof putProductsId>>,
+  TError,
+  { id: string; data: BodyType<UpdateProductRequest> },
+  TContext
+> => {
+  const mutationKey = ["putProductsId"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof putProductsId>>,
+    { id: string; data: BodyType<UpdateProductRequest> }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return putProductsId(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PutProductsIdMutationResult = NonNullable<
+  Awaited<ReturnType<typeof putProductsId>>
+>;
+export type PutProductsIdMutationBody = BodyType<UpdateProductRequest>;
+export type PutProductsIdMutationError = ErrorType<
+  BadRequestResponse | UnauthorizedResponse | NotFoundResponse
+>;
+
+/**
+ * @summary Обновить продукт
+ */
+export const usePutProductsId = <
+  TError = ErrorType<
+    BadRequestResponse | UnauthorizedResponse | NotFoundResponse
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof putProductsId>>,
+      TError,
+      { id: string; data: BodyType<UpdateProductRequest> },
+      TContext
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof putProductsId>>,
+  TError,
+  { id: string; data: BodyType<UpdateProductRequest> },
+  TContext
+> => {
+  const mutationOptions = getPutProductsIdMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Удалить продукт
+ */
+export const deleteProductsId = (
+  id: string,
+  options?: SecondParameter<typeof createInstance>,
+) => {
+  return createInstance<void>(
+    { url: `/products/${id}`, method: "DELETE" },
+    options,
+  );
+};
+
+export const getDeleteProductsIdMutationOptions = <
+  TError = ErrorType<UnauthorizedResponse | NotFoundResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteProductsId>>,
+    TError,
+    { id: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof createInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteProductsId>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  const mutationKey = ["deleteProductsId"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteProductsId>>,
+    { id: string }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return deleteProductsId(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteProductsIdMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteProductsId>>
+>;
+
+export type DeleteProductsIdMutationError = ErrorType<
+  UnauthorizedResponse | NotFoundResponse
+>;
+
+/**
+ * @summary Удалить продукт
+ */
+export const useDeleteProductsId = <
+  TError = ErrorType<UnauthorizedResponse | NotFoundResponse>,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof deleteProductsId>>,
+      TError,
+      { id: string },
+      TContext
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof deleteProductsId>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  const mutationOptions = getDeleteProductsIdMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Поиск продукта по штрихкоду
+ */
+export const getProductsBarcodeBarcode = (
+  barcode: string,
+  options?: SecondParameter<typeof createInstance>,
+  signal?: AbortSignal,
+) => {
+  return createInstance<Product>(
+    { url: `/products/barcode/${barcode}`, method: "GET", signal },
+    options,
+  );
+};
+
+export const getGetProductsBarcodeBarcodeQueryKey = (barcode?: string) => {
+  return [`/products/barcode/${barcode}`] as const;
+};
+
+export const getGetProductsBarcodeBarcodeQueryOptions = <
+  TData = Awaited<ReturnType<typeof getProductsBarcodeBarcode>>,
+  TError = ErrorType<Error>,
+>(
+  barcode: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getProductsBarcodeBarcode>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetProductsBarcodeBarcodeQueryKey(barcode);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getProductsBarcodeBarcode>>
+  > = ({ signal }) =>
+    getProductsBarcodeBarcode(barcode, requestOptions, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!barcode,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getProductsBarcodeBarcode>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetProductsBarcodeBarcodeQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getProductsBarcodeBarcode>>
+>;
+export type GetProductsBarcodeBarcodeQueryError = ErrorType<Error>;
+
+export function useGetProductsBarcodeBarcode<
+  TData = Awaited<ReturnType<typeof getProductsBarcodeBarcode>>,
+  TError = ErrorType<Error>,
+>(
+  barcode: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getProductsBarcodeBarcode>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getProductsBarcodeBarcode>>,
+          TError,
+          Awaited<ReturnType<typeof getProductsBarcodeBarcode>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetProductsBarcodeBarcode<
+  TData = Awaited<ReturnType<typeof getProductsBarcodeBarcode>>,
+  TError = ErrorType<Error>,
+>(
+  barcode: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getProductsBarcodeBarcode>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getProductsBarcodeBarcode>>,
+          TError,
+          Awaited<ReturnType<typeof getProductsBarcodeBarcode>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetProductsBarcodeBarcode<
+  TData = Awaited<ReturnType<typeof getProductsBarcodeBarcode>>,
+  TError = ErrorType<Error>,
+>(
+  barcode: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getProductsBarcodeBarcode>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Поиск продукта по штрихкоду
+ */
+
+export function useGetProductsBarcodeBarcode<
+  TData = Awaited<ReturnType<typeof getProductsBarcodeBarcode>>,
+  TError = ErrorType<Error>,
+>(
+  barcode: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getProductsBarcodeBarcode>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetProductsBarcodeBarcodeQueryOptions(
+    barcode,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary Получить список рецептов пользователя
+ */
+export const getRecipes = (
+  params?: GetRecipesParams,
+  options?: SecondParameter<typeof createInstance>,
+  signal?: AbortSignal,
+) => {
+  return createInstance<GetRecipes200>(
+    { url: `/recipes`, method: "GET", params, signal },
+    options,
+  );
+};
+
+export const getGetRecipesQueryKey = (params?: GetRecipesParams) => {
+  return [`/recipes`, ...(params ? [params] : [])] as const;
+};
+
+export const getGetRecipesQueryOptions = <
+  TData = Awaited<ReturnType<typeof getRecipes>>,
+  TError = ErrorType<UnauthorizedResponse>,
+>(
+  params?: GetRecipesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getRecipes>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetRecipesQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getRecipes>>> = ({
+    signal,
+  }) => getRecipes(params, requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getRecipes>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetRecipesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getRecipes>>
+>;
+export type GetRecipesQueryError = ErrorType<UnauthorizedResponse>;
+
+export function useGetRecipes<
+  TData = Awaited<ReturnType<typeof getRecipes>>,
+  TError = ErrorType<UnauthorizedResponse>,
+>(
+  params: undefined | GetRecipesParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getRecipes>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getRecipes>>,
+          TError,
+          Awaited<ReturnType<typeof getRecipes>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetRecipes<
+  TData = Awaited<ReturnType<typeof getRecipes>>,
+  TError = ErrorType<UnauthorizedResponse>,
+>(
+  params?: GetRecipesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getRecipes>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getRecipes>>,
+          TError,
+          Awaited<ReturnType<typeof getRecipes>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetRecipes<
+  TData = Awaited<ReturnType<typeof getRecipes>>,
+  TError = ErrorType<UnauthorizedResponse>,
+>(
+  params?: GetRecipesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getRecipes>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Получить список рецептов пользователя
+ */
+
+export function useGetRecipes<
+  TData = Awaited<ReturnType<typeof getRecipes>>,
+  TError = ErrorType<UnauthorizedResponse>,
+>(
+  params?: GetRecipesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getRecipes>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetRecipesQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary Создать новый рецепт
+ */
+export const postRecipes = (
+  createRecipeRequest: BodyType<CreateRecipeRequest>,
+  options?: SecondParameter<typeof createInstance>,
+  signal?: AbortSignal,
+) => {
+  return createInstance<Recipe>(
+    {
+      url: `/recipes`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: createRecipeRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostRecipesMutationOptions = <
+  TError = ErrorType<BadRequestResponse | UnauthorizedResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postRecipes>>,
+    TError,
+    { data: BodyType<CreateRecipeRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof createInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postRecipes>>,
+  TError,
+  { data: BodyType<CreateRecipeRequest> },
+  TContext
+> => {
+  const mutationKey = ["postRecipes"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postRecipes>>,
+    { data: BodyType<CreateRecipeRequest> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postRecipes(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostRecipesMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postRecipes>>
+>;
+export type PostRecipesMutationBody = BodyType<CreateRecipeRequest>;
+export type PostRecipesMutationError = ErrorType<
+  BadRequestResponse | UnauthorizedResponse
+>;
+
+/**
+ * @summary Создать новый рецепт
+ */
+export const usePostRecipes = <
+  TError = ErrorType<BadRequestResponse | UnauthorizedResponse>,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postRecipes>>,
+      TError,
+      { data: BodyType<CreateRecipeRequest> },
+      TContext
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postRecipes>>,
+  TError,
+  { data: BodyType<CreateRecipeRequest> },
+  TContext
+> => {
+  const mutationOptions = getPostRecipesMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Получить рецепт
+ */
+export const getRecipesId = (
+  id: string,
+  options?: SecondParameter<typeof createInstance>,
+  signal?: AbortSignal,
+) => {
+  return createInstance<Recipe>(
+    { url: `/recipes/${id}`, method: "GET", signal },
+    options,
+  );
+};
+
+export const getGetRecipesIdQueryKey = (id?: string) => {
+  return [`/recipes/${id}`] as const;
+};
+
+export const getGetRecipesIdQueryOptions = <
+  TData = Awaited<ReturnType<typeof getRecipesId>>,
+  TError = ErrorType<UnauthorizedResponse | NotFoundResponse>,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getRecipesId>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetRecipesIdQueryKey(id);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getRecipesId>>> = ({
+    signal,
+  }) => getRecipesId(id, requestOptions, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!id,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getRecipesId>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetRecipesIdQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getRecipesId>>
+>;
+export type GetRecipesIdQueryError = ErrorType<
+  UnauthorizedResponse | NotFoundResponse
+>;
+
+export function useGetRecipesId<
+  TData = Awaited<ReturnType<typeof getRecipesId>>,
+  TError = ErrorType<UnauthorizedResponse | NotFoundResponse>,
+>(
+  id: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getRecipesId>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getRecipesId>>,
+          TError,
+          Awaited<ReturnType<typeof getRecipesId>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetRecipesId<
+  TData = Awaited<ReturnType<typeof getRecipesId>>,
+  TError = ErrorType<UnauthorizedResponse | NotFoundResponse>,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getRecipesId>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getRecipesId>>,
+          TError,
+          Awaited<ReturnType<typeof getRecipesId>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetRecipesId<
+  TData = Awaited<ReturnType<typeof getRecipesId>>,
+  TError = ErrorType<UnauthorizedResponse | NotFoundResponse>,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getRecipesId>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Получить рецепт
+ */
+
+export function useGetRecipesId<
+  TData = Awaited<ReturnType<typeof getRecipesId>>,
+  TError = ErrorType<UnauthorizedResponse | NotFoundResponse>,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getRecipesId>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetRecipesIdQueryOptions(id, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary Обновить рецепт
+ */
+export const putRecipesId = (
+  id: string,
+  updateRecipeRequest: BodyType<UpdateRecipeRequest>,
+  options?: SecondParameter<typeof createInstance>,
+) => {
+  return createInstance<Recipe>(
+    {
+      url: `/recipes/${id}`,
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      data: updateRecipeRequest,
+    },
+    options,
+  );
+};
+
+export const getPutRecipesIdMutationOptions = <
+  TError = ErrorType<
+    BadRequestResponse | UnauthorizedResponse | NotFoundResponse
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof putRecipesId>>,
+    TError,
+    { id: string; data: BodyType<UpdateRecipeRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof createInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof putRecipesId>>,
+  TError,
+  { id: string; data: BodyType<UpdateRecipeRequest> },
+  TContext
+> => {
+  const mutationKey = ["putRecipesId"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof putRecipesId>>,
+    { id: string; data: BodyType<UpdateRecipeRequest> }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return putRecipesId(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PutRecipesIdMutationResult = NonNullable<
+  Awaited<ReturnType<typeof putRecipesId>>
+>;
+export type PutRecipesIdMutationBody = BodyType<UpdateRecipeRequest>;
+export type PutRecipesIdMutationError = ErrorType<
+  BadRequestResponse | UnauthorizedResponse | NotFoundResponse
+>;
+
+/**
+ * @summary Обновить рецепт
+ */
+export const usePutRecipesId = <
+  TError = ErrorType<
+    BadRequestResponse | UnauthorizedResponse | NotFoundResponse
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof putRecipesId>>,
+      TError,
+      { id: string; data: BodyType<UpdateRecipeRequest> },
+      TContext
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof putRecipesId>>,
+  TError,
+  { id: string; data: BodyType<UpdateRecipeRequest> },
+  TContext
+> => {
+  const mutationOptions = getPutRecipesIdMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Удалить рецепт
+ */
+export const deleteRecipesId = (
+  id: string,
+  options?: SecondParameter<typeof createInstance>,
+) => {
+  return createInstance<void>(
+    { url: `/recipes/${id}`, method: "DELETE" },
+    options,
+  );
+};
+
+export const getDeleteRecipesIdMutationOptions = <
+  TError = ErrorType<UnauthorizedResponse | NotFoundResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteRecipesId>>,
+    TError,
+    { id: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof createInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteRecipesId>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  const mutationKey = ["deleteRecipesId"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteRecipesId>>,
+    { id: string }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return deleteRecipesId(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteRecipesIdMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteRecipesId>>
+>;
+
+export type DeleteRecipesIdMutationError = ErrorType<
+  UnauthorizedResponse | NotFoundResponse
+>;
+
+/**
+ * @summary Удалить рецепт
+ */
+export const useDeleteRecipesId = <
+  TError = ErrorType<UnauthorizedResponse | NotFoundResponse>,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof deleteRecipesId>>,
+      TError,
+      { id: string },
+      TContext
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof deleteRecipesId>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  const mutationOptions = getDeleteRecipesIdMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Дублировать рецепт (для редактирования чужого)
+ */
+export const postRecipesIdDuplicate = (
+  id: string,
+  options?: SecondParameter<typeof createInstance>,
+  signal?: AbortSignal,
+) => {
+  return createInstance<Recipe>(
+    { url: `/recipes/${id}/duplicate`, method: "POST", signal },
+    options,
+  );
+};
+
+export const getPostRecipesIdDuplicateMutationOptions = <
+  TError = ErrorType<UnauthorizedResponse | NotFoundResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postRecipesIdDuplicate>>,
+    TError,
+    { id: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof createInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postRecipesIdDuplicate>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  const mutationKey = ["postRecipesIdDuplicate"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postRecipesIdDuplicate>>,
+    { id: string }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return postRecipesIdDuplicate(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostRecipesIdDuplicateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postRecipesIdDuplicate>>
+>;
+
+export type PostRecipesIdDuplicateMutationError = ErrorType<
+  UnauthorizedResponse | NotFoundResponse
+>;
+
+/**
+ * @summary Дублировать рецепт (для редактирования чужого)
+ */
+export const usePostRecipesIdDuplicate = <
+  TError = ErrorType<UnauthorizedResponse | NotFoundResponse>,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postRecipesIdDuplicate>>,
+      TError,
+      { id: string },
+      TContext
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postRecipesIdDuplicate>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  const mutationOptions = getPostRecipesIdDuplicateMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Создаёт meal из рецепта с указанным количеством порций
+ * @summary Добавить рецепт в приём пищи
+ */
+export const postRecipesIdAddToMeal = (
+  id: string,
+  addRecipeToMealRequest: BodyType<AddRecipeToMealRequest>,
+  options?: SecondParameter<typeof createInstance>,
+  signal?: AbortSignal,
+) => {
+  return createInstance<Meal>(
+    {
+      url: `/recipes/${id}/add-to-meal`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: addRecipeToMealRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostRecipesIdAddToMealMutationOptions = <
+  TError = ErrorType<
+    BadRequestResponse | UnauthorizedResponse | NotFoundResponse
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postRecipesIdAddToMeal>>,
+    TError,
+    { id: string; data: BodyType<AddRecipeToMealRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof createInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postRecipesIdAddToMeal>>,
+  TError,
+  { id: string; data: BodyType<AddRecipeToMealRequest> },
+  TContext
+> => {
+  const mutationKey = ["postRecipesIdAddToMeal"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postRecipesIdAddToMeal>>,
+    { id: string; data: BodyType<AddRecipeToMealRequest> }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return postRecipesIdAddToMeal(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostRecipesIdAddToMealMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postRecipesIdAddToMeal>>
+>;
+export type PostRecipesIdAddToMealMutationBody =
+  BodyType<AddRecipeToMealRequest>;
+export type PostRecipesIdAddToMealMutationError = ErrorType<
+  BadRequestResponse | UnauthorizedResponse | NotFoundResponse
+>;
+
+/**
+ * @summary Добавить рецепт в приём пищи
+ */
+export const usePostRecipesIdAddToMeal = <
+  TError = ErrorType<
+    BadRequestResponse | UnauthorizedResponse | NotFoundResponse
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postRecipesIdAddToMeal>>,
+      TError,
+      { id: string; data: BodyType<AddRecipeToMealRequest> },
+      TContext
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postRecipesIdAddToMeal>>,
+  TError,
+  { id: string; data: BodyType<AddRecipeToMealRequest> },
+  TContext
+> => {
+  const mutationOptions = getPostRecipesIdAddToMealMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Поиск публичных рецептов
+ */
+export const getRecipesPublic = (
+  params?: GetRecipesPublicParams,
+  options?: SecondParameter<typeof createInstance>,
+  signal?: AbortSignal,
+) => {
+  return createInstance<GetRecipesPublic200>(
+    { url: `/recipes/public`, method: "GET", params, signal },
+    options,
+  );
+};
+
+export const getGetRecipesPublicQueryKey = (
+  params?: GetRecipesPublicParams,
+) => {
+  return [`/recipes/public`, ...(params ? [params] : [])] as const;
+};
+
+export const getGetRecipesPublicQueryOptions = <
+  TData = Awaited<ReturnType<typeof getRecipesPublic>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: GetRecipesPublicParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getRecipesPublic>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetRecipesPublicQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getRecipesPublic>>
+  > = ({ signal }) => getRecipesPublic(params, requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getRecipesPublic>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetRecipesPublicQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getRecipesPublic>>
+>;
+export type GetRecipesPublicQueryError = ErrorType<unknown>;
+
+export function useGetRecipesPublic<
+  TData = Awaited<ReturnType<typeof getRecipesPublic>>,
+  TError = ErrorType<unknown>,
+>(
+  params: undefined | GetRecipesPublicParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getRecipesPublic>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getRecipesPublic>>,
+          TError,
+          Awaited<ReturnType<typeof getRecipesPublic>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetRecipesPublic<
+  TData = Awaited<ReturnType<typeof getRecipesPublic>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: GetRecipesPublicParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getRecipesPublic>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getRecipesPublic>>,
+          TError,
+          Awaited<ReturnType<typeof getRecipesPublic>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetRecipesPublic<
+  TData = Awaited<ReturnType<typeof getRecipesPublic>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: GetRecipesPublicParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getRecipesPublic>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Поиск публичных рецептов
+ */
+
+export function useGetRecipesPublic<
+  TData = Awaited<ReturnType<typeof getRecipesPublic>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: GetRecipesPublicParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getRecipesPublic>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetRecipesPublicQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
  * @summary Получить список планов
  */
-export const getPlans = (signal?: AbortSignal) => {
-  return createInstance<GetPlans200>({ url: `/plans`, method: "GET", signal });
+export const getPlans = (
+  options?: SecondParameter<typeof createInstance>,
+  signal?: AbortSignal,
+) => {
+  return createInstance<GetPlans200>(
+    { url: `/plans`, method: "GET", signal },
+    options,
+  );
 };
 
 export const getGetPlansQueryKey = () => {
@@ -1215,14 +3486,15 @@ export const getGetPlansQueryOptions = <
   query?: Partial<
     UseQueryOptions<Awaited<ReturnType<typeof getPlans>>, TError, TData>
   >;
+  request?: SecondParameter<typeof createInstance>;
 }) => {
-  const { query: queryOptions } = options ?? {};
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
   const queryKey = queryOptions?.queryKey ?? getGetPlansQueryKey();
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof getPlans>>> = ({
     signal,
-  }) => getPlans(signal);
+  }) => getPlans(requestOptions, signal);
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof getPlans>>,
@@ -1252,6 +3524,7 @@ export function useGetPlans<
         >,
         "initialData"
       >;
+    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): DefinedUseQueryResult<TData, TError> & {
@@ -1273,6 +3546,7 @@ export function useGetPlans<
         >,
         "initialData"
       >;
+    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
@@ -1286,6 +3560,7 @@ export function useGetPlans<
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getPlans>>, TError, TData>
     >;
+    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
@@ -1303,6 +3578,7 @@ export function useGetPlans<
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getPlans>>, TError, TData>
     >;
+    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
@@ -1326,14 +3602,13 @@ export function useGetPlans<
 export const postPlansIdApply = (
   id: string,
   params?: PostPlansIdApplyParams,
+  options?: SecondParameter<typeof createInstance>,
   signal?: AbortSignal,
 ) => {
-  return createInstance<PostPlansIdApply200>({
-    url: `/plans/${id}/apply`,
-    method: "POST",
-    params,
-    signal,
-  });
+  return createInstance<PostPlansIdApply200>(
+    { url: `/plans/${id}/apply`, method: "POST", params, signal },
+    options,
+  );
 };
 
 export const getPostPlansIdApplyMutationOptions = <
@@ -1346,6 +3621,7 @@ export const getPostPlansIdApplyMutationOptions = <
     { id: string; params?: PostPlansIdApplyParams },
     TContext
   >;
+  request?: SecondParameter<typeof createInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof postPlansIdApply>>,
   TError,
@@ -1353,13 +3629,13 @@ export const getPostPlansIdApplyMutationOptions = <
   TContext
 > => {
   const mutationKey = ["postPlansIdApply"];
-  const { mutation: mutationOptions } = options
+  const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation &&
       "mutationKey" in options.mutation &&
       options.mutation.mutationKey
       ? options
       : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey } };
+    : { mutation: { mutationKey }, request: undefined };
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof postPlansIdApply>>,
@@ -1367,7 +3643,7 @@ export const getPostPlansIdApplyMutationOptions = <
   > = (props) => {
     const { id, params } = props ?? {};
 
-    return postPlansIdApply(id, params);
+    return postPlansIdApply(id, params, requestOptions);
   };
 
   return { mutationFn, ...mutationOptions };
@@ -1395,6 +3671,7 @@ export const usePostPlansIdApply = <
       { id: string; params?: PostPlansIdApplyParams },
       TContext
     >;
+    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseMutationResult<
@@ -1411,13 +3688,15 @@ export const usePostPlansIdApply = <
 /**
  * @summary Статистика за период
  */
-export const getStats = (params: GetStatsParams, signal?: AbortSignal) => {
-  return createInstance<StatsResponse>({
-    url: `/stats`,
-    method: "GET",
-    params,
-    signal,
-  });
+export const getStats = (
+  params: GetStatsParams,
+  options?: SecondParameter<typeof createInstance>,
+  signal?: AbortSignal,
+) => {
+  return createInstance<StatsResponse>(
+    { url: `/stats`, method: "GET", params, signal },
+    options,
+  );
 };
 
 export const getGetStatsQueryKey = (params?: GetStatsParams) => {
@@ -1433,15 +3712,16 @@ export const getGetStatsQueryOptions = <
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getStats>>, TError, TData>
     >;
+    request?: SecondParameter<typeof createInstance>;
   },
 ) => {
-  const { query: queryOptions } = options ?? {};
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
   const queryKey = queryOptions?.queryKey ?? getGetStatsQueryKey(params);
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof getStats>>> = ({
     signal,
-  }) => getStats(params, signal);
+  }) => getStats(params, requestOptions, signal);
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof getStats>>,
@@ -1474,6 +3754,7 @@ export function useGetStats<
         >,
         "initialData"
       >;
+    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): DefinedUseQueryResult<TData, TError> & {
@@ -1496,6 +3777,7 @@ export function useGetStats<
         >,
         "initialData"
       >;
+    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
@@ -1510,6 +3792,7 @@ export function useGetStats<
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getStats>>, TError, TData>
     >;
+    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
@@ -1528,6 +3811,7 @@ export function useGetStats<
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getStats>>, TError, TData>
     >;
+    request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
@@ -1713,6 +3997,14 @@ export const getGetDayDateResponseMock = (
         ).map(() => ({
           id: faker.string.uuid(),
           mealId: faker.string.uuid(),
+          productId: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([faker.string.uuid(), null]),
+            undefined,
+          ]),
+          recipeId: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([faker.string.uuid(), null]),
+            undefined,
+          ]),
           name: faker.string.alpha({ length: { min: 10, max: 20 } }),
           quantity: faker.number.float({
             min: undefined,
@@ -1793,6 +4085,14 @@ export const getPostDayDateMealsResponseMock = (
     ).map(() => ({
       id: faker.string.uuid(),
       mealId: faker.string.uuid(),
+      productId: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.uuid(), null]),
+        undefined,
+      ]),
+      recipeId: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.uuid(), null]),
+        undefined,
+      ]),
       name: faker.string.alpha({ length: { min: 10, max: 20 } }),
       quantity: faker.number.float({
         min: undefined,
@@ -1870,6 +4170,14 @@ export const getPutMealsIdResponseMock = (
     ).map(() => ({
       id: faker.string.uuid(),
       mealId: faker.string.uuid(),
+      productId: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.uuid(), null]),
+        undefined,
+      ]),
+      recipeId: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.uuid(), null]),
+        undefined,
+      ]),
       name: faker.string.alpha({ length: { min: 10, max: 20 } }),
       quantity: faker.number.float({
         min: undefined,
@@ -1923,16 +4231,188 @@ export const getPutMealsIdResponseMock = (
 export const getPostAiParseMealResponseMock = (
   overrideResponse: Partial<AiParseMealResponse> = {},
 ): AiParseMealResponse => ({
-  parsedItems: faker.helpers.arrayElement([
+  parsed: faker.helpers.arrayElement([
+    {
+      type: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          "breakfast",
+          "lunch",
+          "dinner",
+          "snack",
+          "other",
+        ] as const),
+        undefined,
+      ]),
+      items: faker.helpers.arrayElement([
+        Array.from(
+          { length: faker.number.int({ min: 1, max: 10 }) },
+          (_, i) => i + 1,
+        ).map(() => ({
+          rawText: faker.helpers.arrayElement([
+            faker.string.alpha({ length: { min: 10, max: 20 } }),
+            undefined,
+          ]),
+          parsedName: faker.helpers.arrayElement([
+            faker.string.alpha({ length: { min: 10, max: 20 } }),
+            undefined,
+          ]),
+          quantity: faker.helpers.arrayElement([
+            faker.number.float({
+              min: undefined,
+              max: undefined,
+              fractionDigits: 2,
+            }),
+            undefined,
+          ]),
+          unit: faker.helpers.arrayElement([
+            faker.string.alpha({ length: { min: 10, max: 20 } }),
+            undefined,
+          ]),
+          productSuggestions: faker.helpers.arrayElement([
+            Array.from(
+              { length: faker.number.int({ min: 1, max: 10 }) },
+              (_, i) => i + 1,
+            ).map(() => ({
+              productId: faker.helpers.arrayElement([
+                faker.string.uuid(),
+                undefined,
+              ]),
+              name: faker.helpers.arrayElement([
+                faker.string.alpha({ length: { min: 10, max: 20 } }),
+                undefined,
+              ]),
+              kcalPer100g: faker.helpers.arrayElement([
+                faker.number.int({ min: undefined, max: undefined }),
+                undefined,
+              ]),
+              source: faker.helpers.arrayElement([
+                faker.string.alpha({ length: { min: 10, max: 20 } }),
+                undefined,
+              ]),
+              matchScore: faker.helpers.arrayElement([
+                faker.number.float({
+                  min: undefined,
+                  max: undefined,
+                  fractionDigits: 2,
+                }),
+                undefined,
+              ]),
+            })),
+            undefined,
+          ]),
+          recipeSuggestions: faker.helpers.arrayElement([
+            Array.from(
+              { length: faker.number.int({ min: 1, max: 10 }) },
+              (_, i) => i + 1,
+            ).map(() => ({
+              recipeId: faker.helpers.arrayElement([
+                faker.string.uuid(),
+                undefined,
+              ]),
+              name: faker.helpers.arrayElement([
+                faker.string.alpha({ length: { min: 10, max: 20 } }),
+                undefined,
+              ]),
+              kcalPerServing: faker.helpers.arrayElement([
+                faker.number.int({ min: undefined, max: undefined }),
+                undefined,
+              ]),
+              servings: faker.helpers.arrayElement([
+                faker.number.int({ min: undefined, max: undefined }),
+                undefined,
+              ]),
+              usageCount: faker.helpers.arrayElement([
+                faker.number.int({ min: undefined, max: undefined }),
+                undefined,
+              ]),
+              matchScore: faker.helpers.arrayElement([
+                faker.number.float({
+                  min: undefined,
+                  max: undefined,
+                  fractionDigits: 2,
+                }),
+                undefined,
+              ]),
+            })),
+            undefined,
+          ]),
+          aiFallback: faker.helpers.arrayElement([
+            {
+              name: faker.helpers.arrayElement([
+                faker.string.alpha({ length: { min: 10, max: 20 } }),
+                undefined,
+              ]),
+              kcalPer100g: faker.helpers.arrayElement([
+                faker.number.int({ min: undefined, max: undefined }),
+                undefined,
+              ]),
+              proteinPer100g: faker.helpers.arrayElement([
+                faker.number.float({
+                  min: undefined,
+                  max: undefined,
+                  fractionDigits: 2,
+                }),
+                undefined,
+              ]),
+              fatPer100g: faker.helpers.arrayElement([
+                faker.number.float({
+                  min: undefined,
+                  max: undefined,
+                  fractionDigits: 2,
+                }),
+                undefined,
+              ]),
+              carbsPer100g: faker.helpers.arrayElement([
+                faker.number.float({
+                  min: undefined,
+                  max: undefined,
+                  fractionDigits: 2,
+                }),
+                undefined,
+              ]),
+              confidence: faker.helpers.arrayElement([
+                faker.number.float({
+                  min: undefined,
+                  max: undefined,
+                  fractionDigits: 2,
+                }),
+                undefined,
+              ]),
+            },
+            undefined,
+          ]),
+        })),
+        undefined,
+      ]),
+    },
+    undefined,
+  ]),
+  needsReview: faker.helpers.arrayElement([
+    Array.from(
+      { length: faker.number.int({ min: 1, max: 10 }) },
+      (_, i) => i + 1,
+    ).map(() => faker.string.alpha({ length: { min: 10, max: 20 } })),
+    undefined,
+  ]),
+  ...overrideResponse,
+});
+
+export const getGetProductsResponseMock = (
+  overrideResponse: Partial<GetProducts200> = {},
+): GetProducts200 => ({
+  products: faker.helpers.arrayElement([
     Array.from(
       { length: faker.number.int({ min: 1, max: 10 }) },
       (_, i) => i + 1,
     ).map(() => ({
-      name: faker.helpers.arrayElement([
+      id: faker.string.uuid(),
+      name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      normalizedName: faker.helpers.arrayElement([
         faker.string.alpha({ length: { min: 10, max: 20 } }),
         undefined,
       ]),
-      quantity: faker.helpers.arrayElement([
+      kcalPer100g: faker.number.int({ min: undefined, max: undefined }),
+      proteinPer100g: faker.helpers.arrayElement([
         faker.number.float({
           min: undefined,
           max: undefined,
@@ -1940,10 +4420,772 @@ export const getPostAiParseMealResponseMock = (
         }),
         undefined,
       ]),
-      unit: faker.helpers.arrayElement([
+      fatPer100g: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      carbsPer100g: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      fiberPer100g: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.number.float({
+            min: undefined,
+            max: undefined,
+            fractionDigits: 2,
+          }),
+          null,
+        ]),
+        undefined,
+      ]),
+      sugarPer100g: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.number.float({
+            min: undefined,
+            max: undefined,
+            fractionDigits: 2,
+          }),
+          null,
+        ]),
+        undefined,
+      ]),
+      source: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          "manual",
+          "ai",
+          "openfoodfacts",
+          "user",
+        ] as const),
+        undefined,
+      ]),
+      isVerified: faker.helpers.arrayElement([
+        faker.datatype.boolean(),
+        undefined,
+      ]),
+      usageCount: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        undefined,
+      ]),
+      createdBy: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.uuid(), null]),
+        undefined,
+      ]),
+      barcode: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.string.alpha({ length: { min: 10, max: 20 } }),
+          null,
+        ]),
+        undefined,
+      ]),
+      brand: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.string.alpha({ length: { min: 10, max: 20 } }),
+          null,
+        ]),
+        undefined,
+      ]),
+      category: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.string.alpha({ length: { min: 10, max: 20 } }),
+          null,
+        ]),
+        undefined,
+      ]),
+      createdAt: `${faker.date.past().toISOString().split(".")[0]}Z`,
+      updatedAt: faker.helpers.arrayElement([
+        `${faker.date.past().toISOString().split(".")[0]}Z`,
+        undefined,
+      ]),
+    })),
+    undefined,
+  ]),
+  total: faker.helpers.arrayElement([
+    faker.number.int({ min: undefined, max: undefined }),
+    undefined,
+  ]),
+  ...overrideResponse,
+});
+
+export const getPostProductsResponseMock = (
+  overrideResponse: Partial<Product> = {},
+): Product => ({
+  id: faker.string.uuid(),
+  name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+  normalizedName: faker.helpers.arrayElement([
+    faker.string.alpha({ length: { min: 10, max: 20 } }),
+    undefined,
+  ]),
+  kcalPer100g: faker.number.int({ min: undefined, max: undefined }),
+  proteinPer100g: faker.helpers.arrayElement([
+    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
+  fatPer100g: faker.helpers.arrayElement([
+    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
+  carbsPer100g: faker.helpers.arrayElement([
+    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
+  fiberPer100g: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+      null,
+    ]),
+    undefined,
+  ]),
+  sugarPer100g: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+      null,
+    ]),
+    undefined,
+  ]),
+  source: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      "manual",
+      "ai",
+      "openfoodfacts",
+      "user",
+    ] as const),
+    undefined,
+  ]),
+  isVerified: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+  usageCount: faker.helpers.arrayElement([
+    faker.number.int({ min: undefined, max: undefined }),
+    undefined,
+  ]),
+  createdBy: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([faker.string.uuid(), null]),
+    undefined,
+  ]),
+  barcode: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      faker.string.alpha({ length: { min: 10, max: 20 } }),
+      null,
+    ]),
+    undefined,
+  ]),
+  brand: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      faker.string.alpha({ length: { min: 10, max: 20 } }),
+      null,
+    ]),
+    undefined,
+  ]),
+  category: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      faker.string.alpha({ length: { min: 10, max: 20 } }),
+      null,
+    ]),
+    undefined,
+  ]),
+  createdAt: `${faker.date.past().toISOString().split(".")[0]}Z`,
+  updatedAt: faker.helpers.arrayElement([
+    `${faker.date.past().toISOString().split(".")[0]}Z`,
+    undefined,
+  ]),
+  ...overrideResponse,
+});
+
+export const getGetProductsSearchResponseMock = (
+  overrideResponse: Partial<GetProductsSearch200> = {},
+): GetProductsSearch200 => ({
+  products: faker.helpers.arrayElement([
+    Array.from(
+      { length: faker.number.int({ min: 1, max: 10 }) },
+      (_, i) => i + 1,
+    ).map(() => ({
+      id: faker.string.uuid(),
+      name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      normalizedName: faker.helpers.arrayElement([
         faker.string.alpha({ length: { min: 10, max: 20 } }),
         undefined,
       ]),
+      kcalPer100g: faker.number.int({ min: undefined, max: undefined }),
+      proteinPer100g: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      fatPer100g: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      carbsPer100g: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      fiberPer100g: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.number.float({
+            min: undefined,
+            max: undefined,
+            fractionDigits: 2,
+          }),
+          null,
+        ]),
+        undefined,
+      ]),
+      sugarPer100g: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.number.float({
+            min: undefined,
+            max: undefined,
+            fractionDigits: 2,
+          }),
+          null,
+        ]),
+        undefined,
+      ]),
+      source: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          "manual",
+          "ai",
+          "openfoodfacts",
+          "user",
+        ] as const),
+        undefined,
+      ]),
+      isVerified: faker.helpers.arrayElement([
+        faker.datatype.boolean(),
+        undefined,
+      ]),
+      usageCount: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        undefined,
+      ]),
+      createdBy: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.uuid(), null]),
+        undefined,
+      ]),
+      barcode: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.string.alpha({ length: { min: 10, max: 20 } }),
+          null,
+        ]),
+        undefined,
+      ]),
+      brand: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.string.alpha({ length: { min: 10, max: 20 } }),
+          null,
+        ]),
+        undefined,
+      ]),
+      category: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.string.alpha({ length: { min: 10, max: 20 } }),
+          null,
+        ]),
+        undefined,
+      ]),
+      createdAt: `${faker.date.past().toISOString().split(".")[0]}Z`,
+      updatedAt: faker.helpers.arrayElement([
+        `${faker.date.past().toISOString().split(".")[0]}Z`,
+        undefined,
+      ]),
+    })),
+    undefined,
+  ]),
+  ...overrideResponse,
+});
+
+export const getGetProductsIdResponseMock = (
+  overrideResponse: Partial<Product> = {},
+): Product => ({
+  id: faker.string.uuid(),
+  name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+  normalizedName: faker.helpers.arrayElement([
+    faker.string.alpha({ length: { min: 10, max: 20 } }),
+    undefined,
+  ]),
+  kcalPer100g: faker.number.int({ min: undefined, max: undefined }),
+  proteinPer100g: faker.helpers.arrayElement([
+    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
+  fatPer100g: faker.helpers.arrayElement([
+    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
+  carbsPer100g: faker.helpers.arrayElement([
+    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
+  fiberPer100g: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+      null,
+    ]),
+    undefined,
+  ]),
+  sugarPer100g: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+      null,
+    ]),
+    undefined,
+  ]),
+  source: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      "manual",
+      "ai",
+      "openfoodfacts",
+      "user",
+    ] as const),
+    undefined,
+  ]),
+  isVerified: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+  usageCount: faker.helpers.arrayElement([
+    faker.number.int({ min: undefined, max: undefined }),
+    undefined,
+  ]),
+  createdBy: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([faker.string.uuid(), null]),
+    undefined,
+  ]),
+  barcode: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      faker.string.alpha({ length: { min: 10, max: 20 } }),
+      null,
+    ]),
+    undefined,
+  ]),
+  brand: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      faker.string.alpha({ length: { min: 10, max: 20 } }),
+      null,
+    ]),
+    undefined,
+  ]),
+  category: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      faker.string.alpha({ length: { min: 10, max: 20 } }),
+      null,
+    ]),
+    undefined,
+  ]),
+  createdAt: `${faker.date.past().toISOString().split(".")[0]}Z`,
+  updatedAt: faker.helpers.arrayElement([
+    `${faker.date.past().toISOString().split(".")[0]}Z`,
+    undefined,
+  ]),
+  ...overrideResponse,
+});
+
+export const getPutProductsIdResponseMock = (
+  overrideResponse: Partial<Product> = {},
+): Product => ({
+  id: faker.string.uuid(),
+  name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+  normalizedName: faker.helpers.arrayElement([
+    faker.string.alpha({ length: { min: 10, max: 20 } }),
+    undefined,
+  ]),
+  kcalPer100g: faker.number.int({ min: undefined, max: undefined }),
+  proteinPer100g: faker.helpers.arrayElement([
+    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
+  fatPer100g: faker.helpers.arrayElement([
+    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
+  carbsPer100g: faker.helpers.arrayElement([
+    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
+  fiberPer100g: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+      null,
+    ]),
+    undefined,
+  ]),
+  sugarPer100g: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+      null,
+    ]),
+    undefined,
+  ]),
+  source: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      "manual",
+      "ai",
+      "openfoodfacts",
+      "user",
+    ] as const),
+    undefined,
+  ]),
+  isVerified: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+  usageCount: faker.helpers.arrayElement([
+    faker.number.int({ min: undefined, max: undefined }),
+    undefined,
+  ]),
+  createdBy: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([faker.string.uuid(), null]),
+    undefined,
+  ]),
+  barcode: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      faker.string.alpha({ length: { min: 10, max: 20 } }),
+      null,
+    ]),
+    undefined,
+  ]),
+  brand: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      faker.string.alpha({ length: { min: 10, max: 20 } }),
+      null,
+    ]),
+    undefined,
+  ]),
+  category: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      faker.string.alpha({ length: { min: 10, max: 20 } }),
+      null,
+    ]),
+    undefined,
+  ]),
+  createdAt: `${faker.date.past().toISOString().split(".")[0]}Z`,
+  updatedAt: faker.helpers.arrayElement([
+    `${faker.date.past().toISOString().split(".")[0]}Z`,
+    undefined,
+  ]),
+  ...overrideResponse,
+});
+
+export const getGetProductsBarcodeBarcodeResponseMock = (
+  overrideResponse: Partial<Product> = {},
+): Product => ({
+  id: faker.string.uuid(),
+  name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+  normalizedName: faker.helpers.arrayElement([
+    faker.string.alpha({ length: { min: 10, max: 20 } }),
+    undefined,
+  ]),
+  kcalPer100g: faker.number.int({ min: undefined, max: undefined }),
+  proteinPer100g: faker.helpers.arrayElement([
+    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
+  fatPer100g: faker.helpers.arrayElement([
+    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
+  carbsPer100g: faker.helpers.arrayElement([
+    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
+  fiberPer100g: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+      null,
+    ]),
+    undefined,
+  ]),
+  sugarPer100g: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+      null,
+    ]),
+    undefined,
+  ]),
+  source: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      "manual",
+      "ai",
+      "openfoodfacts",
+      "user",
+    ] as const),
+    undefined,
+  ]),
+  isVerified: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+  usageCount: faker.helpers.arrayElement([
+    faker.number.int({ min: undefined, max: undefined }),
+    undefined,
+  ]),
+  createdBy: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([faker.string.uuid(), null]),
+    undefined,
+  ]),
+  barcode: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      faker.string.alpha({ length: { min: 10, max: 20 } }),
+      null,
+    ]),
+    undefined,
+  ]),
+  brand: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      faker.string.alpha({ length: { min: 10, max: 20 } }),
+      null,
+    ]),
+    undefined,
+  ]),
+  category: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      faker.string.alpha({ length: { min: 10, max: 20 } }),
+      null,
+    ]),
+    undefined,
+  ]),
+  createdAt: `${faker.date.past().toISOString().split(".")[0]}Z`,
+  updatedAt: faker.helpers.arrayElement([
+    `${faker.date.past().toISOString().split(".")[0]}Z`,
+    undefined,
+  ]),
+  ...overrideResponse,
+});
+
+export const getGetRecipesResponseMock = (
+  overrideResponse: Partial<GetRecipes200> = {},
+): GetRecipes200 => ({
+  recipes: faker.helpers.arrayElement([
+    Array.from(
+      { length: faker.number.int({ min: 1, max: 10 }) },
+      (_, i) => i + 1,
+    ).map(() => ({
+      id: faker.string.uuid(),
+      userId: faker.string.uuid(),
+      name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      description: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
+      servings: faker.number.int({ min: 1, max: undefined }),
+      category: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          "breakfast",
+          "lunch",
+          "dinner",
+          "snack",
+          "dessert",
+          "drink",
+          "other",
+        ] as const),
+        undefined,
+      ]),
+      ingredients: faker.helpers.arrayElement([
+        Array.from(
+          { length: faker.number.int({ min: 1, max: 10 }) },
+          (_, i) => i + 1,
+        ).map(() => ({
+          id: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
+          recipeId: faker.helpers.arrayElement([
+            faker.string.uuid(),
+            undefined,
+          ]),
+          productId: faker.string.uuid(),
+          productName: faker.helpers.arrayElement([
+            faker.string.alpha({ length: { min: 10, max: 20 } }),
+            undefined,
+          ]),
+          quantity: faker.number.float({
+            min: undefined,
+            max: undefined,
+            fractionDigits: 2,
+          }),
+          unit: faker.string.alpha({ length: { min: 10, max: 20 } }),
+          kcal: faker.helpers.arrayElement([
+            faker.number.int({ min: undefined, max: undefined }),
+            undefined,
+          ]),
+          protein: faker.helpers.arrayElement([
+            faker.number.float({
+              min: undefined,
+              max: undefined,
+              fractionDigits: 2,
+            }),
+            undefined,
+          ]),
+          fat: faker.helpers.arrayElement([
+            faker.number.float({
+              min: undefined,
+              max: undefined,
+              fractionDigits: 2,
+            }),
+            undefined,
+          ]),
+          carbs: faker.helpers.arrayElement([
+            faker.number.float({
+              min: undefined,
+              max: undefined,
+              fractionDigits: 2,
+            }),
+            undefined,
+          ]),
+          notes: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([
+              faker.string.alpha({ length: { min: 10, max: 20 } }),
+              null,
+            ]),
+            undefined,
+          ]),
+        })),
+        undefined,
+      ]),
+      totalKcal: faker.helpers.arrayElement([
+        faker.number.int({ min: 0, max: undefined }),
+        undefined,
+      ]),
+      totalProtein: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      totalFat: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      totalCarbs: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      kcalPerServing: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        undefined,
+      ]),
+      proteinPerServing: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      fatPerServing: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      carbsPerServing: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      imageUrl: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.string.alpha({ length: { min: 10, max: 20 } }),
+          null,
+        ]),
+        undefined,
+      ]),
+      cookingTime: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.number.int({ min: undefined, max: undefined }),
+          null,
+        ]),
+        undefined,
+      ]),
+      usageCount: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        undefined,
+      ]),
+      lastUsedAt: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          `${faker.date.past().toISOString().split(".")[0]}Z`,
+          null,
+        ]),
+        undefined,
+      ]),
+      isPublic: faker.helpers.arrayElement([
+        faker.datatype.boolean(),
+        undefined,
+      ]),
+      createdAt: `${faker.date.past().toISOString().split(".")[0]}Z`,
+      updatedAt: `${faker.date.past().toISOString().split(".")[0]}Z`,
+    })),
+    undefined,
+  ]),
+  total: faker.helpers.arrayElement([
+    faker.number.int({ min: undefined, max: undefined }),
+    undefined,
+  ]),
+  ...overrideResponse,
+});
+
+export const getPostRecipesResponseMock = (
+  overrideResponse: Partial<Recipe> = {},
+): Recipe => ({
+  id: faker.string.uuid(),
+  userId: faker.string.uuid(),
+  name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+  description: faker.helpers.arrayElement([
+    faker.string.alpha({ length: { min: 10, max: 20 } }),
+    undefined,
+  ]),
+  servings: faker.number.int({ min: 1, max: undefined }),
+  category: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      "breakfast",
+      "lunch",
+      "dinner",
+      "snack",
+      "dessert",
+      "drink",
+      "other",
+    ] as const),
+    undefined,
+  ]),
+  ingredients: faker.helpers.arrayElement([
+    Array.from(
+      { length: faker.number.int({ min: 1, max: 10 }) },
+      (_, i) => i + 1,
+    ).map(() => ({
+      id: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
+      recipeId: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
+      productId: faker.string.uuid(),
+      productName: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
+      quantity: faker.number.float({
+        min: undefined,
+        max: undefined,
+        fractionDigits: 2,
+      }),
+      unit: faker.string.alpha({ length: { min: 10, max: 20 } }),
       kcal: faker.helpers.arrayElement([
         faker.number.int({ min: undefined, max: undefined }),
         undefined,
@@ -1972,8 +5214,11 @@ export const getPostAiParseMealResponseMock = (
         }),
         undefined,
       ]),
-      confidence: faker.helpers.arrayElement([
-        faker.number.float({ min: 0, max: 1, fractionDigits: 2 }),
+      notes: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.string.alpha({ length: { min: 10, max: 20 } }),
+          null,
+        ]),
         undefined,
       ]),
     })),
@@ -1983,11 +5228,751 @@ export const getPostAiParseMealResponseMock = (
     faker.number.int({ min: 0, max: undefined }),
     undefined,
   ]),
-  warnings: faker.helpers.arrayElement([
+  totalProtein: faker.helpers.arrayElement([
+    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
+  totalFat: faker.helpers.arrayElement([
+    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
+  totalCarbs: faker.helpers.arrayElement([
+    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
+  kcalPerServing: faker.helpers.arrayElement([
+    faker.number.int({ min: undefined, max: undefined }),
+    undefined,
+  ]),
+  proteinPerServing: faker.helpers.arrayElement([
+    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
+  fatPerServing: faker.helpers.arrayElement([
+    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
+  carbsPerServing: faker.helpers.arrayElement([
+    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
+  imageUrl: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      faker.string.alpha({ length: { min: 10, max: 20 } }),
+      null,
+    ]),
+    undefined,
+  ]),
+  cookingTime: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      faker.number.int({ min: undefined, max: undefined }),
+      null,
+    ]),
+    undefined,
+  ]),
+  usageCount: faker.helpers.arrayElement([
+    faker.number.int({ min: undefined, max: undefined }),
+    undefined,
+  ]),
+  lastUsedAt: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      `${faker.date.past().toISOString().split(".")[0]}Z`,
+      null,
+    ]),
+    undefined,
+  ]),
+  isPublic: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+  createdAt: `${faker.date.past().toISOString().split(".")[0]}Z`,
+  updatedAt: `${faker.date.past().toISOString().split(".")[0]}Z`,
+  ...overrideResponse,
+});
+
+export const getGetRecipesIdResponseMock = (
+  overrideResponse: Partial<Recipe> = {},
+): Recipe => ({
+  id: faker.string.uuid(),
+  userId: faker.string.uuid(),
+  name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+  description: faker.helpers.arrayElement([
+    faker.string.alpha({ length: { min: 10, max: 20 } }),
+    undefined,
+  ]),
+  servings: faker.number.int({ min: 1, max: undefined }),
+  category: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      "breakfast",
+      "lunch",
+      "dinner",
+      "snack",
+      "dessert",
+      "drink",
+      "other",
+    ] as const),
+    undefined,
+  ]),
+  ingredients: faker.helpers.arrayElement([
     Array.from(
       { length: faker.number.int({ min: 1, max: 10 }) },
       (_, i) => i + 1,
-    ).map(() => faker.string.alpha({ length: { min: 10, max: 20 } })),
+    ).map(() => ({
+      id: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
+      recipeId: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
+      productId: faker.string.uuid(),
+      productName: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
+      quantity: faker.number.float({
+        min: undefined,
+        max: undefined,
+        fractionDigits: 2,
+      }),
+      unit: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      kcal: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        undefined,
+      ]),
+      protein: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      fat: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      carbs: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      notes: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.string.alpha({ length: { min: 10, max: 20 } }),
+          null,
+        ]),
+        undefined,
+      ]),
+    })),
+    undefined,
+  ]),
+  totalKcal: faker.helpers.arrayElement([
+    faker.number.int({ min: 0, max: undefined }),
+    undefined,
+  ]),
+  totalProtein: faker.helpers.arrayElement([
+    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
+  totalFat: faker.helpers.arrayElement([
+    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
+  totalCarbs: faker.helpers.arrayElement([
+    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
+  kcalPerServing: faker.helpers.arrayElement([
+    faker.number.int({ min: undefined, max: undefined }),
+    undefined,
+  ]),
+  proteinPerServing: faker.helpers.arrayElement([
+    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
+  fatPerServing: faker.helpers.arrayElement([
+    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
+  carbsPerServing: faker.helpers.arrayElement([
+    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
+  imageUrl: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      faker.string.alpha({ length: { min: 10, max: 20 } }),
+      null,
+    ]),
+    undefined,
+  ]),
+  cookingTime: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      faker.number.int({ min: undefined, max: undefined }),
+      null,
+    ]),
+    undefined,
+  ]),
+  usageCount: faker.helpers.arrayElement([
+    faker.number.int({ min: undefined, max: undefined }),
+    undefined,
+  ]),
+  lastUsedAt: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      `${faker.date.past().toISOString().split(".")[0]}Z`,
+      null,
+    ]),
+    undefined,
+  ]),
+  isPublic: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+  createdAt: `${faker.date.past().toISOString().split(".")[0]}Z`,
+  updatedAt: `${faker.date.past().toISOString().split(".")[0]}Z`,
+  ...overrideResponse,
+});
+
+export const getPutRecipesIdResponseMock = (
+  overrideResponse: Partial<Recipe> = {},
+): Recipe => ({
+  id: faker.string.uuid(),
+  userId: faker.string.uuid(),
+  name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+  description: faker.helpers.arrayElement([
+    faker.string.alpha({ length: { min: 10, max: 20 } }),
+    undefined,
+  ]),
+  servings: faker.number.int({ min: 1, max: undefined }),
+  category: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      "breakfast",
+      "lunch",
+      "dinner",
+      "snack",
+      "dessert",
+      "drink",
+      "other",
+    ] as const),
+    undefined,
+  ]),
+  ingredients: faker.helpers.arrayElement([
+    Array.from(
+      { length: faker.number.int({ min: 1, max: 10 }) },
+      (_, i) => i + 1,
+    ).map(() => ({
+      id: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
+      recipeId: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
+      productId: faker.string.uuid(),
+      productName: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
+      quantity: faker.number.float({
+        min: undefined,
+        max: undefined,
+        fractionDigits: 2,
+      }),
+      unit: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      kcal: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        undefined,
+      ]),
+      protein: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      fat: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      carbs: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      notes: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.string.alpha({ length: { min: 10, max: 20 } }),
+          null,
+        ]),
+        undefined,
+      ]),
+    })),
+    undefined,
+  ]),
+  totalKcal: faker.helpers.arrayElement([
+    faker.number.int({ min: 0, max: undefined }),
+    undefined,
+  ]),
+  totalProtein: faker.helpers.arrayElement([
+    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
+  totalFat: faker.helpers.arrayElement([
+    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
+  totalCarbs: faker.helpers.arrayElement([
+    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
+  kcalPerServing: faker.helpers.arrayElement([
+    faker.number.int({ min: undefined, max: undefined }),
+    undefined,
+  ]),
+  proteinPerServing: faker.helpers.arrayElement([
+    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
+  fatPerServing: faker.helpers.arrayElement([
+    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
+  carbsPerServing: faker.helpers.arrayElement([
+    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
+  imageUrl: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      faker.string.alpha({ length: { min: 10, max: 20 } }),
+      null,
+    ]),
+    undefined,
+  ]),
+  cookingTime: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      faker.number.int({ min: undefined, max: undefined }),
+      null,
+    ]),
+    undefined,
+  ]),
+  usageCount: faker.helpers.arrayElement([
+    faker.number.int({ min: undefined, max: undefined }),
+    undefined,
+  ]),
+  lastUsedAt: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      `${faker.date.past().toISOString().split(".")[0]}Z`,
+      null,
+    ]),
+    undefined,
+  ]),
+  isPublic: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+  createdAt: `${faker.date.past().toISOString().split(".")[0]}Z`,
+  updatedAt: `${faker.date.past().toISOString().split(".")[0]}Z`,
+  ...overrideResponse,
+});
+
+export const getPostRecipesIdDuplicateResponseMock = (
+  overrideResponse: Partial<Recipe> = {},
+): Recipe => ({
+  id: faker.string.uuid(),
+  userId: faker.string.uuid(),
+  name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+  description: faker.helpers.arrayElement([
+    faker.string.alpha({ length: { min: 10, max: 20 } }),
+    undefined,
+  ]),
+  servings: faker.number.int({ min: 1, max: undefined }),
+  category: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      "breakfast",
+      "lunch",
+      "dinner",
+      "snack",
+      "dessert",
+      "drink",
+      "other",
+    ] as const),
+    undefined,
+  ]),
+  ingredients: faker.helpers.arrayElement([
+    Array.from(
+      { length: faker.number.int({ min: 1, max: 10 }) },
+      (_, i) => i + 1,
+    ).map(() => ({
+      id: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
+      recipeId: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
+      productId: faker.string.uuid(),
+      productName: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
+      quantity: faker.number.float({
+        min: undefined,
+        max: undefined,
+        fractionDigits: 2,
+      }),
+      unit: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      kcal: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        undefined,
+      ]),
+      protein: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      fat: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      carbs: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      notes: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.string.alpha({ length: { min: 10, max: 20 } }),
+          null,
+        ]),
+        undefined,
+      ]),
+    })),
+    undefined,
+  ]),
+  totalKcal: faker.helpers.arrayElement([
+    faker.number.int({ min: 0, max: undefined }),
+    undefined,
+  ]),
+  totalProtein: faker.helpers.arrayElement([
+    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
+  totalFat: faker.helpers.arrayElement([
+    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
+  totalCarbs: faker.helpers.arrayElement([
+    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
+  kcalPerServing: faker.helpers.arrayElement([
+    faker.number.int({ min: undefined, max: undefined }),
+    undefined,
+  ]),
+  proteinPerServing: faker.helpers.arrayElement([
+    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
+  fatPerServing: faker.helpers.arrayElement([
+    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
+  carbsPerServing: faker.helpers.arrayElement([
+    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
+  imageUrl: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      faker.string.alpha({ length: { min: 10, max: 20 } }),
+      null,
+    ]),
+    undefined,
+  ]),
+  cookingTime: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      faker.number.int({ min: undefined, max: undefined }),
+      null,
+    ]),
+    undefined,
+  ]),
+  usageCount: faker.helpers.arrayElement([
+    faker.number.int({ min: undefined, max: undefined }),
+    undefined,
+  ]),
+  lastUsedAt: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      `${faker.date.past().toISOString().split(".")[0]}Z`,
+      null,
+    ]),
+    undefined,
+  ]),
+  isPublic: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+  createdAt: `${faker.date.past().toISOString().split(".")[0]}Z`,
+  updatedAt: `${faker.date.past().toISOString().split(".")[0]}Z`,
+  ...overrideResponse,
+});
+
+export const getPostRecipesIdAddToMealResponseMock = (
+  overrideResponse: Partial<Meal> = {},
+): Meal => ({
+  id: faker.string.uuid(),
+  dayEntryId: faker.string.uuid(),
+  type: faker.helpers.arrayElement([
+    "breakfast",
+    "lunch",
+    "dinner",
+    "snack",
+    "other",
+  ] as const),
+  time: faker.helpers.arrayElement([
+    faker.helpers.fromRegExp("^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$"),
+    undefined,
+  ]),
+  name: faker.helpers.arrayElement([
+    faker.string.alpha({ length: { min: 10, max: 20 } }),
+    undefined,
+  ]),
+  items: faker.helpers.arrayElement([
+    Array.from(
+      { length: faker.number.int({ min: 1, max: 10 }) },
+      (_, i) => i + 1,
+    ).map(() => ({
+      id: faker.string.uuid(),
+      mealId: faker.string.uuid(),
+      productId: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.uuid(), null]),
+        undefined,
+      ]),
+      recipeId: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.uuid(), null]),
+        undefined,
+      ]),
+      name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      quantity: faker.number.float({
+        min: undefined,
+        max: undefined,
+        fractionDigits: 2,
+      }),
+      unit: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      kcal: faker.number.int({ min: 0, max: undefined }),
+      protein: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      fat: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      carbs: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      source: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
+    })),
+    undefined,
+  ]),
+  totalKcal: faker.number.int({ min: 0, max: undefined }),
+  source: faker.helpers.arrayElement(["manual", "ai"] as const),
+  aiConfidence: faker.helpers.arrayElement([
+    faker.number.float({ min: 0, max: 1, fractionDigits: 2 }),
+    undefined,
+  ]),
+  createdAt: `${faker.date.past().toISOString().split(".")[0]}Z`,
+  updatedAt: `${faker.date.past().toISOString().split(".")[0]}Z`,
+  ...overrideResponse,
+});
+
+export const getGetRecipesPublicResponseMock = (
+  overrideResponse: Partial<GetRecipesPublic200> = {},
+): GetRecipesPublic200 => ({
+  recipes: faker.helpers.arrayElement([
+    Array.from(
+      { length: faker.number.int({ min: 1, max: 10 }) },
+      (_, i) => i + 1,
+    ).map(() => ({
+      id: faker.string.uuid(),
+      userId: faker.string.uuid(),
+      name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      description: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
+      servings: faker.number.int({ min: 1, max: undefined }),
+      category: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          "breakfast",
+          "lunch",
+          "dinner",
+          "snack",
+          "dessert",
+          "drink",
+          "other",
+        ] as const),
+        undefined,
+      ]),
+      ingredients: faker.helpers.arrayElement([
+        Array.from(
+          { length: faker.number.int({ min: 1, max: 10 }) },
+          (_, i) => i + 1,
+        ).map(() => ({
+          id: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
+          recipeId: faker.helpers.arrayElement([
+            faker.string.uuid(),
+            undefined,
+          ]),
+          productId: faker.string.uuid(),
+          productName: faker.helpers.arrayElement([
+            faker.string.alpha({ length: { min: 10, max: 20 } }),
+            undefined,
+          ]),
+          quantity: faker.number.float({
+            min: undefined,
+            max: undefined,
+            fractionDigits: 2,
+          }),
+          unit: faker.string.alpha({ length: { min: 10, max: 20 } }),
+          kcal: faker.helpers.arrayElement([
+            faker.number.int({ min: undefined, max: undefined }),
+            undefined,
+          ]),
+          protein: faker.helpers.arrayElement([
+            faker.number.float({
+              min: undefined,
+              max: undefined,
+              fractionDigits: 2,
+            }),
+            undefined,
+          ]),
+          fat: faker.helpers.arrayElement([
+            faker.number.float({
+              min: undefined,
+              max: undefined,
+              fractionDigits: 2,
+            }),
+            undefined,
+          ]),
+          carbs: faker.helpers.arrayElement([
+            faker.number.float({
+              min: undefined,
+              max: undefined,
+              fractionDigits: 2,
+            }),
+            undefined,
+          ]),
+          notes: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([
+              faker.string.alpha({ length: { min: 10, max: 20 } }),
+              null,
+            ]),
+            undefined,
+          ]),
+        })),
+        undefined,
+      ]),
+      totalKcal: faker.helpers.arrayElement([
+        faker.number.int({ min: 0, max: undefined }),
+        undefined,
+      ]),
+      totalProtein: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      totalFat: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      totalCarbs: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      kcalPerServing: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        undefined,
+      ]),
+      proteinPerServing: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      fatPerServing: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      carbsPerServing: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      imageUrl: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.string.alpha({ length: { min: 10, max: 20 } }),
+          null,
+        ]),
+        undefined,
+      ]),
+      cookingTime: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.number.int({ min: undefined, max: undefined }),
+          null,
+        ]),
+        undefined,
+      ]),
+      usageCount: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        undefined,
+      ]),
+      lastUsedAt: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          `${faker.date.past().toISOString().split(".")[0]}Z`,
+          null,
+        ]),
+        undefined,
+      ]),
+      isPublic: faker.helpers.arrayElement([
+        faker.datatype.boolean(),
+        undefined,
+      ]),
+      createdAt: `${faker.date.past().toISOString().split(".")[0]}Z`,
+      updatedAt: `${faker.date.past().toISOString().split(".")[0]}Z`,
+    })),
     undefined,
   ]),
   ...overrideResponse,
@@ -2066,40 +6051,58 @@ export const getPostPlansIdApplyResponseMock = (
 export const getGetStatsResponseMock = (
   overrideResponse: Partial<StatsResponse> = {},
 ): StatsResponse => ({
-  from: faker.helpers.arrayElement([
-    faker.date.past().toISOString().split("T")[0],
-    undefined,
-  ]),
-  to: faker.helpers.arrayElement([
-    faker.date.past().toISOString().split("T")[0],
-    undefined,
-  ]),
-  totalKcal: faker.helpers.arrayElement([
-    faker.number.int({ min: undefined, max: undefined }),
+  period: faker.helpers.arrayElement([
+    {
+      from: faker.helpers.arrayElement([
+        faker.date.past().toISOString().split("T")[0],
+        undefined,
+      ]),
+      to: faker.helpers.arrayElement([
+        faker.date.past().toISOString().split("T")[0],
+        undefined,
+      ]),
+    },
     undefined,
   ]),
   averageKcal: faker.helpers.arrayElement([
     faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
     undefined,
   ]),
-  averageGoalCompletion: faker.helpers.arrayElement([
-    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+  totalKcal: faker.helpers.arrayElement([
+    faker.number.int({ min: undefined, max: undefined }),
     undefined,
   ]),
-  days: faker.helpers.arrayElement([
-    Array.from(
-      { length: faker.number.int({ min: 1, max: 10 }) },
-      (_, i) => i + 1,
-    ).map(() => ({
-      date: faker.date.past().toISOString().split("T")[0],
-      consumedKcal: faker.number.int({ min: 0, max: undefined }),
-      targetKcal: faker.number.int({ min: 0, max: undefined }),
-      consumedPercent: faker.number.float({
-        min: 0,
-        max: 100,
-        fractionDigits: 2,
-      }),
-    })),
+  daysTracked: faker.helpers.arrayElement([
+    faker.number.int({ min: undefined, max: undefined }),
+    undefined,
+  ]),
+  averageMacros: faker.helpers.arrayElement([
+    {
+      protein: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      fat: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      carbs: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+    },
     undefined,
   ]),
   ...overrideResponse,
@@ -2350,6 +6353,412 @@ export const getPostAiParseMealMockHandler = (
   );
 };
 
+export const getGetProductsMockHandler = (
+  overrideResponse?:
+    | GetProducts200
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) => Promise<GetProducts200> | GetProducts200),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    "*/products",
+    async (info) => {
+      await delay(1000);
+
+      return new HttpResponse(
+        JSON.stringify(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === "function"
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getGetProductsResponseMock(),
+        ),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      );
+    },
+    options,
+  );
+};
+
+export const getPostProductsMockHandler = (
+  overrideResponse?:
+    | Product
+    | ((
+        info: Parameters<Parameters<typeof http.post>[1]>[0],
+      ) => Promise<Product> | Product),
+  options?: RequestHandlerOptions,
+) => {
+  return http.post(
+    "*/products",
+    async (info) => {
+      await delay(1000);
+
+      return new HttpResponse(
+        JSON.stringify(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === "function"
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getPostProductsResponseMock(),
+        ),
+        { status: 201, headers: { "Content-Type": "application/json" } },
+      );
+    },
+    options,
+  );
+};
+
+export const getGetProductsSearchMockHandler = (
+  overrideResponse?:
+    | GetProductsSearch200
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) => Promise<GetProductsSearch200> | GetProductsSearch200),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    "*/products/search",
+    async (info) => {
+      await delay(1000);
+
+      return new HttpResponse(
+        JSON.stringify(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === "function"
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getGetProductsSearchResponseMock(),
+        ),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      );
+    },
+    options,
+  );
+};
+
+export const getGetProductsIdMockHandler = (
+  overrideResponse?:
+    | Product
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) => Promise<Product> | Product),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    "*/products/:id",
+    async (info) => {
+      await delay(1000);
+
+      return new HttpResponse(
+        JSON.stringify(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === "function"
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getGetProductsIdResponseMock(),
+        ),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      );
+    },
+    options,
+  );
+};
+
+export const getPutProductsIdMockHandler = (
+  overrideResponse?:
+    | Product
+    | ((
+        info: Parameters<Parameters<typeof http.put>[1]>[0],
+      ) => Promise<Product> | Product),
+  options?: RequestHandlerOptions,
+) => {
+  return http.put(
+    "*/products/:id",
+    async (info) => {
+      await delay(1000);
+
+      return new HttpResponse(
+        JSON.stringify(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === "function"
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getPutProductsIdResponseMock(),
+        ),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      );
+    },
+    options,
+  );
+};
+
+export const getDeleteProductsIdMockHandler = (
+  overrideResponse?:
+    | void
+    | ((
+        info: Parameters<Parameters<typeof http.delete>[1]>[0],
+      ) => Promise<void> | void),
+  options?: RequestHandlerOptions,
+) => {
+  return http.delete(
+    "*/products/:id",
+    async (info) => {
+      await delay(1000);
+      if (typeof overrideResponse === "function") {
+        await overrideResponse(info);
+      }
+      return new HttpResponse(null, { status: 204 });
+    },
+    options,
+  );
+};
+
+export const getGetProductsBarcodeBarcodeMockHandler = (
+  overrideResponse?:
+    | Product
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) => Promise<Product> | Product),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    "*/products/barcode/:barcode",
+    async (info) => {
+      await delay(1000);
+
+      return new HttpResponse(
+        JSON.stringify(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === "function"
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getGetProductsBarcodeBarcodeResponseMock(),
+        ),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      );
+    },
+    options,
+  );
+};
+
+export const getGetRecipesMockHandler = (
+  overrideResponse?:
+    | GetRecipes200
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) => Promise<GetRecipes200> | GetRecipes200),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    "*/recipes",
+    async (info) => {
+      await delay(1000);
+
+      return new HttpResponse(
+        JSON.stringify(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === "function"
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getGetRecipesResponseMock(),
+        ),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      );
+    },
+    options,
+  );
+};
+
+export const getPostRecipesMockHandler = (
+  overrideResponse?:
+    | Recipe
+    | ((
+        info: Parameters<Parameters<typeof http.post>[1]>[0],
+      ) => Promise<Recipe> | Recipe),
+  options?: RequestHandlerOptions,
+) => {
+  return http.post(
+    "*/recipes",
+    async (info) => {
+      await delay(1000);
+
+      return new HttpResponse(
+        JSON.stringify(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === "function"
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getPostRecipesResponseMock(),
+        ),
+        { status: 201, headers: { "Content-Type": "application/json" } },
+      );
+    },
+    options,
+  );
+};
+
+export const getGetRecipesIdMockHandler = (
+  overrideResponse?:
+    | Recipe
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) => Promise<Recipe> | Recipe),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    "*/recipes/:id",
+    async (info) => {
+      await delay(1000);
+
+      return new HttpResponse(
+        JSON.stringify(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === "function"
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getGetRecipesIdResponseMock(),
+        ),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      );
+    },
+    options,
+  );
+};
+
+export const getPutRecipesIdMockHandler = (
+  overrideResponse?:
+    | Recipe
+    | ((
+        info: Parameters<Parameters<typeof http.put>[1]>[0],
+      ) => Promise<Recipe> | Recipe),
+  options?: RequestHandlerOptions,
+) => {
+  return http.put(
+    "*/recipes/:id",
+    async (info) => {
+      await delay(1000);
+
+      return new HttpResponse(
+        JSON.stringify(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === "function"
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getPutRecipesIdResponseMock(),
+        ),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      );
+    },
+    options,
+  );
+};
+
+export const getDeleteRecipesIdMockHandler = (
+  overrideResponse?:
+    | void
+    | ((
+        info: Parameters<Parameters<typeof http.delete>[1]>[0],
+      ) => Promise<void> | void),
+  options?: RequestHandlerOptions,
+) => {
+  return http.delete(
+    "*/recipes/:id",
+    async (info) => {
+      await delay(1000);
+      if (typeof overrideResponse === "function") {
+        await overrideResponse(info);
+      }
+      return new HttpResponse(null, { status: 204 });
+    },
+    options,
+  );
+};
+
+export const getPostRecipesIdDuplicateMockHandler = (
+  overrideResponse?:
+    | Recipe
+    | ((
+        info: Parameters<Parameters<typeof http.post>[1]>[0],
+      ) => Promise<Recipe> | Recipe),
+  options?: RequestHandlerOptions,
+) => {
+  return http.post(
+    "*/recipes/:id/duplicate",
+    async (info) => {
+      await delay(1000);
+
+      return new HttpResponse(
+        JSON.stringify(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === "function"
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getPostRecipesIdDuplicateResponseMock(),
+        ),
+        { status: 201, headers: { "Content-Type": "application/json" } },
+      );
+    },
+    options,
+  );
+};
+
+export const getPostRecipesIdAddToMealMockHandler = (
+  overrideResponse?:
+    | Meal
+    | ((
+        info: Parameters<Parameters<typeof http.post>[1]>[0],
+      ) => Promise<Meal> | Meal),
+  options?: RequestHandlerOptions,
+) => {
+  return http.post(
+    "*/recipes/:id/add-to-meal",
+    async (info) => {
+      await delay(1000);
+
+      return new HttpResponse(
+        JSON.stringify(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === "function"
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getPostRecipesIdAddToMealResponseMock(),
+        ),
+        { status: 201, headers: { "Content-Type": "application/json" } },
+      );
+    },
+    options,
+  );
+};
+
+export const getGetRecipesPublicMockHandler = (
+  overrideResponse?:
+    | GetRecipesPublic200
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) => Promise<GetRecipesPublic200> | GetRecipesPublic200),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    "*/recipes/public",
+    async (info) => {
+      await delay(1000);
+
+      return new HttpResponse(
+        JSON.stringify(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === "function"
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getGetRecipesPublicResponseMock(),
+        ),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      );
+    },
+    options,
+  );
+};
+
 export const getGetPlansMockHandler = (
   overrideResponse?:
     | GetPlans200
@@ -2443,6 +6852,21 @@ export const getNutriAIFoodCalorieTrackerAPIMock = () => [
   getPutMealsIdMockHandler(),
   getDeleteMealsIdMockHandler(),
   getPostAiParseMealMockHandler(),
+  getGetProductsMockHandler(),
+  getPostProductsMockHandler(),
+  getGetProductsSearchMockHandler(),
+  getGetProductsIdMockHandler(),
+  getPutProductsIdMockHandler(),
+  getDeleteProductsIdMockHandler(),
+  getGetProductsBarcodeBarcodeMockHandler(),
+  getGetRecipesMockHandler(),
+  getPostRecipesMockHandler(),
+  getGetRecipesIdMockHandler(),
+  getPutRecipesIdMockHandler(),
+  getDeleteRecipesIdMockHandler(),
+  getPostRecipesIdDuplicateMockHandler(),
+  getPostRecipesIdAddToMealMockHandler(),
+  getGetRecipesPublicMockHandler(),
   getGetPlansMockHandler(),
   getPostPlansIdApplyMockHandler(),
   getGetStatsMockHandler(),
