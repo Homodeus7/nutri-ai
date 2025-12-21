@@ -74,4 +74,8 @@ export const useI18n = createI18nModule({
     en: "Passwords do not match",
     ru: "Пароли не совпадают",
   },
+  or: {
+    en: "or",
+    ru: "или",
+  },
 } as const);

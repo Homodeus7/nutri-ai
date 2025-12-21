@@ -275,11 +275,13 @@ export interface SignupRequest {
 export interface LoginRequest {
   email: string;
   password: string;
+  timezone?: string;
 }
 
 export interface GoogleAuthRequest {
   /** Google ID token from Gmail OAuth */
   idToken: string;
+  timezone?: string;
 }
 
 export interface AuthResponse {
