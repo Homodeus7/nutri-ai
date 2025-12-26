@@ -1,30 +1,26 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/shared/ui/primitives/button";
+import { ChevronRight } from "lucide-react";
 import {
   useSearchProducts,
   SearchInput,
   ProductsTable,
-  useI18n,
 } from "@/features/product/search-product";
-import { CreateProductForm, type ProductItemData } from "@/features/product/create-product";
 import type { Product } from "@/shared/api/generated/nutriAIFoodCalorieTrackerAPI";
 import { SearchTabLayout } from "./search-tab-layout";
+import { useI18n } from "../i18n";
 
 interface SearchProductsTabProps {
   onSelectProducts: (products: Product[]) => void;
-  onCreateProduct: (productItemData: ProductItemData) => void;
-  onShowCreateFormChange?: (show: boolean) => void;
+  onShowCreateForm: () => void;
 }
 
 export function SearchProductsTab({
   onSelectProducts,
-  onCreateProduct,
-  onShowCreateFormChange,
+  onShowCreateForm,
 }: SearchProductsTabProps) {
   const { t } = useI18n();
-  const [showCreateForm, setShowCreateForm] = useState(false);
 
   const { setSearchQuery, products, isLoading, isEmpty } = useSearchProducts({
     limit: 100,
@@ -34,21 +30,8 @@ export function SearchProductsTab({
     setSearchQuery(query);
   };
 
-  const handleCreateSuccess = (productItemData: ProductItemData) => {
-    setShowCreateForm(false);
-    onShowCreateFormChange?.(false);
-    onCreateProduct(productItemData);
-  };
-
-  const handleShowCreateFormChange = (show: boolean) => {
-    setShowCreateForm(show);
-    onShowCreateFormChange?.(show);
-  };
-
   return (
     <SearchTabLayout
-      showCreateForm={showCreateForm}
-      onBackToSearch={() => handleShowCreateFormChange(false)}
       isLoading={isLoading}
       isEmpty={isEmpty}
       hasContent={products.length > 0}
@@ -62,17 +45,18 @@ export function SearchProductsTab({
         <ProductsTable
           products={products}
           onSelectProducts={onSelectProducts}
+          onCreateProduct={onShowCreateForm}
         />
       }
       emptyState={
         <div className="space-y-4 py-8 text-center">
           <p className="text-sm text-muted-foreground">{t("noResults")}</p>
-          <Button onClick={() => handleShowCreateFormChange(true)}>
+          <Button variant="ghost" onClick={onShowCreateForm}>
             {t("createProduct")}
+            <ChevronRight size="20" />
           </Button>
         </div>
       }
-      createForm={<CreateProductForm onSuccess={handleCreateSuccess} />}
     />
   );
 }
