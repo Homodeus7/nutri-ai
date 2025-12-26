@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Button } from "@/shared/ui/primitives/button";
-import { useI18n } from "@/features/food/search-product";
+import { useI18n } from "@/features/product/search-product";
 
 interface SearchTabLayoutProps {
   searchInput?: ReactNode;

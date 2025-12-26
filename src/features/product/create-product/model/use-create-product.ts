@@ -4,12 +4,12 @@ import {
   type Product,
 } from "@/shared/api/generated/nutriAIFoodCalorieTrackerAPI";
 
-export interface UseCreateFoodOptions {
+export interface UseCreateProductOptions {
   onSuccess?: (product: Product) => void;
   onError?: (error: Error) => void;
 }
 
-export function useCreateFood(options?: UseCreateFoodOptions) {
+export function useCreateProduct(options?: UseCreateProductOptions) {
   const { onSuccess, onError } = options || {};
 
   const mutation = usePostProducts({
@@ -23,14 +23,14 @@ export function useCreateFood(options?: UseCreateFoodOptions) {
     },
   });
 
-  const createFood = async (data: CreateProductRequest) => {
+  const createProduct = async (data: CreateProductRequest) => {
     return mutation.mutate({
       data,
     });
   };
 
   return {
-    createFood,
+    createProduct,
     isPending: mutation.isPending,
     isError: mutation.isError,
     error: mutation.error,

@@ -14,7 +14,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/shared/ui/primitives/tabs";
-import type { FoodItemData } from "@/features/food/create-food";
+import type { ProductItemData } from "@/features/product/create-product";
 import type { Product } from "@/shared/api/generated/nutriAIFoodCalorieTrackerAPI";
 import type { AddFoodFormData } from "../model/types";
 import { useI18n } from "../i18n";
@@ -47,13 +47,13 @@ export function AddFoodDialog({ mealName, onAddFood }: AddFoodDialogProps) {
     setIsOpen(false);
   };
 
-  const handleCreateProduct = (foodItemData: FoodItemData) => {
+  const handleCreateProduct = (productItemData: ProductItemData) => {
     const formData: AddFoodFormData = {
-      name: foodItemData.name,
-      calories: String(foodItemData.calories),
-      protein: String(foodItemData.protein),
-      fat: String(foodItemData.fat),
-      carbs: String(foodItemData.carbs),
+      name: productItemData.name,
+      calories: String(productItemData.calories),
+      protein: String(productItemData.protein),
+      fat: String(productItemData.fat),
+      carbs: String(productItemData.carbs),
     };
 
     onAddFood(formData);
