@@ -6,6 +6,7 @@ import {
   useSearchProducts,
   SearchInput,
   ProductsTable,
+  useI18n,
 } from "@/features/food/search-product";
 import { CreateFoodForm, type FoodItemData } from "@/features/food/create-food";
 import type { Product } from "@/shared/api/generated/nutriAIFoodCalorieTrackerAPI";
@@ -22,6 +23,7 @@ export function SearchProductsTab({
   onCreateProduct,
   onShowCreateFormChange,
 }: SearchProductsTabProps) {
+  const { t } = useI18n();
   const [showCreateForm, setShowCreateForm] = useState(false);
 
   const { setSearchQuery, products, isLoading, isEmpty } = useSearchProducts({
@@ -53,7 +55,7 @@ export function SearchProductsTab({
       searchInput={<SearchInput onSearchChange={handleSearchChange} />}
       loadingState={
         <div className="text-center text-sm text-muted-foreground py-8">
-          Поиск...
+          {t("searching")}
         </div>
       }
       content={
@@ -64,9 +66,9 @@ export function SearchProductsTab({
       }
       emptyState={
         <div className="space-y-4 py-8 text-center">
-          <p className="text-sm text-muted-foreground">Ничего не найдено</p>
+          <p className="text-sm text-muted-foreground">{t("noResults")}</p>
           <Button onClick={() => handleShowCreateFormChange(true)}>
-            Создать продукт
+            {t("createProduct")}
           </Button>
         </div>
       }
