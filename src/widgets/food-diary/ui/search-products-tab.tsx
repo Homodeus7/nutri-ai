@@ -7,14 +7,14 @@ import {
   SearchInput,
   ProductsTable,
   useI18n,
-} from "@/features/food/search-product";
-import { CreateFoodForm, type FoodItemData } from "@/features/food/create-food";
+} from "@/features/product/search-product";
+import { CreateProductForm, type ProductItemData } from "@/features/product/create-product";
 import type { Product } from "@/shared/api/generated/nutriAIFoodCalorieTrackerAPI";
 import { SearchTabLayout } from "./search-tab-layout";
 
 interface SearchProductsTabProps {
   onSelectProducts: (products: Product[]) => void;
-  onCreateProduct: (foodItemData: FoodItemData) => void;
+  onCreateProduct: (productItemData: ProductItemData) => void;
   onShowCreateFormChange?: (show: boolean) => void;
 }
 
@@ -34,10 +34,10 @@ export function SearchProductsTab({
     setSearchQuery(query);
   };
 
-  const handleCreateSuccess = (foodItemData: FoodItemData) => {
+  const handleCreateSuccess = (productItemData: ProductItemData) => {
     setShowCreateForm(false);
     onShowCreateFormChange?.(false);
-    onCreateProduct(foodItemData);
+    onCreateProduct(productItemData);
   };
 
   const handleShowCreateFormChange = (show: boolean) => {
@@ -72,7 +72,7 @@ export function SearchProductsTab({
           </Button>
         </div>
       }
-      createForm={<CreateFoodForm onSuccess={handleCreateSuccess} />}
+      createForm={<CreateProductForm onSuccess={handleCreateSuccess} />}
     />
   );
 }
