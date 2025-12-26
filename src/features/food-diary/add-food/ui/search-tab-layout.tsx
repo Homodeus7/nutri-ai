@@ -1,14 +1,11 @@
 import type { ReactNode } from "react";
-import { Button } from "@/shared/ui/primitives/button";
-import { useI18n } from "@/features/product/search-product";
+import { useI18n } from "../i18n";
 
 interface SearchTabLayoutProps {
   searchInput?: ReactNode;
   content: ReactNode;
   emptyState?: ReactNode;
   loadingState?: ReactNode;
-  createForm?: ReactNode;
-  showCreateForm?: boolean;
   onBackToSearch?: () => void;
   isLoading?: boolean;
   isEmpty?: boolean;
@@ -20,30 +17,12 @@ export function SearchTabLayout({
   content,
   emptyState,
   loadingState,
-  createForm,
-  showCreateForm = false,
-  onBackToSearch,
   isLoading = false,
   isEmpty = false,
   hasContent = false,
 }: SearchTabLayoutProps) {
   const { t } = useI18n();
 
-  // Показываем форму создания
-  if (showCreateForm && createForm) {
-    return (
-      <div className="space-y-4">
-        {onBackToSearch && (
-          <Button variant="ghost" size="sm" onClick={onBackToSearch}>
-            {t("backToSearch")}
-          </Button>
-        )}
-        {createForm}
-      </div>
-    );
-  }
-
-  // Основной layout с поиском
   return (
     <div className="space-y-4">
       {searchInput}

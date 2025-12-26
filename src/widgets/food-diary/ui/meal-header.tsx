@@ -1,4 +1,4 @@
-import { AddFoodDialog } from "./add-food-dialog";
+import { AddFoodDialog } from "@/features/food-diary/add-food";
 import { UiText } from "@/shared/ui/ui-text";
 import type { AddFoodFormData } from "../model/types";
 

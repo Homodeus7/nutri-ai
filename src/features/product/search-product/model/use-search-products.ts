@@ -14,7 +14,6 @@ export function useSearchProducts(options?: UseSearchProductsOptions) {
 
   const debouncedQuery = useDebounce(searchQuery, debounceDelay);
 
-  // Transliterate query if it contains Cyrillic characters
   const processedQuery = useMemo(() => {
     return hasCyrillic(debouncedQuery)
       ? transliterate(debouncedQuery)

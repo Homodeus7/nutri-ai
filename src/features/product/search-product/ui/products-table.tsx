@@ -18,11 +18,13 @@ import { useI18n } from "../i18n";
 interface ProductsTableProps {
   products: Product[];
   onSelectProducts: (products: Product[]) => void;
+  onCreateProduct?: () => void;
 }
 
 export function ProductsTable({
   products,
   onSelectProducts,
+  onCreateProduct,
 }: ProductsTableProps) {
   const { t } = useI18n();
   const [selectedProducts, setSelectedProducts] = useState<Set<string>>(
@@ -111,6 +113,15 @@ export function ProductsTable({
           })}
         </TableBody>
       </Table>
+
+      {onCreateProduct && (
+        <div className="flex justify-center py-2">
+          <Button variant="ghost" onClick={onCreateProduct}>
+            {t("createProduct")}
+            <ChevronRight size="20" />
+          </Button>
+        </div>
+      )}
 
       <div className="flex items-center justify-between gap-4">
         {totalPages > 1 && (

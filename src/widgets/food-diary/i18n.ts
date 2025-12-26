@@ -94,4 +94,28 @@ export const useI18n = createI18nModule({
     en: "g",
     ru: "г",
   },
+
+  // SearchTabLayout (from search-product feature)
+  backToSearch: {
+    en: "← Back to search",
+    ru: "← Назад к поиску",
+  },
+  startTyping: {
+    en: "Start typing product name",
+    ru: "Начните вводить название продукта",
+  },
+  searching: {
+    en: "Searching...",
+    ru: "Поиск...",
+  },
+
+  // SearchProductsTab (from search-product feature)
+  noResults: {
+    en: "Nothing found",
+    ru: "Ничего не найдено",
+  },
+  createProduct: {
+    en: "Create product",
+    ru: "Создать продукт",
+  },
 } as const);
