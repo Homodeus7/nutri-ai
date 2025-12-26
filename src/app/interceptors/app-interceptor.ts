@@ -1,4 +1,5 @@
 import { apiInstance } from "@/shared/api/api-instance";
+import { useAuthStore } from "@/entities/auth";
 import { ROUTER_PATHS } from "@/shared/constants/routes";
 import { useEventCallback } from "@/shared/lib/react";
 import { useRouter } from "next/router";
@@ -6,33 +7,46 @@ import { useEffect } from "react";
 
 export function useApplayAppInterceptor() {
   const router = useRouter();
+  const token = useAuthStore((s) => s.token);
+  const clearAuth = useAuthStore((s) => s.clearAuth);
 
   const routerReplace = useEventCallback(router.replace);
+
   useEffect(() => {
-    apiInstance.interceptors.response.use(
-      (response) => {
-        return response;
+    // Request interceptor - add auth token
+    const requestInterceptor = apiInstance.interceptors.request.use(
+      (config) => {
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
       },
       (error) => {
-        // 403 handler
-        if (error.response.status === 403) {
-          routerReplace(ROUTER_PATHS[403]);
-        }
-        throw error;
+        return Promise.reject(error);
       },
     );
 
-    apiInstance.interceptors.response.use(
-      (response) => {
-        return response;
-      },
+    // Response interceptor - handle errors
+    const responseInterceptor = apiInstance.interceptors.response.use(
+      (response) => response,
       (error) => {
-        // 401 handler
-        if (error.response.status === 401) {
+        if (error.response?.status === 401) {
+          clearAuth();
           routerReplace(ROUTER_PATHS.SIGN_IN);
         }
-        throw error;
+
+        if (error.response?.status === 403) {
+          routerReplace(ROUTER_PATHS[403]);
+        }
+
+        return Promise.reject(error);
       },
     );
-  }, [routerReplace]);
+
+    // Cleanup interceptors on unmount
+    return () => {
+      apiInstance.interceptors.request.eject(requestInterceptor);
+      apiInstance.interceptors.response.eject(responseInterceptor);
+    };
+  }, [token, clearAuth, routerReplace]);
 }
