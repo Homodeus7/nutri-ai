@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Button } from "@/shared/ui/primitives/button";
+import { useI18n } from "@/features/food/search-product";
 
 interface SearchTabLayoutProps {
   searchInput?: ReactNode;
@@ -26,13 +27,15 @@ export function SearchTabLayout({
   isEmpty = false,
   hasContent = false,
 }: SearchTabLayoutProps) {
+  const { t } = useI18n();
+
   // Показываем форму создания
   if (showCreateForm && createForm) {
     return (
       <div className="space-y-4">
         {onBackToSearch && (
           <Button variant="ghost" size="sm" onClick={onBackToSearch}>
-            ← Назад к поиску
+            {t("backToSearch")}
           </Button>
         )}
         {createForm}
@@ -53,7 +56,7 @@ export function SearchTabLayout({
 
       {!isLoading && !hasContent && !isEmpty && (
         <div className="text-center text-sm text-muted-foreground py-8">
-          Начните вводить название продукта
+          {t("startTyping")}
         </div>
       )}
     </div>

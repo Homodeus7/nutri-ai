@@ -13,6 +13,7 @@ import {
 } from "@/shared/ui/primitives/table";
 import { Checkbox } from "@/shared/ui/primitives/checkbox";
 import type { Product } from "@/shared/api/generated/nutriAIFoodCalorieTrackerAPI";
+import { useI18n } from "../i18n";
 
 interface ProductsTableProps {
   products: Product[];
@@ -23,6 +24,7 @@ export function ProductsTable({
   products,
   onSelectProducts,
 }: ProductsTableProps) {
+  const { t } = useI18n();
   const [selectedProducts, setSelectedProducts] = useState<Set<string>>(
     new Set(),
   );
@@ -67,11 +69,11 @@ export function ProductsTable({
         <TableHeader>
           <TableRow>
             <TableHead className="w-12" />
-            <TableHead>Название</TableHead>
-            <TableHead className="text-right">ккал/100г</TableHead>
-            <TableHead className="text-right">Б</TableHead>
-            <TableHead className="text-right">Ж</TableHead>
-            <TableHead className="text-right">У</TableHead>
+            <TableHead>{t("productName")}</TableHead>
+            <TableHead className="text-right">{t("kcalPer100g")}</TableHead>
+            <TableHead className="text-right">{t("protein")}</TableHead>
+            <TableHead className="text-right">{t("fat")}</TableHead>
+            <TableHead className="text-right">{t("carbs")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -114,7 +116,7 @@ export function ProductsTable({
         {totalPages > 1 && (
           <>
             <div className="text-sm text-muted-foreground">
-              Страница {page + 1} из {totalPages}
+              {t("pageOf", { page: String(page + 1), total: String(totalPages) })}
             </div>
             <div className="flex gap-2">
               <Button
@@ -138,7 +140,7 @@ export function ProductsTable({
         )}
         {selectedProducts.size > 0 && (
           <Button onClick={handleAddSelectedProducts} className="ml-auto">
-            Добавить ({selectedProducts.size})
+            {t("addSelected", { count: String(selectedProducts.size) })}
           </Button>
         )}
       </div>

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Search } from "lucide-react";
 import { Input } from "@/shared/ui/primitives/input";
+import { useI18n } from "../i18n";
 
 interface SearchInputProps {
   onSearchChange: (query: string) => void;
@@ -11,8 +12,9 @@ interface SearchInputProps {
 
 export function SearchInput({
   onSearchChange,
-  placeholder = "Поиск продуктов...",
+  placeholder,
 }: SearchInputProps) {
+  const { t } = useI18n();
   const [value, setValue] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -25,7 +27,7 @@ export function SearchInput({
     <div className="relative">
       <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
       <Input
-        placeholder={placeholder}
+        placeholder={placeholder ?? t("searchPlaceholder")}
         value={value}
         onChange={handleChange}
         className="pl-9"
