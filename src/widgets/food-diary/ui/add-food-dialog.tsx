@@ -8,9 +8,18 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/shared/ui/primitives/dialog";
-import { CreateFoodForm, type FoodItemData } from "@/features/food/create-food";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/shared/ui/primitives/tabs";
+import type { FoodItemData } from "@/features/food/create-food";
+import type { Product } from "@/shared/api/generated/nutriAIFoodCalorieTrackerAPI";
 import type { AddFoodFormData } from "../model/types";
 import { useI18n } from "../i18n";
+import { SearchProductsTab } from "./search-products-tab";
+import { RecentProductsTab } from "./recent-products-tab";
 
 interface AddFoodDialogProps {
   mealName: string;
@@ -20,9 +29,25 @@ interface AddFoodDialogProps {
 export function AddFoodDialog({ mealName, onAddFood }: AddFoodDialogProps) {
   const { t } = useI18n();
   const [isOpen, setIsOpen] = useState(false);
+  const [showCreateForm, setShowCreateForm] = useState(false);
 
-  const handleSuccess = (foodItemData: FoodItemData) => {
-    // Convert FoodItemData to AddFoodFormData format
+  const handleProductsSelect = (products: Product[]) => {
+    // TODO: Open quantity selection dialog
+    // For now, add 100g by default for each product
+    products.forEach((product) => {
+      const formData: AddFoodFormData = {
+        name: product.name,
+        calories: String(product.kcalPer100g),
+        protein: String(product.proteinPer100g || 0),
+        fat: String(product.fatPer100g || 0),
+        carbs: String(product.carbsPer100g || 0),
+      };
+      onAddFood(formData);
+    });
+    setIsOpen(false);
+  };
+
+  const handleCreateProduct = (foodItemData: FoodItemData) => {
     const formData: AddFoodFormData = {
       name: foodItemData.name,
       calories: String(foodItemData.calories),
@@ -31,11 +56,9 @@ export function AddFoodDialog({ mealName, onAddFood }: AddFoodDialogProps) {
       carbs: String(foodItemData.carbs),
     };
 
-    // Add to meal (updates local state)
     onAddFood(formData);
-
-    // Close dialog
     setIsOpen(false);
+    setShowCreateForm(false);
   };
 
   return (
@@ -45,15 +68,41 @@ export function AddFoodDialog({ mealName, onAddFood }: AddFoodDialogProps) {
           <Plus className="size-6 text-chart-2" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[90vh] overflow-y-auto flex flex-col items-satrt lg:min-h-[400px]">
         <DialogHeader>
           <DialogTitle>
-            {t("addFoodTo")} {mealName.toLowerCase()}
+            {showCreateForm
+              ? "Создать продукт"
+              : `${t("addFoodTo")} ${mealName.toLowerCase()}`}
           </DialogTitle>
         </DialogHeader>
-        <div className="py-4">
-          <CreateFoodForm onSuccess={handleSuccess} />
-        </div>
+        {!showCreateForm && (
+          <Tabs defaultValue="search" className="py-4">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="search">Еда</TabsTrigger>
+              <TabsTrigger value="recent">Недавние</TabsTrigger>
+            </TabsList>
+            <TabsContent value="search">
+              <SearchProductsTab
+                onSelectProducts={handleProductsSelect}
+                onCreateProduct={handleCreateProduct}
+                onShowCreateFormChange={setShowCreateForm}
+              />
+            </TabsContent>
+            <TabsContent value="recent">
+              <RecentProductsTab />
+            </TabsContent>
+          </Tabs>
+        )}
+        {showCreateForm && (
+          <div className="py-4">
+            <SearchProductsTab
+              onSelectProducts={handleProductsSelect}
+              onCreateProduct={handleCreateProduct}
+              onShowCreateFormChange={setShowCreateForm}
+            />
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );
