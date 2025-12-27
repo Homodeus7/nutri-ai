@@ -6,8 +6,8 @@ import { Home, Square, Zap, Utensils, Settings } from "lucide-react";
 import { cn } from "@/shared/lib/css";
 import { UpdateLang } from "@/features/i18n";
 import { UpdateTheme } from "@/features/theme";
-import { UiText } from "@/shared/ui/ui-text";
 import { UiButton } from "@/shared/ui/ui-button";
+import { NutriAiLogo } from "@/shared/ui";
 import { useI18n } from "../i18n";
 
 type TranslateFn = (
@@ -29,13 +29,8 @@ export function AppSidebar() {
 
   return (
     <aside className="w-64 bg-card border-r border-border flex flex-col py-8 px-6 sticky top-0 h-screen">
-      <div className="flex items-center gap-3 mb-12">
-        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-lg">
-          NA
-        </div>
-        <UiText variant="h4" weight="bold" className="text-white">
-          {t("appName")}
-        </UiText>
+      <div className="mb-12">
+        <NutriAiLogo width={139} height={34} />
       </div>
 
       <nav className="flex flex-col gap-2">

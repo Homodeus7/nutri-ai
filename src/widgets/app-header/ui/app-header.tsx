@@ -10,10 +10,7 @@ export function AppHeader() {
 
   return (
     <header className="bg-card border-b border-border sticky top-0 z-50">
-      <div className="px-8 py-4 flex items-center justify-between">
-        <UiText variant="h3" weight="bold">
-          {t("appName")}
-        </UiText>
+      <div className="px-8 py-4 flex items-center justify-end">
         <div className="flex items-center gap-4">
           <UiText variant="muted">{t("dashboard")}</UiText>
           <div className="flex gap-2">

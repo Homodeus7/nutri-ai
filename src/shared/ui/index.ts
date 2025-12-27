@@ -13,3 +13,6 @@ export { UiSpinner } from "./ui-spinner";
 
 export { UiText } from "./ui-text";
 export type { UiTextProps, TextVariant } from "./ui-text";
+
+export { NutriAiLogo } from "./nutri-ai-logo";
+export type { NutriAiLogoProps } from "./nutri-ai-logo";
