@@ -43,7 +43,7 @@ export function AddFoodDialog({ mealName, onAddFood }: AddFoodDialogProps) {
           <Plus className="size-6 text-chart-2" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[90vh] overflow-y-auto flex flex-col items-start lg:min-h-[400px]">
+      <DialogContent className="max-h-[90vh] lg:min-h-[400px] lg:max-h-[600px] overflow-y-auto flex flex-col items-start">
         <DialogHeader>
           <DialogTitle>{dialogTitle}</DialogTitle>
         </DialogHeader>
