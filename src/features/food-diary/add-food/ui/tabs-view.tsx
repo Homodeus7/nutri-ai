@@ -24,7 +24,7 @@ export function TabsView({
   recentTabLabel,
 }: TabsViewProps) {
   return (
-    <Tabs defaultValue="search" className="py-4">
+    <Tabs defaultValue="search" className="py-4 w-full">
       <TabsList className="grid w-full grid-cols-2">
         <TabsTrigger value="search">{searchTabLabel}</TabsTrigger>
         <TabsTrigger value="recent">{recentTabLabel}</TabsTrigger>
