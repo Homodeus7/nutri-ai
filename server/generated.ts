@@ -302,15 +302,11 @@ export const CreateMealRequestType = {
 } as const;
 
 export type CreateMealRequestItemsItem = {
-  productId?: string;
-  recipeId?: string;
-  name: string;
+  /** @nullable */
+  productId?: string | null;
+  /** @nullable */
+  recipeId?: string | null;
   quantity: number;
-  unit: string;
-  kcal: number;
-  protein?: number;
-  fat?: number;
-  carbs?: number;
 };
 
 export type CreateMealRequestSource =
@@ -327,11 +323,14 @@ export interface CreateMealRequest {
   /** @pattern ^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$ */
   time?: string;
   name?: string;
-  items?: CreateMealRequestItemsItem[];
-  /** @minimum 0 */
-  totalKcal: number;
+  items: CreateMealRequestItemsItem[];
   source: CreateMealRequestSource;
-  aiConfidence?: number;
+  /**
+   * @minimum 0
+   * @maximum 1
+   * @nullable
+   */
+  aiConfidence?: number | null;
 }
 
 export type CreateProductRequestSource =

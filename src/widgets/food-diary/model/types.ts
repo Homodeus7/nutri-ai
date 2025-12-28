@@ -7,9 +7,12 @@ export interface FoodItem {
   carbs: number;
 }
 
+export type MealType = "breakfast" | "lunch" | "dinner" | "snack" | "other";
+
 export interface MealData {
   id: string;
   name: string;
+  type: MealType;
   icon: React.ElementType;
   color: string;
   bgColor: string;

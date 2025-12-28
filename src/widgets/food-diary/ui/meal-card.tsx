@@ -2,16 +2,12 @@ import { useMemo } from "react";
 import { Card, CardContent } from "@/shared/ui/primitives/card";
 import { MealHeader } from "./meal-header";
 import { MealContent } from "./meal-content";
-import type {
-  MealData,
-  AddFoodFormData,
-  NutritionTotals,
-} from "../model/types";
+import type { MealData, NutritionTotals } from "../model/types";
 import { useI18n } from "../i18n";
 
 interface MealCardProps {
+  date: string;
   meal: MealData;
-  onAddFood: (formData: AddFoodFormData) => void;
   onRemoveFood: (foodId: string) => void;
 }
 
@@ -27,19 +23,20 @@ function calculateTotals(meal: MealData): NutritionTotals {
   );
 }
 
-export function MealCard({ meal, onAddFood, onRemoveFood }: MealCardProps) {
+export function MealCard({ date, meal, onRemoveFood }: MealCardProps) {
   const { t } = useI18n();
   const totals = useMemo(() => calculateTotals(meal), [meal]);
-  const mealName = t(meal.id as "breakfast" | "lunch" | "dinner" | "snack");
+  const mealName = t(meal.type);
 
   return (
     <Card className={`${meal.bgColor} border-0`}>
       <CardContent className="">
         <MealHeader
+          date={date}
+          mealType={meal.type}
           name={mealName}
           icon={meal.icon}
           color={meal.color}
-          onAddFood={onAddFood}
         />
         <MealContent
           items={meal.items}
