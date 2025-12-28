@@ -1,14 +1,7 @@
-// Public API for day-data feature
+export { useDayData } from "./get-meals/model/use-day-data";
 
-// Schema exports
-export {
-  dayDateSchema,
-  parseDayDate,
-  formatDayDate,
-  getTodayDate,
-} from "./model/day-data.schema";
-export type { DayDate } from "./model/day-data.schema";
+export { CreateMealDialog } from "./create-meal/ui/create-meal-dialog";
+export { getTodayDate } from "./get-meals/model/day-data.schema";
+export { useCreateMeal } from "./create-meal/model/use-create-meal";
 
-// Hook exports
-export { useDayData } from "./model/use-day-data";
-export type { UseDayDataOptions } from "./model/use-day-data";
+export { useSelectedDate } from "./select-date";

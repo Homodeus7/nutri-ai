@@ -12,6 +12,7 @@ import {
 import { Calendar } from "@/shared/ui/primitives/calendar";
 import { UiText } from "@/shared/ui/ui-text";
 import { useI18n } from "../i18n";
+import { useSelectedDate } from "@/features/day-data";
 
 interface DayData {
   day: string;
@@ -19,7 +20,6 @@ interface DayData {
 }
 
 interface DatePickerProps {
-  initialDate?: Date;
   onDateChange?: (date: Date) => void;
 }
 
@@ -62,12 +62,10 @@ const isSameDay = (date1: Date, date2: Date): boolean => {
   );
 };
 
-export function DatePicker({
-  initialDate = new Date(),
-  onDateChange,
-}: DatePickerProps) {
+export function DatePicker({ onDateChange }: DatePickerProps) {
   const { t } = useI18n();
-  const [selectedDate, setSelectedDate] = useState(initialDate);
+  const selectedDate = useSelectedDate((state) => state.selectedDate);
+  const setDate = useSelectedDate((state) => state.setDate);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   const weekDays = useMemo(
@@ -76,13 +74,13 @@ export function DatePicker({
   );
 
   const handleDayClick = (date: Date) => {
-    setSelectedDate(date);
+    setDate(date);
     onDateChange?.(date);
   };
 
   const handleCalendarSelect = (date: Date | undefined) => {
     if (date) {
-      setSelectedDate(date);
+      setDate(date);
       onDateChange?.(date);
       setIsCalendarOpen(false);
     }

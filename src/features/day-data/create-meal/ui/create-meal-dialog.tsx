@@ -9,13 +9,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/shared/ui/primitives/dialog";
-import { useAddFoodDialog } from "../model/use-add-food-dialog";
-import type { AddFoodDialogProps } from "../model/types";
+import { useCreateMealDialog } from "../model/use-create-meal-dialog";
+import type { CreateMealDialogProps } from "../model/types";
 import { TabsView } from "./tabs-view";
 import { CreateView } from "./create-view";
 import { useI18n } from "../i18n";
 
-export function AddFoodDialog({ mealName, onAddFood }: AddFoodDialogProps) {
+export function CreateMealDialog({
+  date,
+  mealType,
+  mealName,
+}: CreateMealDialogProps) {
   const { t } = useI18n();
 
   const {
@@ -26,7 +30,8 @@ export function AddFoodDialog({ mealName, onAddFood }: AddFoodDialogProps) {
     switchToSearch,
     handleProductsSelect,
     handleCreateProduct,
-  } = useAddFoodDialog({ onAddFood });
+    isPending,
+  } = useCreateMealDialog({ date, mealType });
 
   const dialogTitle =
     state.mode === "create"
@@ -39,7 +44,12 @@ export function AddFoodDialog({ mealName, onAddFood }: AddFoodDialogProps) {
       onOpenChange={(isOpen) => (isOpen ? open() : close())}
     >
       <DialogTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-10 w-10 rounded-full"
+          disabled={isPending}
+        >
           <Plus className="size-6 text-chart-2" />
         </Button>
       </DialogTrigger>

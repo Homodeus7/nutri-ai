@@ -4,9 +4,6 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { Home, Square, Zap, Utensils, Settings } from "lucide-react";
 import { cn } from "@/shared/lib/css";
-import { UpdateLang } from "@/features/i18n";
-import { UpdateTheme } from "@/features/theme";
-import { UiButton } from "@/shared/ui/ui-button";
 import { NutriAiLogo } from "@/shared/ui";
 import { useI18n } from "../i18n";
 
@@ -55,20 +52,6 @@ export function AppSidebar() {
           );
         })}
       </nav>
-
-      <div className="mt-auto mb-4 flex flex-col gap-4 items-start">
-        <UiButton
-          variant="ghost"
-          size="icon"
-          className="bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white"
-        >
-          <Settings className="w-6 h-6" />
-        </UiButton>
-        <div className="w-full">
-          <UpdateTheme className="w-full" />
-        </div>
-        <UpdateLang />
-      </div>
     </aside>
   );
 }

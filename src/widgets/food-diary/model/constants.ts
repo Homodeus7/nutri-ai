@@ -5,6 +5,7 @@ export const INITIAL_MEALS: MealData[] = [
   {
     id: "breakfast",
     name: "Завтрак",
+    type: "breakfast",
     icon: Sun,
     color: "text-orange-500",
     bgColor: "bg-orange-500/20",
@@ -13,6 +14,7 @@ export const INITIAL_MEALS: MealData[] = [
   {
     id: "lunch",
     name: "Обед",
+    type: "lunch",
     icon: Utensils,
     color: "text-green-500",
     bgColor: "bg-green-500/20",
@@ -21,6 +23,7 @@ export const INITIAL_MEALS: MealData[] = [
   {
     id: "dinner",
     name: "Ужин",
+    type: "dinner",
     icon: Moon,
     color: "text-purple-500",
     bgColor: "bg-purple-500/20",
@@ -29,6 +32,7 @@ export const INITIAL_MEALS: MealData[] = [
   {
     id: "snack",
     name: "Перекус",
+    type: "snack",
     icon: Coffee,
     color: "text-yellow-500",
     bgColor: "bg-yellow-500/20",

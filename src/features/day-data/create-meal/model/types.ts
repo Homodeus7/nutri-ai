@@ -1,15 +1,15 @@
 import type { Product } from "@/shared/api/generated/nutriAIFoodCalorieTrackerAPI";
 
 /**
- * Режимы диалога добавления еды
+ * Режимы диалога создания приема пищи
  */
-export type AddFoodMode = "search" | "recent" | "create";
+export type CreateMealMode = "search" | "recent" | "create";
 
 /**
- * Состояние диалога добавления еды
+ * Состояние диалога создания приема пищи
  */
-export interface AddFoodState {
-  mode: AddFoodMode;
+export interface CreateMealState {
+  mode: CreateMealMode;
   isOpen: boolean;
 }
 
@@ -25,11 +25,12 @@ export interface AddFoodFormData {
 }
 
 /**
- * Пропсы для диалога добавления еды
+ * Пропсы для диалога создания приема пищи
  */
-export interface AddFoodDialogProps {
+export interface CreateMealDialogProps {
+  date: string;
+  mealType: "breakfast" | "lunch" | "dinner" | "snack" | "other";
   mealName: string;
-  onAddFood: (formData: AddFoodFormData) => void;
 }
 
 /**

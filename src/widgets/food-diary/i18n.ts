@@ -24,6 +24,10 @@ export const useI18n = createI18nModule({
     en: "Snack",
     ru: "Перекус",
   },
+  other: {
+    en: "Other",
+    ru: "Другое",
+  },
 
   // add-food-dialog
   addFoodTo: {

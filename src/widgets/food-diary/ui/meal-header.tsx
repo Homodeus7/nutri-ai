@@ -1,19 +1,20 @@
-import { AddFoodDialog } from "@/features/food-diary/add-food";
+import { CreateMealDialog } from "@/features/day-data";
 import { UiText } from "@/shared/ui/ui-text";
-import type { AddFoodFormData } from "../model/types";
 
 interface MealHeaderProps {
+  date: string;
+  mealType: "breakfast" | "lunch" | "dinner" | "snack" | "other";
   name: string;
   icon: React.ElementType;
   color: string;
-  onAddFood: (formData: AddFoodFormData) => void;
 }
 
 export function MealHeader({
+  date,
+  mealType,
   name,
   icon: Icon,
   color,
-  onAddFood,
 }: MealHeaderProps) {
   return (
     <>
@@ -26,7 +27,7 @@ export function MealHeader({
             {name}
           </UiText>
         </div>
-        <AddFoodDialog mealName={name} onAddFood={onAddFood} />
+        <CreateMealDialog date={date} mealType={mealType} mealName={name} />
       </div>
     </>
   );
