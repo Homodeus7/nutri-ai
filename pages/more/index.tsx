@@ -1,7 +1,7 @@
 import {
   getPrivateLayout,
   getPrivateRouterLoader,
-} from "@/app/pub/get-private-layout";
+} from "@/_app/pub/get-private-layout";
 import { MorePage } from "@/pages/more";
 import { setPageLayout } from "@/shared/lib/next";
 

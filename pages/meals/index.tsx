@@ -1,7 +1,7 @@
 import {
   getPrivateLayout,
   getPrivateRouterLoader,
-} from "@/app/pub/get-private-layout";
+} from "@/_app/pub/get-private-layout";
 import { MealsPage } from "@/pages/meals";
 import { setPageLayout } from "@/shared/lib/next";
 

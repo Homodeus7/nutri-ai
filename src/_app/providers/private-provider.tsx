@@ -1,4 +1,4 @@
-import { useApplayAppInterceptor } from "@/app/interceptors/app-interceptor";
+import { useApplayAppInterceptor } from "@/_app/interceptors/app-interceptor";
 
 export function PrivateProvider({ children }: { children: React.ReactNode }) {
   useApplayAppInterceptor();
