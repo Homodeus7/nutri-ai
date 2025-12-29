@@ -18,11 +18,15 @@ export function CreateView({
   backButtonLabel,
 }: CreateViewProps) {
   return (
-    <div className="space-y-4">
-      <Button variant="ghost" size="sm" onClick={onBack}>
-        {backButtonLabel}
-      </Button>
-      <CreateProductForm onSuccess={onCreate} />
+    <div className="flex h-full min-h-0 w-full flex-1 flex-col">
+      <div className="shrink-0">
+        <Button variant="ghost" size="sm" onClick={onBack}>
+          {backButtonLabel}
+        </Button>
+      </div>
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        <CreateProductForm onSuccess={onCreate} />
+      </div>
     </div>
   );
 }

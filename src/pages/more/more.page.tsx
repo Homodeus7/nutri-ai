@@ -6,6 +6,7 @@ import { UiButton } from "@/shared/ui";
 import { Settings } from "lucide-react";
 import { UpdateTheme } from "@/features/theme";
 import { UpdateLang } from "@/features/i18n";
+import { LogoutButton } from "@/features/auth";
 
 export function MorePage() {
   const { t } = useI18n();
@@ -28,6 +29,7 @@ export function MorePage() {
           <UpdateTheme className="w-full" />
         </div>
         <UpdateLang />
+        <LogoutButton className="w-full" variant="destructive" />
       </div>
     </>
   );
