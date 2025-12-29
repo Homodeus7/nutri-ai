@@ -49,8 +49,8 @@ export function CreateMealDialog({
           <Plus className="size-6 text-chart-2" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[90vh] lg:min-h-[400px] lg:max-h-[500px] overflow-hidden flex flex-col items-start h-[90vh]">
-        <DialogHeader>
+      <DialogContent className="flex h-[90vh] max-h-[90vh] flex-col lg:max-h-[500px] lg:min-h-[400px]">
+        <DialogHeader className="shrink-0">
           <DialogTitle>{dialogTitle}</DialogTitle>
         </DialogHeader>
 
