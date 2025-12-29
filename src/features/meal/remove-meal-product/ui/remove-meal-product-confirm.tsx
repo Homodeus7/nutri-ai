@@ -3,7 +3,6 @@
 import { Button } from "@/shared/ui/primitives/button";
 import { DialogDescription, DialogFooter } from "@/shared/ui/primitives/dialog";
 import { useI18n } from "../i18n";
-import { UI } from "react-day-picker";
 import { UiText } from "@/shared/ui";
 
 export interface RemoveMealProductConfirmProps {
