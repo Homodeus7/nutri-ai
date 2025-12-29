@@ -7,7 +7,6 @@ import { useI18n } from "../i18n";
 interface MealContentProps {
   items: FoodItemType[];
   totals: NutritionTotals;
-  onRemoveFood: (foodId: string) => void;
 }
 
 function EmptyState() {
@@ -25,13 +24,7 @@ function EmptyState() {
   );
 }
 
-export function MealContent({ items, totals, onRemoveFood }: MealContentProps) {
-  // const hasItems = items.length > 0;
-
-  // if (!hasItems) {
-  //   return <EmptyState />;
-  // }
-
+export function MealContent({ items, totals }: MealContentProps) {
   const hasItems = items.length > 0;
 
   if (!hasItems) {
@@ -42,11 +35,7 @@ export function MealContent({ items, totals, onRemoveFood }: MealContentProps) {
     <div className="space-y-3">
       <div className="space-y-2 max-h-32 overflow-y-auto">
         {items.map((item) => (
-          <FoodItem
-            key={item.id}
-            item={item}
-            onRemove={() => onRemoveFood(item.id)}
-          />
+          <FoodItem key={item.id} item={item} />
         ))}
       </div>
       <MealTotals totals={totals} />

@@ -101,7 +101,8 @@ export function CreateProductForm({ onSuccess }: CreateProductFormProps) {
       const productItemData: ProductItemData = {
         name: product.name,
         calories: Math.round(product.kcalPer100g * multiplier),
-        protein: Math.round((product.proteinPer100g || 0) * multiplier * 10) / 10,
+        protein:
+          Math.round((product.proteinPer100g || 0) * multiplier * 10) / 10,
         fat: Math.round((product.fatPer100g || 0) * multiplier * 10) / 10,
         carbs: Math.round((product.carbsPer100g || 0) * multiplier * 10) / 10,
       };

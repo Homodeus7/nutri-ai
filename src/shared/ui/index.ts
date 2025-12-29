@@ -1,4 +1,3 @@
-// UI Components
 export { UiButton } from "./ui-button";
 export type { UiButtonProps } from "./ui-button";
 
@@ -16,3 +15,10 @@ export type { UiTextProps, TextVariant } from "./ui-text";
 
 export { NutriAiLogo } from "./nutri-ai-logo";
 export type { NutriAiLogoProps } from "./nutri-ai-logo";
+
+export { ControlledDialog, useControlledDialog } from "./controlled-dialog";
+export type {
+  ControlledDialogProps,
+  UseControlledDialogOptions,
+  UseControlledDialogReturn,
+} from "./controlled-dialog";

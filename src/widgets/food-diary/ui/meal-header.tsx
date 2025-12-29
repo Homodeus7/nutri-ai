@@ -1,21 +1,16 @@
 import { CreateMealDialog } from "@/features/day-data";
 import { UiText } from "@/shared/ui/ui-text";
+import { useMealCardContext } from "../model/meal-card-context";
 
 interface MealHeaderProps {
-  date: string;
-  mealType: "breakfast" | "lunch" | "dinner" | "snack" | "other";
   name: string;
   icon: React.ElementType;
   color: string;
 }
 
-export function MealHeader({
-  date,
-  mealType,
-  name,
-  icon: Icon,
-  color,
-}: MealHeaderProps) {
+export function MealHeader({ name, icon: Icon, color }: MealHeaderProps) {
+  const { date, mealType } = useMealCardContext();
+
   return (
     <>
       <div className="flex items-center justify-between">
