@@ -14,8 +14,8 @@ export function AppProvider({ children }: { children?: React.ReactNode }) {
     <MSWProvider>
       <ThemeProvider
         attribute="class"
-        defaultTheme="light"
-        enableSystem={false}
+        defaultTheme="system"
+        enableSystem={true}
         storageKey="theme"
       >
         <Toaster />

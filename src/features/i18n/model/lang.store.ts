@@ -9,11 +9,23 @@ type LangStore = {
   setLang: (lang: Lang) => void;
 };
 
-export const useLang = create<LangStore>((set, get) => ({
+const getSystemLang = (): Lang => {
+  if (typeof window === "undefined") return "ru";
+
+  const browserLang = navigator.language.toLowerCase();
+
+  if (browserLang.startsWith("en")) return "en";
+  if (browserLang.startsWith("ru")) return "ru";
+
+  return "ru";
+};
+
+export const useLang = create<LangStore>((set) => ({
   isLoading: true,
   lang: "ru",
   loadLang: () => {
-    const lang = (localStorage.getItem("lang") as Lang) ?? get().lang;
+    const savedLang = localStorage.getItem("lang") as Lang | null;
+    const lang = savedLang ?? getSystemLang();
     set({ lang, isLoading: false });
   },
   setLang: (lang) => {

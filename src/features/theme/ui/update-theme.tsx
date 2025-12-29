@@ -5,11 +5,12 @@ import { UiSelect } from "@/shared/ui";
 import { useEffect, useState } from "react";
 
 type ThemeOption = {
-  id: "light" | "dark";
+  id: "light" | "dark" | "system";
   label: string;
 };
 
 const themeOptions: ThemeOption[] = [
+  { id: "system", label: "System" },
   { id: "dark", label: "Dark" },
   { id: "light", label: "Light" },
 ];
