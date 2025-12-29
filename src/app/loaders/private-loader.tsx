@@ -1,25 +1,11 @@
-// import { BoardsProvider } from "@/entities/board";
-// import { useSession } from "@/entities/session";
-// import { TasksProvider } from "@/entities/task";
-// import { UsersProvider } from "@/entities/user";
-import { api } from "@/shared/api";
-// import { ROUTER_PATHS } from "@/shared/constants/routes";
+import { useAuthStore } from "@/entities/auth";
+import { ROUTER_PATHS } from "@/shared/constants/routes";
 import { ComposeChildren, useEventCallback } from "@/shared/lib/react";
 import { UiPageSpinner } from "@/shared/ui";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 export const loadPrivateLoaderData = async () => {
-  // try {
-  //   const [users, tasks, boards] = await Promise.all([
-  //     api.getUsers(),
-  //     api.getTasks(),
-  //     api.getBoards(),
-  //   ]);
-  //   return { users, tasks, boards };
-  // } catch {
-  //   return {};
-  // }
   return {};
 };
 
@@ -31,47 +17,27 @@ export function PrivateLoader({
   data?: Awaited<ReturnType<typeof loadPrivateLoaderData>>;
 }) {
   const [data, setData] = useState(defaultData);
-  // const tasks = data?.tasks;
-  // const boards = data?.boards;
-  // const users = data?.users;
-
-  // const isData = tasks && boards && users;
-
   const router = useRouter();
-  // const session = useSession((s) => s.currentSession);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const token = useAuthStore((s) => s.token);
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const routerPush = useEventCallback(router.push);
-  // useEffect(() => {
-  //   if (!session) {
-  //     routerPush(ROUTER_PATHS.SIGN_IN);
-  //     return;
-  //   }
+  const routerReplace = useEventCallback(router.replace);
 
-  //   if (isData) {
-  //     return;
-  //   }
+  useEffect(() => {
+    if (!isAuthenticated || !token) {
+      routerReplace(ROUTER_PATHS.SIGN_IN);
+      return;
+    }
 
-  //   setIsLoading(true);
-  //   loadPrivateLoaderData()
-  //     .then(setData)
-  //     .finally(() => {
-  //       setIsLoading(false);
-  //     });
-  // }, [session, routerPush, isData]);
+    setIsLoading(false);
+  }, [isAuthenticated, token, routerReplace]);
 
   return (
     <>
       <UiPageSpinner isLoading={isLoading} />
-      {isLoading ? null : (
-        <ComposeChildren>
-          {/* <UsersProvider value={{ users: users ?? [] }} />
-          <BoardsProvider value={{ boards: boards ?? [] }} />
-          <TasksProvider value={{ tasks: tasks ?? [] }} /> */}
-          {children}
-        </ComposeChildren>
-      )}
+      {isLoading ? null : <ComposeChildren>{children}</ComposeChildren>}
     </>
   );
 }
