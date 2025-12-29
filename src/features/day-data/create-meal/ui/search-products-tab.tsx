@@ -7,35 +7,38 @@ import {
   SearchInput,
   ProductsTable,
 } from "@/features/product/search-product";
-import type { Product } from "@/shared/api/generated/nutriAIFoodCalorieTrackerAPI";
 import { SearchTabLayout } from "./search-tab-layout";
 import { useI18n } from "../i18n";
 
 interface SearchProductsTabProps {
-  onSelectProducts: (products: Product[]) => void;
+  onAddProducts: () => void;
   onShowCreateForm: () => void;
+  isPending: boolean;
+  searchQuery: string;
+  onSearchQueryChange: (query: string) => void;
 }
 
 export function SearchProductsTab({
-  onSelectProducts,
+  onAddProducts,
   onShowCreateForm,
+  isPending,
+  searchQuery,
+  onSearchQueryChange,
 }: SearchProductsTabProps) {
   const { t } = useI18n();
 
   const { setSearchQuery, products, isLoading, isEmpty } = useSearchProducts({
     limit: 100,
+    initialQuery: searchQuery,
+    onQueryChange: onSearchQueryChange,
   });
-
-  const handleSearchChange = (query: string) => {
-    setSearchQuery(query);
-  };
 
   return (
     <SearchTabLayout
       isLoading={isLoading}
       isEmpty={isEmpty}
       hasContent={products.length > 0}
-      searchInput={<SearchInput onSearchChange={handleSearchChange} />}
+      searchInput={<SearchInput onSearchChange={setSearchQuery} initialValue={searchQuery} />}
       loadingState={
         <div className="text-center text-sm text-muted-foreground py-8">
           {t("searching")}
@@ -44,8 +47,9 @@ export function SearchProductsTab({
       content={
         <ProductsTable
           products={products}
-          onSelectProducts={onSelectProducts}
+          onAddProducts={onAddProducts}
           onCreateProduct={onShowCreateForm}
+          isPending={isPending}
         />
       }
       emptyState={

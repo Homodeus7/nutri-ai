@@ -600,6 +600,32 @@ components:
           example: 0.95
           nullable: true
 
+    AddProductToMealRequest:
+      type: object
+      required:
+        - productId
+        - quantity
+      properties:
+        productId:
+          type: string
+          format: uuid
+          example: "507f1f77bcf86cd799439011"
+        quantity:
+          type: number
+          format: float
+          example: 150
+          description: "Количество продукта в граммах"
+
+    RemoveProductFromMealRequest:
+      type: object
+      required:
+        - productId
+      properties:
+        productId:
+          type: string
+          format: uuid
+          example: "507f1f77bcf86cd799439011"
+
     CreateProductRequest:
       type: object
       required:
@@ -1103,6 +1129,31 @@ paths:
   # MEALS
   # ========================================
   /meals/{id}:
+    get:
+      tags:
+        - Meals
+      summary: Получить приём пищи
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Данные приёма пищи
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Meal"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
     put:
       tags:
         - Meals
@@ -1152,6 +1203,75 @@ paths:
       responses:
         "204":
           description: Приём удалён
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /meals/{id}/product:
+    put:
+      tags:
+        - Meals
+      summary: Добавить или обновить продукт в приёме пищи
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Meal ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddProductToMealRequest"
+      responses:
+        "200":
+          description: Продукт добавлен/обновлён
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Meal"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    delete:
+      tags:
+        - Meals
+      summary: Удалить продукт из приёма пищи
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Meal ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RemoveProductFromMealRequest"
+      responses:
+        "200":
+          description: Продукт удалён из приёма пищи
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Meal"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":

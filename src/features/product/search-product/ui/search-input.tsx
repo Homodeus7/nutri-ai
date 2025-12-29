@@ -8,14 +8,16 @@ import { useI18n } from "../i18n";
 interface SearchInputProps {
   onSearchChange: (query: string) => void;
   placeholder?: string;
+  initialValue?: string;
 }
 
 export function SearchInput({
   onSearchChange,
   placeholder,
+  initialValue = "",
 }: SearchInputProps) {
   const { t } = useI18n();
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState(initialValue);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;

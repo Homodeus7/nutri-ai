@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   Tabs,
   TabsContent,
@@ -11,31 +12,38 @@ import { RecentProductsTab } from "./recent-products-tab";
 import type { ProductSelectionHandlers } from "../model/types";
 
 interface TabsViewProps {
-  onProductsSelect: ProductSelectionHandlers["onProductsSelect"];
+  onAddProducts: () => void;
   onSwitchToCreate: ProductSelectionHandlers["onSwitchToCreate"];
   searchTabLabel: string;
   recentTabLabel: string;
+  isPending: boolean;
 }
 
 export function TabsView({
-  onProductsSelect,
+  onAddProducts,
   onSwitchToCreate,
   searchTabLabel,
   recentTabLabel,
+  isPending,
 }: TabsViewProps) {
+  const [searchQuery, setSearchQuery] = useState("");
+
   return (
-    <Tabs defaultValue="search" className="py-4 w-full">
+    <Tabs defaultValue="search" className="w-full flex flex-col h-full">
       <TabsList className="grid w-full grid-cols-2">
         <TabsTrigger value="search">{searchTabLabel}</TabsTrigger>
         <TabsTrigger value="recent">{recentTabLabel}</TabsTrigger>
       </TabsList>
-      <TabsContent value="search">
+      <TabsContent value="search" className="flex-1 flex flex-col min-h-0">
         <SearchProductsTab
-          onSelectProducts={onProductsSelect}
+          onAddProducts={onAddProducts}
           onShowCreateForm={onSwitchToCreate}
+          isPending={isPending}
+          searchQuery={searchQuery}
+          onSearchQueryChange={setSearchQuery}
         />
       </TabsContent>
-      <TabsContent value="recent">
+      <TabsContent value="recent" className="flex-1 flex flex-col min-h-0">
         <RecentProductsTab />
       </TabsContent>
     </Tabs>

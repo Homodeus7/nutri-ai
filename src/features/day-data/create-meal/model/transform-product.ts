@@ -1,20 +1,17 @@
-import type {
-  Product,
-  CreateMealRequest,
-} from "@/shared/api/generated/nutriAIFoodCalorieTrackerAPI";
+import type { CreateMealRequest } from "@/shared/api/generated/nutriAIFoodCalorieTrackerAPI";
 import type { ProductItemData } from "@/features/product/create-product";
+import type { SelectedProduct } from "./selected-products.store";
 
 /**
- * Трансформирует массив продуктов в items для CreateMealRequest
- * По умолчанию использует 100g порцию для каждого продукта
+ * Трансформирует массив выбранных продуктов в items для CreateMealRequest
  */
 export function transformProductsToMealItems(
-  products: Product[]
+  selectedProducts: SelectedProduct[]
 ): CreateMealRequest["items"] {
-  return products.map((product) => ({
+  return selectedProducts.map(({ product, quantity }) => ({
     productId: product.id,
     recipeId: null,
-    quantity: 100,
+    quantity: quantity ?? 0,
   }));
 }
 

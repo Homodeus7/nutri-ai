@@ -24,12 +24,12 @@ export function SearchTabLayout({
   const { t } = useI18n();
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col h-full">
       {searchInput}
 
       {isLoading && loadingState}
 
-      {!isLoading && hasContent && content}
+      {!isLoading && hasContent && <div className="flex-1 flex flex-col min-h-0">{content}</div>}
 
       {isEmpty && emptyState}
 
