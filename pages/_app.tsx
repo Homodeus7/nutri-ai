@@ -1,4 +1,4 @@
-import { App } from "@/app/pub/app";
-import "@/app/pub/globals.css";
+import { App } from "@/_app/pub/app";
+import "@/_app/pub/globals.css";
 
 export default App;

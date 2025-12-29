@@ -1,10 +1,9 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
   reactStrictMode: true,
-  eslint: {
-    // Ignore ESLint during production builds (run in CI/locally instead)
-    ignoreDuringBuilds: true,
-  },
+  // Using Pages Router (/pages directory)
+  // Note: /src/app is FSD infrastructure layer, not App Router
   turbopack: {
     root: __dirname,
   },
@@ -19,4 +18,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+export default nextConfig;
