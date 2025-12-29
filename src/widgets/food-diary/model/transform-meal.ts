@@ -35,8 +35,9 @@ const MEAL_CONFIG = {
 
 function transformFoodItem(apiItem: ApiFoodItem): FoodItem {
   return {
-    id: apiItem.id,
+    id: apiItem.productId ?? apiItem.id,
     name: apiItem.name,
+    quantity: apiItem.quantity,
     calories: apiItem.kcal,
     protein: apiItem.protein ?? 0,
     fat: apiItem.fat ?? 0,

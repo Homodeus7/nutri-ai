@@ -24,8 +24,7 @@ export function CreateMealDialog({
 
   const {
     state,
-    open,
-    close,
+    setOpen,
     switchToCreate,
     switchToSearch,
     handleAddProducts,
@@ -39,10 +38,7 @@ export function CreateMealDialog({
       : `${t("addFoodTo")} ${mealName.toLowerCase()}`;
 
   return (
-    <Dialog
-      open={state.isOpen}
-      onOpenChange={(isOpen) => (isOpen ? open() : close())}
-    >
+    <Dialog open={state.isOpen} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
           variant="ghost"
