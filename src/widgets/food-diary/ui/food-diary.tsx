@@ -17,26 +17,9 @@ export function FoodDiary() {
   const { t } = useI18n();
   const dateString = useSelectedDate((state) => state.selectedDateString);
 
-  // Fetch day data based on selected date
-  const { data: dayData, isLoading } = useDayData({
+  const { data: dayData } = useDayData({
     date: dateString,
-    queryOptions: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
-    }
   });
-
-  if (isLoading) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl">{t("title")}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center text-muted-foreground">Loading...</div>
-        </CardContent>
-      </Card>
-    );
-  }
 
   const apiMeals = dayData?.meals ?? [];
   const meals = mergeMealsWithBase(apiMeals);

@@ -30,7 +30,7 @@ export function MealCard({ date, meal, onRemoveFood }: MealCardProps) {
 
   return (
     <Card className={`${meal.bgColor} border-0`}>
-      <CardContent className="">
+      <CardContent className="flex flex-col gap-2">
         <MealHeader
           date={date}
           mealType={meal.type}

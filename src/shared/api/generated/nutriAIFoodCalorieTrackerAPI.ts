@@ -353,6 +353,16 @@ export interface CreateMealRequest {
   aiConfidence?: number | null;
 }
 
+export interface AddProductToMealRequest {
+  productId: string;
+  /** Количество продукта в граммах */
+  quantity: number;
+}
+
+export interface RemoveProductFromMealRequest {
+  productId: string;
+}
+
 export type CreateProductRequestSource =
   (typeof CreateProductRequestSource)[keyof typeof CreateProductRequestSource];
 
@@ -1355,6 +1365,155 @@ export const usePostDayDateMeals = <
 };
 
 /**
+ * @summary Получить приём пищи
+ */
+export const getMealsId = (
+  id: string,
+  options?: SecondParameter<typeof createInstance>,
+  signal?: AbortSignal,
+) => {
+  return createInstance<Meal>(
+    { url: `/meals/${id}`, method: "GET", signal },
+    options,
+  );
+};
+
+export const getGetMealsIdQueryKey = (id?: string) => {
+  return [`/meals/${id}`] as const;
+};
+
+export const getGetMealsIdQueryOptions = <
+  TData = Awaited<ReturnType<typeof getMealsId>>,
+  TError = ErrorType<UnauthorizedResponse | NotFoundResponse>,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getMealsId>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetMealsIdQueryKey(id);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getMealsId>>> = ({
+    signal,
+  }) => getMealsId(id, requestOptions, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!id,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getMealsId>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetMealsIdQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getMealsId>>
+>;
+export type GetMealsIdQueryError = ErrorType<
+  UnauthorizedResponse | NotFoundResponse
+>;
+
+export function useGetMealsId<
+  TData = Awaited<ReturnType<typeof getMealsId>>,
+  TError = ErrorType<UnauthorizedResponse | NotFoundResponse>,
+>(
+  id: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getMealsId>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMealsId>>,
+          TError,
+          Awaited<ReturnType<typeof getMealsId>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetMealsId<
+  TData = Awaited<ReturnType<typeof getMealsId>>,
+  TError = ErrorType<UnauthorizedResponse | NotFoundResponse>,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getMealsId>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMealsId>>,
+          TError,
+          Awaited<ReturnType<typeof getMealsId>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetMealsId<
+  TData = Awaited<ReturnType<typeof getMealsId>>,
+  TError = ErrorType<UnauthorizedResponse | NotFoundResponse>,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getMealsId>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Получить приём пищи
+ */
+
+export function useGetMealsId<
+  TData = Awaited<ReturnType<typeof getMealsId>>,
+  TError = ErrorType<UnauthorizedResponse | NotFoundResponse>,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getMealsId>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetMealsIdQueryOptions(id, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
  * @summary Обновить приём пищи
  */
 export const putMealsId = (
@@ -1534,6 +1693,201 @@ export const useDeleteMealsId = <
   TContext
 > => {
   const mutationOptions = getDeleteMealsIdMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Добавить или обновить продукт в приёме пищи
+ */
+export const putMealsIdProduct = (
+  id: string,
+  addProductToMealRequest: BodyType<AddProductToMealRequest>,
+  options?: SecondParameter<typeof createInstance>,
+) => {
+  return createInstance<Meal>(
+    {
+      url: `/meals/${id}/product`,
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      data: addProductToMealRequest,
+    },
+    options,
+  );
+};
+
+export const getPutMealsIdProductMutationOptions = <
+  TError = ErrorType<
+    BadRequestResponse | UnauthorizedResponse | NotFoundResponse
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof putMealsIdProduct>>,
+    TError,
+    { id: string; data: BodyType<AddProductToMealRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof createInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof putMealsIdProduct>>,
+  TError,
+  { id: string; data: BodyType<AddProductToMealRequest> },
+  TContext
+> => {
+  const mutationKey = ["putMealsIdProduct"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof putMealsIdProduct>>,
+    { id: string; data: BodyType<AddProductToMealRequest> }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return putMealsIdProduct(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PutMealsIdProductMutationResult = NonNullable<
+  Awaited<ReturnType<typeof putMealsIdProduct>>
+>;
+export type PutMealsIdProductMutationBody = BodyType<AddProductToMealRequest>;
+export type PutMealsIdProductMutationError = ErrorType<
+  BadRequestResponse | UnauthorizedResponse | NotFoundResponse
+>;
+
+/**
+ * @summary Добавить или обновить продукт в приёме пищи
+ */
+export const usePutMealsIdProduct = <
+  TError = ErrorType<
+    BadRequestResponse | UnauthorizedResponse | NotFoundResponse
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof putMealsIdProduct>>,
+      TError,
+      { id: string; data: BodyType<AddProductToMealRequest> },
+      TContext
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof putMealsIdProduct>>,
+  TError,
+  { id: string; data: BodyType<AddProductToMealRequest> },
+  TContext
+> => {
+  const mutationOptions = getPutMealsIdProductMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Удалить продукт из приёма пищи
+ */
+export const deleteMealsIdProduct = (
+  id: string,
+  removeProductFromMealRequest: BodyType<RemoveProductFromMealRequest>,
+  options?: SecondParameter<typeof createInstance>,
+) => {
+  return createInstance<Meal>(
+    {
+      url: `/meals/${id}/product`,
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      data: removeProductFromMealRequest,
+    },
+    options,
+  );
+};
+
+export const getDeleteMealsIdProductMutationOptions = <
+  TError = ErrorType<
+    BadRequestResponse | UnauthorizedResponse | NotFoundResponse
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteMealsIdProduct>>,
+    TError,
+    { id: string; data: BodyType<RemoveProductFromMealRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof createInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteMealsIdProduct>>,
+  TError,
+  { id: string; data: BodyType<RemoveProductFromMealRequest> },
+  TContext
+> => {
+  const mutationKey = ["deleteMealsIdProduct"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteMealsIdProduct>>,
+    { id: string; data: BodyType<RemoveProductFromMealRequest> }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return deleteMealsIdProduct(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteMealsIdProductMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteMealsIdProduct>>
+>;
+export type DeleteMealsIdProductMutationBody =
+  BodyType<RemoveProductFromMealRequest>;
+export type DeleteMealsIdProductMutationError = ErrorType<
+  BadRequestResponse | UnauthorizedResponse | NotFoundResponse
+>;
+
+/**
+ * @summary Удалить продукт из приёма пищи
+ */
+export const useDeleteMealsIdProduct = <
+  TError = ErrorType<
+    BadRequestResponse | UnauthorizedResponse | NotFoundResponse
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof deleteMealsIdProduct>>,
+      TError,
+      { id: string; data: BodyType<RemoveProductFromMealRequest> },
+      TContext
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof deleteMealsIdProduct>>,
+  TError,
+  { id: string; data: BodyType<RemoveProductFromMealRequest> },
+  TContext
+> => {
+  const mutationOptions = getDeleteMealsIdProductMutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };
@@ -4142,7 +4496,262 @@ export const getPostDayDateMealsResponseMock = (
   ...overrideResponse,
 });
 
+export const getGetMealsIdResponseMock = (
+  overrideResponse: Partial<Meal> = {},
+): Meal => ({
+  id: faker.string.uuid(),
+  dayEntryId: faker.string.uuid(),
+  type: faker.helpers.arrayElement([
+    "breakfast",
+    "lunch",
+    "dinner",
+    "snack",
+    "other",
+  ] as const),
+  time: faker.helpers.arrayElement([
+    faker.helpers.fromRegExp("^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$"),
+    undefined,
+  ]),
+  name: faker.helpers.arrayElement([
+    faker.string.alpha({ length: { min: 10, max: 20 } }),
+    undefined,
+  ]),
+  items: faker.helpers.arrayElement([
+    Array.from(
+      { length: faker.number.int({ min: 1, max: 10 }) },
+      (_, i) => i + 1,
+    ).map(() => ({
+      id: faker.string.uuid(),
+      mealId: faker.string.uuid(),
+      productId: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.uuid(), null]),
+        undefined,
+      ]),
+      recipeId: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.uuid(), null]),
+        undefined,
+      ]),
+      name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      quantity: faker.number.float({
+        min: undefined,
+        max: undefined,
+        fractionDigits: 2,
+      }),
+      unit: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      kcal: faker.number.int({ min: 0, max: undefined }),
+      protein: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      fat: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      carbs: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      source: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
+    })),
+    undefined,
+  ]),
+  totalKcal: faker.number.int({ min: 0, max: undefined }),
+  source: faker.helpers.arrayElement(["manual", "ai"] as const),
+  aiConfidence: faker.helpers.arrayElement([
+    faker.number.float({ min: 0, max: 1, fractionDigits: 2 }),
+    undefined,
+  ]),
+  createdAt: `${faker.date.past().toISOString().split(".")[0]}Z`,
+  updatedAt: `${faker.date.past().toISOString().split(".")[0]}Z`,
+  ...overrideResponse,
+});
+
 export const getPutMealsIdResponseMock = (
+  overrideResponse: Partial<Meal> = {},
+): Meal => ({
+  id: faker.string.uuid(),
+  dayEntryId: faker.string.uuid(),
+  type: faker.helpers.arrayElement([
+    "breakfast",
+    "lunch",
+    "dinner",
+    "snack",
+    "other",
+  ] as const),
+  time: faker.helpers.arrayElement([
+    faker.helpers.fromRegExp("^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$"),
+    undefined,
+  ]),
+  name: faker.helpers.arrayElement([
+    faker.string.alpha({ length: { min: 10, max: 20 } }),
+    undefined,
+  ]),
+  items: faker.helpers.arrayElement([
+    Array.from(
+      { length: faker.number.int({ min: 1, max: 10 }) },
+      (_, i) => i + 1,
+    ).map(() => ({
+      id: faker.string.uuid(),
+      mealId: faker.string.uuid(),
+      productId: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.uuid(), null]),
+        undefined,
+      ]),
+      recipeId: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.uuid(), null]),
+        undefined,
+      ]),
+      name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      quantity: faker.number.float({
+        min: undefined,
+        max: undefined,
+        fractionDigits: 2,
+      }),
+      unit: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      kcal: faker.number.int({ min: 0, max: undefined }),
+      protein: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      fat: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      carbs: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      source: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
+    })),
+    undefined,
+  ]),
+  totalKcal: faker.number.int({ min: 0, max: undefined }),
+  source: faker.helpers.arrayElement(["manual", "ai"] as const),
+  aiConfidence: faker.helpers.arrayElement([
+    faker.number.float({ min: 0, max: 1, fractionDigits: 2 }),
+    undefined,
+  ]),
+  createdAt: `${faker.date.past().toISOString().split(".")[0]}Z`,
+  updatedAt: `${faker.date.past().toISOString().split(".")[0]}Z`,
+  ...overrideResponse,
+});
+
+export const getPutMealsIdProductResponseMock = (
+  overrideResponse: Partial<Meal> = {},
+): Meal => ({
+  id: faker.string.uuid(),
+  dayEntryId: faker.string.uuid(),
+  type: faker.helpers.arrayElement([
+    "breakfast",
+    "lunch",
+    "dinner",
+    "snack",
+    "other",
+  ] as const),
+  time: faker.helpers.arrayElement([
+    faker.helpers.fromRegExp("^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$"),
+    undefined,
+  ]),
+  name: faker.helpers.arrayElement([
+    faker.string.alpha({ length: { min: 10, max: 20 } }),
+    undefined,
+  ]),
+  items: faker.helpers.arrayElement([
+    Array.from(
+      { length: faker.number.int({ min: 1, max: 10 }) },
+      (_, i) => i + 1,
+    ).map(() => ({
+      id: faker.string.uuid(),
+      mealId: faker.string.uuid(),
+      productId: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.uuid(), null]),
+        undefined,
+      ]),
+      recipeId: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.uuid(), null]),
+        undefined,
+      ]),
+      name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      quantity: faker.number.float({
+        min: undefined,
+        max: undefined,
+        fractionDigits: 2,
+      }),
+      unit: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      kcal: faker.number.int({ min: 0, max: undefined }),
+      protein: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      fat: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      carbs: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      source: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
+    })),
+    undefined,
+  ]),
+  totalKcal: faker.number.int({ min: 0, max: undefined }),
+  source: faker.helpers.arrayElement(["manual", "ai"] as const),
+  aiConfidence: faker.helpers.arrayElement([
+    faker.number.float({ min: 0, max: 1, fractionDigits: 2 }),
+    undefined,
+  ]),
+  createdAt: `${faker.date.past().toISOString().split(".")[0]}Z`,
+  updatedAt: `${faker.date.past().toISOString().split(".")[0]}Z`,
+  ...overrideResponse,
+});
+
+export const getDeleteMealsIdProductResponseMock = (
   overrideResponse: Partial<Meal> = {},
 ): Meal => ({
   id: faker.string.uuid(),
@@ -6275,6 +6884,34 @@ export const getPostDayDateMealsMockHandler = (
   );
 };
 
+export const getGetMealsIdMockHandler = (
+  overrideResponse?:
+    | Meal
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) => Promise<Meal> | Meal),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    "*/meals/:id",
+    async (info) => {
+      await delay(1000);
+
+      return new HttpResponse(
+        JSON.stringify(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === "function"
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getGetMealsIdResponseMock(),
+        ),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      );
+    },
+    options,
+  );
+};
+
 export const getPutMealsIdMockHandler = (
   overrideResponse?:
     | Meal
@@ -6319,6 +6956,62 @@ export const getDeleteMealsIdMockHandler = (
         await overrideResponse(info);
       }
       return new HttpResponse(null, { status: 204 });
+    },
+    options,
+  );
+};
+
+export const getPutMealsIdProductMockHandler = (
+  overrideResponse?:
+    | Meal
+    | ((
+        info: Parameters<Parameters<typeof http.put>[1]>[0],
+      ) => Promise<Meal> | Meal),
+  options?: RequestHandlerOptions,
+) => {
+  return http.put(
+    "*/meals/:id/product",
+    async (info) => {
+      await delay(1000);
+
+      return new HttpResponse(
+        JSON.stringify(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === "function"
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getPutMealsIdProductResponseMock(),
+        ),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      );
+    },
+    options,
+  );
+};
+
+export const getDeleteMealsIdProductMockHandler = (
+  overrideResponse?:
+    | Meal
+    | ((
+        info: Parameters<Parameters<typeof http.delete>[1]>[0],
+      ) => Promise<Meal> | Meal),
+  options?: RequestHandlerOptions,
+) => {
+  return http.delete(
+    "*/meals/:id/product",
+    async (info) => {
+      await delay(1000);
+
+      return new HttpResponse(
+        JSON.stringify(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === "function"
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getDeleteMealsIdProductResponseMock(),
+        ),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      );
     },
     options,
   );
@@ -6848,8 +7541,11 @@ export const getNutriAIFoodCalorieTrackerAPIMock = () => [
   getGetCalendarMockHandler(),
   getGetDayDateMockHandler(),
   getPostDayDateMealsMockHandler(),
+  getGetMealsIdMockHandler(),
   getPutMealsIdMockHandler(),
   getDeleteMealsIdMockHandler(),
+  getPutMealsIdProductMockHandler(),
+  getDeleteMealsIdProductMockHandler(),
   getPostAiParseMealMockHandler(),
   getGetProductsMockHandler(),
   getPostProductsMockHandler(),

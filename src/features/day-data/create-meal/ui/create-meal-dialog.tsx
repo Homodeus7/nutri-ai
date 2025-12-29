@@ -28,7 +28,7 @@ export function CreateMealDialog({
     close,
     switchToCreate,
     switchToSearch,
-    handleProductsSelect,
+    handleAddProducts,
     handleCreateProduct,
     isPending,
   } = useCreateMealDialog({ date, mealType });
@@ -53,7 +53,7 @@ export function CreateMealDialog({
           <Plus className="size-6 text-chart-2" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[90vh] lg:min-h-[400px] lg:max-h-[600px] overflow-y-auto flex flex-col items-start">
+      <DialogContent className="max-h-[90vh] lg:min-h-[400px] lg:max-h-[500px] overflow-hidden flex flex-col items-start h-[90vh]">
         <DialogHeader>
           <DialogTitle>{dialogTitle}</DialogTitle>
         </DialogHeader>
@@ -66,10 +66,11 @@ export function CreateMealDialog({
           />
         ) : (
           <TabsView
-            onProductsSelect={handleProductsSelect}
+            onAddProducts={handleAddProducts}
             onSwitchToCreate={switchToCreate}
             searchTabLabel={t("searchTab")}
             recentTabLabel={t("recentTab")}
+            isPending={isPending}
           />
         )}
       </DialogContent>

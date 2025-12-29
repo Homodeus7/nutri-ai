@@ -1,10 +1,9 @@
 import { describe, it, expect } from "vitest";
+import { dayDateSchema, parseDayDate } from "./day-data.schema";
 import {
-  dayDateSchema,
-  parseDayDate,
   formatDayDate,
   getTodayDate,
-} from "./day-data.schema";
+} from "@/entities/select-date/model/date.lib";
 
 describe("dayDateSchema", () => {
   it("validates correct date format", () => {

@@ -333,6 +333,16 @@ export interface CreateMealRequest {
   aiConfidence?: number | null;
 }
 
+export interface AddProductToMealRequest {
+  productId: string;
+  /** Количество продукта в граммах */
+  quantity: number;
+}
+
+export interface RemoveProductFromMealRequest {
+  productId: string;
+}
+
 export type CreateProductRequestSource =
   (typeof CreateProductRequestSource)[keyof typeof CreateProductRequestSource];
 
@@ -738,6 +748,16 @@ export const postDayDateMeals = <TData = AxiosResponse<Meal>>(
 };
 
 /**
+ * @summary Получить приём пищи
+ */
+export const getMealsId = <TData = AxiosResponse<Meal>>(
+  id: string,
+  options?: AxiosRequestConfig,
+): Promise<TData> => {
+  return axios.get(`/meals/${id}`, options);
+};
+
+/**
  * @summary Обновить приём пищи
  */
 export const putMealsId = <TData = AxiosResponse<Meal>>(
@@ -756,6 +776,31 @@ export const deleteMealsId = <TData = AxiosResponse<void>>(
   options?: AxiosRequestConfig,
 ): Promise<TData> => {
   return axios.delete(`/meals/${id}`, options);
+};
+
+/**
+ * @summary Добавить или обновить продукт в приёме пищи
+ */
+export const putMealsIdProduct = <TData = AxiosResponse<Meal>>(
+  id: string,
+  addProductToMealRequest: AddProductToMealRequest,
+  options?: AxiosRequestConfig,
+): Promise<TData> => {
+  return axios.put(`/meals/${id}/product`, addProductToMealRequest, options);
+};
+
+/**
+ * @summary Удалить продукт из приёма пищи
+ */
+export const deleteMealsIdProduct = <TData = AxiosResponse<Meal>>(
+  id: string,
+  removeProductFromMealRequest: RemoveProductFromMealRequest,
+  options?: AxiosRequestConfig,
+): Promise<TData> => {
+  return axios.delete(`/meals/${id}/product`, {
+    data: removeProductFromMealRequest,
+    ...options,
+  });
 };
 
 /**
@@ -980,8 +1025,11 @@ export type PostAuthGoogleResult = AxiosResponse<AuthResponse>;
 export type GetCalendarResult = AxiosResponse<GetCalendar200>;
 export type GetDayDateResult = AxiosResponse<DayEntry>;
 export type PostDayDateMealsResult = AxiosResponse<Meal>;
+export type GetMealsIdResult = AxiosResponse<Meal>;
 export type PutMealsIdResult = AxiosResponse<Meal>;
 export type DeleteMealsIdResult = AxiosResponse<void>;
+export type PutMealsIdProductResult = AxiosResponse<Meal>;
+export type DeleteMealsIdProductResult = AxiosResponse<Meal>;
 export type PostAiParseMealResult = AxiosResponse<AiParseMealResponse>;
 export type GetProductsResult = AxiosResponse<GetProducts200>;
 export type PostProductsResult = AxiosResponse<Product>;

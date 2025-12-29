@@ -28,6 +28,10 @@ export const useI18n = createI18nModule({
     en: "C",
     ru: "У",
   },
+  quantity: {
+    en: "Qty",
+    ru: "Кол-во",
+  },
 
   // ProductsTable - pagination
   pageOf: {

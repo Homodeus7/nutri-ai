@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { formatDayDate, getTodayDate } from "../../get-meals/model/day-data.schema";
+import { formatDayDate, getTodayDate } from "./date.lib";
 
 type DateStore = {
   selectedDate: Date;
