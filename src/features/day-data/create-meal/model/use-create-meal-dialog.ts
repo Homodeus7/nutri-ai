@@ -5,6 +5,7 @@ import { useControlledDialog } from "@/shared/ui";
 import type { CreateMealMode } from "./types";
 import { transformProductsToMealItems } from "./transform-product";
 import { useCreateMeal, useDayData } from "@/features/day-data";
+import { useUpdateMeal } from "@/features/meal/update-meal";
 import { useSelectedProducts } from "./selected-products.store";
 
 export interface UseCreateMealDialogOptions {
@@ -27,7 +28,7 @@ export function useCreateMealDialog({
     return dayData?.meals?.find((meal) => meal.type === mealType);
   }, [dayData?.meals, mealType]);
 
-  const { createMeal, isPending } = useCreateMeal({
+  const { createMeal, isPending: isCreating } = useCreateMeal({
     date,
     onSuccess: () => {
       clear();
@@ -35,6 +36,16 @@ export function useCreateMealDialog({
       onSuccess?.();
     },
   });
+
+  const { updateMeal, isPending: isUpdating } = useUpdateMeal({
+    onSuccess: () => {
+      clear();
+      dialog.close();
+      onSuccess?.();
+    },
+  });
+
+  const isPending = isCreating || isUpdating;
 
   const dialog = useControlledDialog({
     onOpenChange: (isOpen) => {
@@ -65,18 +76,26 @@ export function useCreateMealDialog({
     const selectedProducts = getAll();
     if (selectedProducts.length === 0) return;
 
-    const items = transformProductsToMealItems(selectedProducts);
+    const newItems = transformProductsToMealItems(selectedProducts);
 
     if (existingMeal) {
-      console.warn("Update meal not implemented yet. Need PATCH/PUT endpoint");
-      console.log("Existing meal:", existingMeal);
-      console.log("New items to add:", items);
-      clear();
-      dialog.close();
+      // Объединяем существующие items с новыми
+      const mergedItems = [...(existingMeal.items || []), ...newItems];
+
+      updateMeal({
+        id: existingMeal.id,
+        data: {
+          type: existingMeal.type,
+          items: mergedItems,
+          source: existingMeal.source || "manual",
+          ...(existingMeal.time && { time: existingMeal.time }),
+          ...(existingMeal.name && { name: existingMeal.name }),
+        },
+      });
     } else {
       createMeal({
         type: mealType,
-        items,
+        items: newItems,
         source: "manual",
       });
     }
@@ -84,9 +103,8 @@ export function useCreateMealDialog({
     getAll,
     existingMeal,
     createMeal,
+    updateMeal,
     mealType,
-    clear,
-    dialog,
   ]);
 
   const handleCreateProduct = useCallback(
