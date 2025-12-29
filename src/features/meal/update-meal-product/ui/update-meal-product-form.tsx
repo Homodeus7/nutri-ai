@@ -97,7 +97,7 @@ export function UpdateMealProductForm({
             )}
           />
         </div>
-        <DialogFooter>
+        <DialogFooter className="grid grid-cols-2 gap-2">
           <Button
             type="button"
             variant="outline"

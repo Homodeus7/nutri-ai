@@ -29,7 +29,7 @@ export function RemoveMealProductConfirm({
           {productName}
         </UiText>
       </DialogDescription>
-      <DialogFooter>
+      <DialogFooter className="grid grid-cols-2 gap-2">
         <Button
           type="button"
           variant="outline"
