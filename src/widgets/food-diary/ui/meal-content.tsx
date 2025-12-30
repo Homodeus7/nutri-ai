@@ -25,9 +25,9 @@ function EmptyState() {
       <UiText variant="small" className="text-muted-foreground">
         {t("noEntries")}
       </UiText>
-      <UiText variant="muted" className="text-xs mt-1">
+      {/* <UiText variant="muted" className="text-xs mt-1">
         {t("clickToAdd")}
-      </UiText>
+      </UiText> */}
     </div>
   );
 }
@@ -44,7 +44,7 @@ export function MealContent({ items, totals }: MealContentProps) {
   const hasItems = items.length > 0;
 
   if (!hasItems) {
-    return null;
+    return <EmptyState />;
   }
 
   return (

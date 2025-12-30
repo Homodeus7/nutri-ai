@@ -4,7 +4,7 @@ import { UiText } from "@/shared/ui/ui-text";
 import { useI18n } from "./i18n";
 import { UiButton } from "@/shared/ui";
 import { Settings } from "lucide-react";
-import { UpdateTheme } from "@/features/theme";
+import { UpdateColorTheme, UpdateTheme } from "@/features/theme";
 import { UpdateLang } from "@/features/i18n";
 import { LogoutButton } from "@/features/auth";
 
@@ -18,18 +18,15 @@ export function MorePage() {
       </UiText>
       <UiText variant="muted">{t("description")}</UiText>
       <div className="mt-auto mb-4 flex flex-col gap-4 items-start">
-        <UiButton
-          variant="ghost"
-          size="icon"
-          className="bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white"
-        >
+        <UiButton variant="default" size="icon">
           <Settings className="w-6 h-6" />
         </UiButton>
-        <div className="w-full">
-          <UpdateTheme className="w-full" />
-        </div>
+
+        <UpdateTheme className="w-full" />
+
+        <UpdateColorTheme />
         <UpdateLang />
-        <LogoutButton className="w-full" variant="destructive" />
+        <LogoutButton />
       </div>
     </>
   );

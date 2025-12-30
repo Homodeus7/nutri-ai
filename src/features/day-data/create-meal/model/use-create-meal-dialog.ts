@@ -3,7 +3,7 @@ import type { CreateMealRequest } from "@/shared/api/generated/nutriAIFoodCalori
 import type { ProductItemData } from "@/features/product/create-product";
 import { useControlledDialog } from "@/shared/ui";
 import type { CreateMealMode } from "./types";
-import { transformProductsToMealItems } from "./transform-product";
+import { transformProductsToMealItems, normalizeFoodItemsForUpdate } from "./transform-product";
 import { useCreateMeal, useDayData } from "@/features/day-data";
 import { useUpdateMeal } from "@/features/meal/update-meal";
 import { useSelectedProducts } from "./selected-products.store";
@@ -79,17 +79,14 @@ export function useCreateMealDialog({
     const newItems = transformProductsToMealItems(selectedProducts);
 
     if (existingMeal) {
-      // Объединяем существующие items с новыми
-      const mergedItems = [...(existingMeal.items || []), ...newItems];
+      // Нормализуем существующие items (убираем лишние поля) и объединяем с новыми
+      const normalizedExistingItems = normalizeFoodItemsForUpdate(existingMeal.items);
+      const mergedItems = [...normalizedExistingItems, ...newItems];
 
       updateMeal({
         id: existingMeal.id,
         data: {
-          type: existingMeal.type,
           items: mergedItems,
-          source: existingMeal.source || "manual",
-          ...(existingMeal.time && { time: existingMeal.time }),
-          ...(existingMeal.name && { name: existingMeal.name }),
         },
       });
     } else {

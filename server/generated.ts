@@ -343,6 +343,19 @@ export interface RemoveProductFromMealRequest {
   productId: string;
 }
 
+export type UpdateMealItemsRequestItemsItem = {
+  /** @nullable */
+  productId?: string | null;
+  /** @nullable */
+  recipeId?: string | null;
+  /** Для продукта - граммы, для рецепта - количество порций */
+  quantity: number;
+};
+
+export interface UpdateMealItemsRequest {
+  items: UpdateMealItemsRequestItemsItem[];
+}
+
 export type CreateProductRequestSource =
   (typeof CreateProductRequestSource)[keyof typeof CreateProductRequestSource];
 
@@ -714,6 +727,16 @@ export const postAuthGoogle = <TData = AxiosResponse<AuthResponse>>(
 };
 
 /**
+ * Проверка валидности токена и получение данных текущего пользователя
+ * @summary Получить информацию о текущем пользователе
+ */
+export const getAuthMe = <TData = AxiosResponse<User>>(
+  options?: AxiosRequestConfig,
+): Promise<TData> => {
+  return axios.get(`/auth/me`, options);
+};
+
+/**
  * @summary Получить календарь за месяц
  */
 export const getCalendar = <TData = AxiosResponse<GetCalendar200>>(
@@ -758,14 +781,15 @@ export const getMealsId = <TData = AxiosResponse<Meal>>(
 };
 
 /**
- * @summary Обновить приём пищи
+ * Обновляет список продуктов в приёме пищи. Полностью заменяет существующие элементы новым списком.
+ * @summary Обновить элементы приёма пищи
  */
 export const putMealsId = <TData = AxiosResponse<Meal>>(
   id: string,
-  createMealRequest: CreateMealRequest,
+  updateMealItemsRequest: UpdateMealItemsRequest,
   options?: AxiosRequestConfig,
 ): Promise<TData> => {
-  return axios.put(`/meals/${id}`, createMealRequest, options);
+  return axios.put(`/meals/${id}`, updateMealItemsRequest, options);
 };
 
 /**
@@ -1022,6 +1046,7 @@ export const getStats = <TData = AxiosResponse<StatsResponse>>(
 export type PostAuthSignupResult = AxiosResponse<AuthResponse>;
 export type PostAuthLoginResult = AxiosResponse<AuthResponse>;
 export type PostAuthGoogleResult = AxiosResponse<AuthResponse>;
+export type GetAuthMeResult = AxiosResponse<User>;
 export type GetCalendarResult = AxiosResponse<GetCalendar200>;
 export type GetDayDateResult = AxiosResponse<DayEntry>;
 export type PostDayDateMealsResult = AxiosResponse<Meal>;

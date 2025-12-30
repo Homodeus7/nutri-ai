@@ -363,6 +363,19 @@ export interface RemoveProductFromMealRequest {
   productId: string;
 }
 
+export type UpdateMealItemsRequestItemsItem = {
+  /** @nullable */
+  productId?: string | null;
+  /** @nullable */
+  recipeId?: string | null;
+  /** Для продукта - граммы, для рецепта - количество порций */
+  quantity: number;
+};
+
+export interface UpdateMealItemsRequest {
+  items: UpdateMealItemsRequestItemsItem[];
+}
+
 export type CreateProductRequestSource =
   (typeof CreateProductRequestSource)[keyof typeof CreateProductRequestSource];
 
@@ -979,6 +992,141 @@ export const usePostAuthGoogle = <
 };
 
 /**
+ * Проверка валидности токена и получение данных текущего пользователя
+ * @summary Получить информацию о текущем пользователе
+ */
+export const getAuthMe = (
+  options?: SecondParameter<typeof createInstance>,
+  signal?: AbortSignal,
+) => {
+  return createInstance<User>(
+    { url: `/auth/me`, method: "GET", signal },
+    options,
+  );
+};
+
+export const getGetAuthMeQueryKey = () => {
+  return [`/auth/me`] as const;
+};
+
+export const getGetAuthMeQueryOptions = <
+  TData = Awaited<ReturnType<typeof getAuthMe>>,
+  TError = ErrorType<Error>,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof getAuthMe>>, TError, TData>
+  >;
+  request?: SecondParameter<typeof createInstance>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetAuthMeQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getAuthMe>>> = ({
+    signal,
+  }) => getAuthMe(requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getAuthMe>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetAuthMeQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getAuthMe>>
+>;
+export type GetAuthMeQueryError = ErrorType<Error>;
+
+export function useGetAuthMe<
+  TData = Awaited<ReturnType<typeof getAuthMe>>,
+  TError = ErrorType<Error>,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAuthMe>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAuthMe>>,
+          TError,
+          Awaited<ReturnType<typeof getAuthMe>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetAuthMe<
+  TData = Awaited<ReturnType<typeof getAuthMe>>,
+  TError = ErrorType<Error>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAuthMe>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAuthMe>>,
+          TError,
+          Awaited<ReturnType<typeof getAuthMe>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetAuthMe<
+  TData = Awaited<ReturnType<typeof getAuthMe>>,
+  TError = ErrorType<Error>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAuthMe>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Получить информацию о текущем пользователе
+ */
+
+export function useGetAuthMe<
+  TData = Awaited<ReturnType<typeof getAuthMe>>,
+  TError = ErrorType<Error>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAuthMe>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetAuthMeQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
  * @summary Получить календарь за месяц
  */
 export const getCalendar = (
@@ -1514,11 +1662,12 @@ export function useGetMealsId<
 }
 
 /**
- * @summary Обновить приём пищи
+ * Обновляет список продуктов в приёме пищи. Полностью заменяет существующие элементы новым списком.
+ * @summary Обновить элементы приёма пищи
  */
 export const putMealsId = (
   id: string,
-  createMealRequest: BodyType<CreateMealRequest>,
+  updateMealItemsRequest: BodyType<UpdateMealItemsRequest>,
   options?: SecondParameter<typeof createInstance>,
 ) => {
   return createInstance<Meal>(
@@ -1526,7 +1675,7 @@ export const putMealsId = (
       url: `/meals/${id}`,
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      data: createMealRequest,
+      data: updateMealItemsRequest,
     },
     options,
   );
@@ -1541,14 +1690,14 @@ export const getPutMealsIdMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof putMealsId>>,
     TError,
-    { id: string; data: BodyType<CreateMealRequest> },
+    { id: string; data: BodyType<UpdateMealItemsRequest> },
     TContext
   >;
   request?: SecondParameter<typeof createInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof putMealsId>>,
   TError,
-  { id: string; data: BodyType<CreateMealRequest> },
+  { id: string; data: BodyType<UpdateMealItemsRequest> },
   TContext
 > => {
   const mutationKey = ["putMealsId"];
@@ -1562,7 +1711,7 @@ export const getPutMealsIdMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof putMealsId>>,
-    { id: string; data: BodyType<CreateMealRequest> }
+    { id: string; data: BodyType<UpdateMealItemsRequest> }
   > = (props) => {
     const { id, data } = props ?? {};
 
@@ -1575,13 +1724,13 @@ export const getPutMealsIdMutationOptions = <
 export type PutMealsIdMutationResult = NonNullable<
   Awaited<ReturnType<typeof putMealsId>>
 >;
-export type PutMealsIdMutationBody = BodyType<CreateMealRequest>;
+export type PutMealsIdMutationBody = BodyType<UpdateMealItemsRequest>;
 export type PutMealsIdMutationError = ErrorType<
   BadRequestResponse | UnauthorizedResponse | NotFoundResponse
 >;
 
 /**
- * @summary Обновить приём пищи
+ * @summary Обновить элементы приёма пищи
  */
 export const usePutMealsId = <
   TError = ErrorType<
@@ -1593,7 +1742,7 @@ export const usePutMealsId = <
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof putMealsId>>,
       TError,
-      { id: string; data: BodyType<CreateMealRequest> },
+      { id: string; data: BodyType<UpdateMealItemsRequest> },
       TContext
     >;
     request?: SecondParameter<typeof createInstance>;
@@ -1602,7 +1751,7 @@ export const usePutMealsId = <
 ): UseMutationResult<
   Awaited<ReturnType<typeof putMealsId>>,
   TError,
-  { id: string; data: BodyType<CreateMealRequest> },
+  { id: string; data: BodyType<UpdateMealItemsRequest> },
   TContext
 > => {
   const mutationOptions = getPutMealsIdMutationOptions(options);
@@ -4275,6 +4424,28 @@ export const getPostAuthGoogleResponseMock = (
   ...overrideResponse,
 });
 
+export const getGetAuthMeResponseMock = (
+  overrideResponse: Partial<User> = {},
+): User => ({
+  id: faker.string.uuid(),
+  email: faker.internet.email(),
+  passwordHash: faker.string.alpha({ length: { min: 10, max: 20 } }),
+  displayName: faker.helpers.arrayElement([
+    faker.string.alpha({ length: { min: 10, max: 20 } }),
+    undefined,
+  ]),
+  timezone: faker.helpers.arrayElement([
+    faker.string.alpha({ length: { min: 10, max: 20 } }),
+    undefined,
+  ]),
+  dailyKcalGoal: faker.helpers.arrayElement([
+    faker.number.int({ min: 0, max: undefined }),
+    undefined,
+  ]),
+  createdAt: `${faker.date.past().toISOString().split(".")[0]}Z`,
+  ...overrideResponse,
+});
+
 export const getGetCalendarResponseMock = (
   overrideResponse: Partial<GetCalendar200> = {},
 ): GetCalendar200 => ({
@@ -6800,6 +6971,34 @@ export const getPostAuthGoogleMockHandler = (
   );
 };
 
+export const getGetAuthMeMockHandler = (
+  overrideResponse?:
+    | User
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) => Promise<User> | User),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    "*/auth/me",
+    async (info) => {
+      await delay(1000);
+
+      return new HttpResponse(
+        JSON.stringify(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === "function"
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getGetAuthMeResponseMock(),
+        ),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      );
+    },
+    options,
+  );
+};
+
 export const getGetCalendarMockHandler = (
   overrideResponse?:
     | GetCalendar200
@@ -7538,6 +7737,7 @@ export const getNutriAIFoodCalorieTrackerAPIMock = () => [
   getPostAuthSignupMockHandler(),
   getPostAuthLoginMockHandler(),
   getPostAuthGoogleMockHandler(),
+  getGetAuthMeMockHandler(),
   getGetCalendarMockHandler(),
   getGetDayDateMockHandler(),
   getPostDayDateMealsMockHandler(),
