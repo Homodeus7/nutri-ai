@@ -24,7 +24,7 @@ export function RemoveMealProductConfirm({
     <>
       <DialogDescription>
         {t("description")}
-        <UiText variant="large" className="text-primary pt-4">
+        <UiText as="span" variant="large" className="text-primary pt-4 block">
           {productName}
         </UiText>
       </DialogDescription>
