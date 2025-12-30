@@ -23,7 +23,7 @@ function NutrientProgress({
   unit,
   colorClass,
 }: NutrientProgressProps) {
-  const percentage = (value / goal) * 100;
+  const percentage = Math.min((value / goal) * 100, 100);
 
   return (
     <div className="text-center">
