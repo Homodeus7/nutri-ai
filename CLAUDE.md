@@ -73,12 +73,12 @@ const form = useForm<FormData>({
 **API:**
 ```tsx
 // Queries
-import { useGetUserProfile } from "@/shared/api/generated";
-const { data, isLoading } = useGetUserProfile();
+import { useGetAuthMe } from "@/shared/api/generated/nutriAIFoodCalorieTrackerAPI";
+const { data, isLoading } = useGetAuthMe();
 
 // Mutations
-import { usePostAuth } from "@/shared/api/generated";
-const { mutate, isPending } = usePostAuth();
+import { usePostAuthLogin } from "@/shared/api/generated/nutriAIFoodCalorieTrackerAPI";
+const { mutate, isPending } = usePostAuthLogin();
 ```
 
 **UI Components:**

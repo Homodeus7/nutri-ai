@@ -8,16 +8,12 @@ import { useI18n } from "../i18n";
 
 export interface LogoutButtonProps {
   className?: string;
-  variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
-  size?: "default" | "sm" | "lg" | "icon";
   showIcon?: boolean;
   showText?: boolean;
 }
 
 export function LogoutButton({
   className,
-  variant = "ghost",
-  size = "default",
   showIcon = true,
   showText = true,
 }: LogoutButtonProps) {
@@ -25,13 +21,8 @@ export function LogoutButton({
   const { t } = useI18n();
 
   return (
-    <UiButton
-      variant={variant}
-      size={size}
-      onClick={logout}
-      className={cn("gap-2", className)}
-    >
-      {showIcon && <LogOut className="w-5 h-5" />}
+    <UiButton onClick={logout} className={cn("gap-2", className)}>
+      {showIcon && <LogOut />}
       {showText && t("logout")}
     </UiButton>
   );

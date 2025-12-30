@@ -1,4 +1,5 @@
 import { useLang } from "@/features/i18n";
+import { ColorThemeProvider } from "@/features/theme";
 import { I18nProvider } from "@/shared/lib/i18n";
 import { QueryProvider } from "@/shared/lib/react-query";
 import { MSWProvider } from "@/shared/lib/msw";
@@ -18,12 +19,14 @@ export function AppProvider({ children }: { children?: React.ReactNode }) {
         enableSystem={true}
         storageKey="theme"
       >
-        <Toaster />
-        <QueryProvider>
-          <GoogleOAuthProvider clientId={googleClientId}>
-            <I18nProvider lang={lang}>{children}</I18nProvider>
-          </GoogleOAuthProvider>
-        </QueryProvider>
+        <ColorThemeProvider>
+          <Toaster />
+          <QueryProvider>
+            <GoogleOAuthProvider clientId={googleClientId}>
+              <I18nProvider lang={lang}>{children}</I18nProvider>
+            </GoogleOAuthProvider>
+          </QueryProvider>
+        </ColorThemeProvider>
       </ThemeProvider>
     </MSWProvider>
   );

@@ -20,6 +20,20 @@ export const useI18n = createI18nModule({
     en: "Recent",
     ru: "Недавние",
   },
+  aiTab: {
+    en: "AI",
+    ru: "AI",
+  },
+
+  // AI Input Tab
+  aiInputQuestion: {
+    en: "What did you eat today?",
+    ru: "Что вы сегодня съели?",
+  },
+  aiInputPlaceholder: {
+    en: "Oatmeal with banana, coffee with milk...",
+    ru: "Овсянка с бананом, кофе с молоком...",
+  },
 
   // Navigation
   backToSearch: {

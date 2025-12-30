@@ -3,7 +3,8 @@ import { ROUTER_PATHS } from "@/shared/constants/routes";
 import { ComposeChildren, useEventCallback } from "@/shared/lib/react";
 import { UiPageSpinner } from "@/shared/ui";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useGetAuthMe } from "@/shared/api/generated/nutriAIFoodCalorieTrackerAPI";
 
 export const loadPrivateLoaderData = async () => {
   return {};
@@ -11,33 +12,57 @@ export const loadPrivateLoaderData = async () => {
 
 export function PrivateLoader({
   children,
-  data: defaultData,
 }: {
   children?: React.ReactNode;
   data?: Awaited<ReturnType<typeof loadPrivateLoaderData>>;
 }) {
-  const [data, setData] = useState(defaultData);
   const router = useRouter();
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const hasHydrated = useAuthStore((s) => s._hasHydrated);
   const token = useAuthStore((s) => s.token);
-
-  const [isLoading, setIsLoading] = useState(true);
+  const clearAuth = useAuthStore((s) => s.clearAuth);
+  const setUser = useAuthStore((s) => s.setUser);
 
   const routerReplace = useEventCallback(router.replace);
 
+  // Validate token with API (only after hydration)
+  const { data: userData, error, isLoading } = useGetAuthMe({
+    query: {
+      enabled: hasHydrated && !!token,
+      retry: false,
+      staleTime: Infinity,
+    },
+  });
+
   useEffect(() => {
-    if (!isAuthenticated || !token) {
+    // Wait for hydration
+    if (!hasHydrated) return;
+
+    // No token - redirect to login
+    if (!token) {
       routerReplace(ROUTER_PATHS.SIGN_IN);
       return;
     }
 
-    setIsLoading(false);
-  }, [isAuthenticated, token, routerReplace]);
+    // Still validating
+    if (isLoading) return;
 
-  return (
-    <>
-      <UiPageSpinner isLoading={isLoading} />
-      {isLoading ? null : <ComposeChildren>{children}</ComposeChildren>}
-    </>
-  );
+    // Validation failed - clear auth and redirect
+    if (error) {
+      clearAuth();
+      routerReplace(ROUTER_PATHS.SIGN_IN);
+      return;
+    }
+
+    // Token valid - update user
+    if (userData) {
+      setUser(userData);
+    }
+  }, [hasHydrated, token, isLoading, error, userData, clearAuth, setUser, routerReplace]);
+
+  // Show loader until token is validated
+  if (!hasHydrated || isLoading || (!userData && !error)) {
+    return <UiPageSpinner isLoading={true} />;
+  }
+
+  return <ComposeChildren>{children}</ComposeChildren>;
 }

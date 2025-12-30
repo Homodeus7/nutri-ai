@@ -1,4 +1,5 @@
 import { usePutMealsId } from "@/shared/api/generated/nutriAIFoodCalorieTrackerAPI";
+import type { UpdateMealItemsRequest } from "@/shared/api/generated/nutriAIFoodCalorieTrackerAPI";
 import { useQueryClient } from "@tanstack/react-query";
 
 interface UseUpdateMealParams {
@@ -31,8 +32,16 @@ export function useUpdateMeal({
     },
   });
 
+  const updateMealItems = (mealId: string, items: UpdateMealItemsRequest["items"]) => {
+    mutate({
+      id: mealId,
+      data: { items },
+    });
+  };
+
   return {
     updateMeal: mutate,
+    updateMealItems,
     isPending,
   };
 }
