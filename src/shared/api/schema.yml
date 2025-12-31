@@ -818,99 +818,61 @@ components:
           type: string
           pattern: "^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$"
 
-    AiParseMealRequest:
+    AiParseRequest:
       type: object
       required:
         - text
+        - mealType
+        - date
       properties:
         text:
           type: string
-          example: "завтрак: овсянка 50 г с бананом и мёдом, кофе с молоком"
+          example: "овсянка 50 г с бананом и мёдом, кофе с молоком"
+        mealType:
+          type: string
+          enum: [breakfast, lunch, dinner, snack, other]
+          example: breakfast
+        date:
+          type: string
+          format: date
+          example: "2025-12-30"
 
-    AiParseMealResponse:
+    AiParseResponse:
       type: object
       properties:
-        parsed:
-          type: object
-          properties:
-            type:
-              type: string
-              enum: [breakfast, lunch, dinner, snack, other]
-            items:
-              type: array
-              items:
-                type: object
-                properties:
-                  rawText:
-                    type: string
-                  parsedName:
-                    type: string
-                  quantity:
-                    type: number
-                    format: float
-                  unit:
-                    type: string
-                  productSuggestions:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        productId:
-                          type: string
-                          format: uuid
-                        name:
-                          type: string
-                        kcalPer100g:
-                          type: integer
-                        source:
-                          type: string
-                        matchScore:
-                          type: number
-                          format: float
-                  recipeSuggestions:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        recipeId:
-                          type: string
-                          format: uuid
-                        name:
-                          type: string
-                        kcalPerServing:
-                          type: integer
-                        servings:
-                          type: integer
-                        usageCount:
-                          type: integer
-                        matchScore:
-                          type: number
-                          format: float
-                  aiFallback:
-                    type: object
-                    nullable: true
-                    properties:
-                      name:
-                        type: string
-                      kcalPer100g:
-                        type: integer
-                      proteinPer100g:
-                        type: number
-                        format: float
-                      fatPer100g:
-                        type: number
-                        format: float
-                      carbsPer100g:
-                        type: number
-                        format: float
-                      confidence:
-                        type: number
-                        format: float
-        needsReview:
+        meal:
+          $ref: "#/components/schemas/Meal"
+        products:
           type: array
           items:
-            type: string
-          description: "Список items с низким confidence"
+            type: object
+            properties:
+              productId:
+                type: string
+                format: uuid
+              name:
+                type: string
+              quantity:
+                type: number
+                format: float
+              wasCreated:
+                type: boolean
+                description: "Был ли продукт создан AI или найден в базе"
+              source:
+                type: string
+                enum: [ai, database]
+        confidence:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+          description: "Общая уверенность AI в парсинге"
+        productsCreatedCount:
+          type: integer
+          description: "Количество созданных продуктов"
+        productsFoundCount:
+          type: integer
+          description: "Количество найденных продуктов в базе"
 
     StatsResponse:
       type: object
@@ -1331,11 +1293,12 @@ paths:
   # ========================================
   # AI
   # ========================================
-  /ai/parse-meal:
+  /ai/parse:
     post:
       tags:
         - AI
-      summary: Распарсить текст через AI
+      summary: Распарсить текст приёма пищи с указанием типа и даты
+      description: Парсит текстовое описание еды с учетом типа приёма пищи и даты, создает meal и возвращает его
       security:
         - bearerAuth: []
       requestBody:
@@ -1343,14 +1306,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/AiParseMealRequest"
+              $ref: "#/components/schemas/AiParseRequest"
       responses:
-        "200":
-          description: Результат парсинга
+        "201":
+          description: Meal успешно распарсен и создан
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AiParseMealResponse"
+                $ref: "#/components/schemas/AiParseResponse"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":

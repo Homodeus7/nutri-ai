@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Mic, ArrowUp, Loader2, AudioLines } from "lucide-react";
-import { cn } from "@/shared/lib/css";
+import { Mic, ArrowUp, Loader2 } from "lucide-react";
 import {
   InputGroup,
   InputGroupAddon,

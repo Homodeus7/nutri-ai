@@ -466,15 +466,11 @@ export interface AddRecipeToMealRequest {
   time?: string;
 }
 
-export interface AiParseMealRequest {
-  text: string;
-}
-
-export type AiParseMealResponseParsedType =
-  (typeof AiParseMealResponseParsedType)[keyof typeof AiParseMealResponseParsedType];
+export type AiParseRequestMealType =
+  (typeof AiParseRequestMealType)[keyof typeof AiParseRequestMealType];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-export const AiParseMealResponseParsedType = {
+export const AiParseRequestMealType = {
   breakfast: "breakfast",
   lunch: "lunch",
   dinner: "dinner",
@@ -482,55 +478,43 @@ export const AiParseMealResponseParsedType = {
   other: "other",
 } as const;
 
-export type AiParseMealResponseParsedItemsItemProductSuggestionsItem = {
+export interface AiParseRequest {
+  text: string;
+  mealType: AiParseRequestMealType;
+  date: string;
+}
+
+export type AiParseResponseProductsItemSource =
+  (typeof AiParseResponseProductsItemSource)[keyof typeof AiParseResponseProductsItemSource];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const AiParseResponseProductsItemSource = {
+  ai: "ai",
+  database: "database",
+} as const;
+
+export type AiParseResponseProductsItem = {
   productId?: string;
   name?: string;
-  kcalPer100g?: number;
-  source?: string;
-  matchScore?: number;
-};
-
-export type AiParseMealResponseParsedItemsItemRecipeSuggestionsItem = {
-  recipeId?: string;
-  name?: string;
-  kcalPerServing?: number;
-  servings?: number;
-  usageCount?: number;
-  matchScore?: number;
-};
-
-/**
- * @nullable
- */
-export type AiParseMealResponseParsedItemsItemAiFallback = {
-  name?: string;
-  kcalPer100g?: number;
-  proteinPer100g?: number;
-  fatPer100g?: number;
-  carbsPer100g?: number;
-  confidence?: number;
-} | null;
-
-export type AiParseMealResponseParsedItemsItem = {
-  rawText?: string;
-  parsedName?: string;
   quantity?: number;
-  unit?: string;
-  productSuggestions?: AiParseMealResponseParsedItemsItemProductSuggestionsItem[];
-  recipeSuggestions?: AiParseMealResponseParsedItemsItemRecipeSuggestionsItem[];
-  /** @nullable */
-  aiFallback?: AiParseMealResponseParsedItemsItemAiFallback;
+  /** Был ли продукт создан AI или найден в базе */
+  wasCreated?: boolean;
+  source?: AiParseResponseProductsItemSource;
 };
 
-export type AiParseMealResponseParsed = {
-  type?: AiParseMealResponseParsedType;
-  items?: AiParseMealResponseParsedItemsItem[];
-};
-
-export interface AiParseMealResponse {
-  parsed?: AiParseMealResponseParsed;
-  /** Список items с низким confidence */
-  needsReview?: string[];
+export interface AiParseResponse {
+  meal?: Meal;
+  products?: AiParseResponseProductsItem[];
+  /**
+   * Общая уверенность AI в парсинге
+   * @minimum 0
+   * @maximum 1
+   */
+  confidence?: number;
+  /** Количество созданных продуктов */
+  productsCreatedCount?: number;
+  /** Количество найденных продуктов в базе */
+  productsFoundCount?: number;
 }
 
 export type StatsResponsePeriod = {
@@ -828,13 +812,14 @@ export const deleteMealsIdProduct = <TData = AxiosResponse<Meal>>(
 };
 
 /**
- * @summary Распарсить текст через AI
+ * Парсит текстовое описание еды с учетом типа приёма пищи и даты, создает meal и возвращает его
+ * @summary Распарсить текст приёма пищи с указанием типа и даты
  */
-export const postAiParseMeal = <TData = AxiosResponse<AiParseMealResponse>>(
-  aiParseMealRequest: AiParseMealRequest,
+export const postAiParse = <TData = AxiosResponse<AiParseResponse>>(
+  aiParseRequest: AiParseRequest,
   options?: AxiosRequestConfig,
 ): Promise<TData> => {
-  return axios.post(`/ai/parse-meal`, aiParseMealRequest, options);
+  return axios.post(`/ai/parse`, aiParseRequest, options);
 };
 
 /**
@@ -1055,7 +1040,7 @@ export type PutMealsIdResult = AxiosResponse<Meal>;
 export type DeleteMealsIdResult = AxiosResponse<void>;
 export type PutMealsIdProductResult = AxiosResponse<Meal>;
 export type DeleteMealsIdProductResult = AxiosResponse<Meal>;
-export type PostAiParseMealResult = AxiosResponse<AiParseMealResponse>;
+export type PostAiParseResult = AxiosResponse<AiParseResponse>;
 export type GetProductsResult = AxiosResponse<GetProducts200>;
 export type PostProductsResult = AxiosResponse<Product>;
 export type GetProductsSearchResult = AxiosResponse<GetProductsSearch200>;
