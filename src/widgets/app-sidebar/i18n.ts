@@ -9,9 +9,9 @@ export const useI18n = createI18nModule({
     en: "Board",
     ru: "Доска",
   },
-  meals: {
-    en: "Meals",
-    ru: "Питание",
+  products: {
+    en: "Products",
+    ru: "Продукты",
   },
   boost: {
     en: "Boost",

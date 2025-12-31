@@ -2,18 +2,18 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Home, Square, Zap, Utensils, Settings } from "lucide-react";
+import { Home, Package, Zap, Utensils, Settings } from "lucide-react";
 import { cn } from "@/shared/lib/css";
 import { NutriAiLogo } from "@/shared/ui";
 import { useI18n } from "../i18n";
 
 type TranslateFn = (
-  key: "lunch" | "meals" | "appName" | "board" | "boost" | "more",
+  key: "lunch" | "products" | "appName" | "board" | "boost" | "more",
 ) => string;
 
 const getNavItems = (t: TranslateFn) => [
   { name: t("board"), href: "/board", icon: Home, color: "bg-orange-500" },
-  { name: t("meals"), href: "/meals", icon: Square, color: "bg-blue-500" },
+  { name: t("products"), href: "/products", icon: Package, color: "bg-blue-500" },
   { name: t("boost"), href: "/boost", icon: Zap, color: "bg-yellow-500" },
   { name: t("lunch"), href: "/lunch", icon: Utensils, color: "bg-green-500" },
   { name: t("more"), href: "/more", icon: Settings, color: "bg-purple-500" },
