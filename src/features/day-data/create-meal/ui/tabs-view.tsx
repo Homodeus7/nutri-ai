@@ -13,28 +13,41 @@ import { RecentProductsTab } from "./recent-products-tab";
 import { AiInputTab } from "./ai-input-tab";
 import type { ProductSelectionHandlers } from "../model/types";
 import { useI18n } from "../i18n";
+import { useAiParse } from "@/features/ai-parse";
+import type { AiParseRequestMealType } from "@/shared/api/generated/nutriAIFoodCalorieTrackerAPI";
 
 interface TabsViewProps {
+  date: string;
+  mealType: AiParseRequestMealType;
   onAddProducts: () => void;
   onSwitchToCreate: ProductSelectionHandlers["onSwitchToCreate"];
   searchTabLabel: string;
   recentTabLabel: string;
   isPending: boolean;
+  onClose?: () => void;
 }
 
 export function TabsView({
+  date,
+  mealType,
   onAddProducts,
   onSwitchToCreate,
   searchTabLabel,
   recentTabLabel,
   isPending,
+  onClose,
 }: TabsViewProps) {
   const { t } = useI18n();
   const [searchQuery, setSearchQuery] = useState("");
 
+  const { parseText, isPending: isAiPending } = useAiParse({
+    onSuccess: () => {
+      onClose?.();
+    },
+  });
+
   const handleAiSubmit = (text: string) => {
-    // AI parsing logic will be implemented later
-    console.log("AI input:", text);
+    parseText(text, mealType, date);
   };
 
   return (
@@ -48,7 +61,7 @@ export function TabsView({
         <TabsTrigger value="recent">{recentTabLabel}</TabsTrigger>
       </TabsList>
       <TabsContent value="ai" className="flex-1 flex flex-col min-h-0">
-        <AiInputTab onSubmit={handleAiSubmit} isPending={isPending} />
+        <AiInputTab onSubmit={handleAiSubmit} isPending={isAiPending} />
       </TabsContent>
       <TabsContent value="search" className="flex-1 flex flex-col min-h-0">
         <SearchProductsTab

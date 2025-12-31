@@ -62,11 +62,14 @@ export function CreateMealDialog({
           />
         ) : (
           <TabsView
+            date={date}
+            mealType={mealType}
             onAddProducts={handleAddProducts}
             onSwitchToCreate={switchToCreate}
             searchTabLabel={t("searchTab")}
             recentTabLabel={t("recentTab")}
             isPending={isPending}
+            onClose={() => setOpen(false)}
           />
         )}
       </DialogContent>

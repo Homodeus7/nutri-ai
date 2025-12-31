@@ -24,6 +24,7 @@ function NutrientProgress({
   colorClass,
 }: NutrientProgressProps) {
   const percentage = Math.min((value / goal) * 100, 100);
+  const formattedValue = Math.round(value * 10) / 10;
 
   return (
     <div className="text-center">
@@ -32,7 +33,7 @@ function NutrientProgress({
       </UiText>
       <Progress value={percentage} className={`h-1.5 mt-1 ${colorClass}`} />
       <UiText variant="small" weight="medium" className="mt-1">
-        {value}
+        {formattedValue}
         {unit}
       </UiText>
     </div>
@@ -42,6 +43,32 @@ function NutrientProgress({
 export function MealTotals({ totals }: MealTotalsProps) {
   const { t } = useI18n();
 
+  const nutrients = [
+    {
+      key: "protein",
+      label: t("protein"),
+      value: totals.protein,
+      goal: NUTRITION_GOALS.protein,
+      colorClass: "bg-green-200",
+    },
+    {
+      key: "fat",
+      label: t("fat"),
+      value: totals.fat,
+      goal: NUTRITION_GOALS.fat,
+      colorClass: "bg-orange-200",
+    },
+    {
+      key: "carbs",
+      label: t("carbs"),
+      value: totals.carbs,
+      goal: NUTRITION_GOALS.carbs,
+      colorClass: "bg-yellow-200",
+    },
+  ] as const;
+
+  const formattedCalories = Math.round(totals.calories);
+
   return (
     <div className="bg-background/70 rounded-lg p-3 space-y-2">
       <div className="flex justify-between">
@@ -49,31 +76,20 @@ export function MealTotals({ totals }: MealTotalsProps) {
           {t("totalCalories")}
         </UiText>
         <UiText variant="small" weight="medium">
-          {totals.calories} {t("kcal")}
+          {formattedCalories} {t("kcal")}
         </UiText>
       </div>
       <div className="grid grid-cols-3 gap-2">
-        <NutrientProgress
-          label={t("protein")}
-          value={totals.protein}
-          goal={NUTRITION_GOALS.protein}
-          unit={t("g")}
-          colorClass="bg-green-200"
-        />
-        <NutrientProgress
-          label={t("fat")}
-          value={totals.fat}
-          goal={NUTRITION_GOALS.fat}
-          unit={t("g")}
-          colorClass="bg-orange-200"
-        />
-        <NutrientProgress
-          label={t("carbs")}
-          value={totals.carbs}
-          goal={NUTRITION_GOALS.carbs}
-          unit={t("g")}
-          colorClass="bg-yellow-200"
-        />
+        {nutrients.map((nutrient) => (
+          <NutrientProgress
+            key={nutrient.key}
+            label={nutrient.label}
+            value={nutrient.value}
+            goal={nutrient.goal}
+            unit={t("g")}
+            colorClass={nutrient.colorClass}
+          />
+        ))}
       </div>
     </div>
   );

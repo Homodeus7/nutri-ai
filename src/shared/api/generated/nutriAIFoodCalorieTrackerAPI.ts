@@ -486,15 +486,11 @@ export interface AddRecipeToMealRequest {
   time?: string;
 }
 
-export interface AiParseMealRequest {
-  text: string;
-}
-
-export type AiParseMealResponseParsedType =
-  (typeof AiParseMealResponseParsedType)[keyof typeof AiParseMealResponseParsedType];
+export type AiParseRequestMealType =
+  (typeof AiParseRequestMealType)[keyof typeof AiParseRequestMealType];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-export const AiParseMealResponseParsedType = {
+export const AiParseRequestMealType = {
   breakfast: "breakfast",
   lunch: "lunch",
   dinner: "dinner",
@@ -502,55 +498,43 @@ export const AiParseMealResponseParsedType = {
   other: "other",
 } as const;
 
-export type AiParseMealResponseParsedItemsItemProductSuggestionsItem = {
+export interface AiParseRequest {
+  text: string;
+  mealType: AiParseRequestMealType;
+  date: string;
+}
+
+export type AiParseResponseProductsItemSource =
+  (typeof AiParseResponseProductsItemSource)[keyof typeof AiParseResponseProductsItemSource];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const AiParseResponseProductsItemSource = {
+  ai: "ai",
+  database: "database",
+} as const;
+
+export type AiParseResponseProductsItem = {
   productId?: string;
   name?: string;
-  kcalPer100g?: number;
-  source?: string;
-  matchScore?: number;
-};
-
-export type AiParseMealResponseParsedItemsItemRecipeSuggestionsItem = {
-  recipeId?: string;
-  name?: string;
-  kcalPerServing?: number;
-  servings?: number;
-  usageCount?: number;
-  matchScore?: number;
-};
-
-/**
- * @nullable
- */
-export type AiParseMealResponseParsedItemsItemAiFallback = {
-  name?: string;
-  kcalPer100g?: number;
-  proteinPer100g?: number;
-  fatPer100g?: number;
-  carbsPer100g?: number;
-  confidence?: number;
-} | null;
-
-export type AiParseMealResponseParsedItemsItem = {
-  rawText?: string;
-  parsedName?: string;
   quantity?: number;
-  unit?: string;
-  productSuggestions?: AiParseMealResponseParsedItemsItemProductSuggestionsItem[];
-  recipeSuggestions?: AiParseMealResponseParsedItemsItemRecipeSuggestionsItem[];
-  /** @nullable */
-  aiFallback?: AiParseMealResponseParsedItemsItemAiFallback;
+  /** Был ли продукт создан AI или найден в базе */
+  wasCreated?: boolean;
+  source?: AiParseResponseProductsItemSource;
 };
 
-export type AiParseMealResponseParsed = {
-  type?: AiParseMealResponseParsedType;
-  items?: AiParseMealResponseParsedItemsItem[];
-};
-
-export interface AiParseMealResponse {
-  parsed?: AiParseMealResponseParsed;
-  /** Список items с низким confidence */
-  needsReview?: string[];
+export interface AiParseResponse {
+  meal?: Meal;
+  products?: AiParseResponseProductsItem[];
+  /**
+   * Общая уверенность AI в парсинге
+   * @minimum 0
+   * @maximum 1
+   */
+  confidence?: number;
+  /** Количество созданных продуктов */
+  productsCreatedCount?: number;
+  /** Количество найденных продуктов в базе */
+  productsFoundCount?: number;
 }
 
 export type StatsResponsePeriod = {
@@ -2042,43 +2026,44 @@ export const useDeleteMealsIdProduct = <
 };
 
 /**
- * @summary Распарсить текст через AI
+ * Парсит текстовое описание еды с учетом типа приёма пищи и даты, создает meal и возвращает его
+ * @summary Распарсить текст приёма пищи с указанием типа и даты
  */
-export const postAiParseMeal = (
-  aiParseMealRequest: BodyType<AiParseMealRequest>,
+export const postAiParse = (
+  aiParseRequest: BodyType<AiParseRequest>,
   options?: SecondParameter<typeof createInstance>,
   signal?: AbortSignal,
 ) => {
-  return createInstance<AiParseMealResponse>(
+  return createInstance<AiParseResponse>(
     {
-      url: `/ai/parse-meal`,
+      url: `/ai/parse`,
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      data: aiParseMealRequest,
+      data: aiParseRequest,
       signal,
     },
     options,
   );
 };
 
-export const getPostAiParseMealMutationOptions = <
+export const getPostAiParseMutationOptions = <
   TError = ErrorType<BadRequestResponse | UnauthorizedResponse | Error>,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof postAiParseMeal>>,
+    Awaited<ReturnType<typeof postAiParse>>,
     TError,
-    { data: BodyType<AiParseMealRequest> },
+    { data: BodyType<AiParseRequest> },
     TContext
   >;
   request?: SecondParameter<typeof createInstance>;
 }): UseMutationOptions<
-  Awaited<ReturnType<typeof postAiParseMeal>>,
+  Awaited<ReturnType<typeof postAiParse>>,
   TError,
-  { data: BodyType<AiParseMealRequest> },
+  { data: BodyType<AiParseRequest> },
   TContext
 > => {
-  const mutationKey = ["postAiParseMeal"];
+  const mutationKey = ["postAiParse"];
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation &&
       "mutationKey" in options.mutation &&
@@ -2088,49 +2073,49 @@ export const getPostAiParseMealMutationOptions = <
     : { mutation: { mutationKey }, request: undefined };
 
   const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof postAiParseMeal>>,
-    { data: BodyType<AiParseMealRequest> }
+    Awaited<ReturnType<typeof postAiParse>>,
+    { data: BodyType<AiParseRequest> }
   > = (props) => {
     const { data } = props ?? {};
 
-    return postAiParseMeal(data, requestOptions);
+    return postAiParse(data, requestOptions);
   };
 
   return { mutationFn, ...mutationOptions };
 };
 
-export type PostAiParseMealMutationResult = NonNullable<
-  Awaited<ReturnType<typeof postAiParseMeal>>
+export type PostAiParseMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postAiParse>>
 >;
-export type PostAiParseMealMutationBody = BodyType<AiParseMealRequest>;
-export type PostAiParseMealMutationError = ErrorType<
+export type PostAiParseMutationBody = BodyType<AiParseRequest>;
+export type PostAiParseMutationError = ErrorType<
   BadRequestResponse | UnauthorizedResponse | Error
 >;
 
 /**
- * @summary Распарсить текст через AI
+ * @summary Распарсить текст приёма пищи с указанием типа и даты
  */
-export const usePostAiParseMeal = <
+export const usePostAiParse = <
   TError = ErrorType<BadRequestResponse | UnauthorizedResponse | Error>,
   TContext = unknown,
 >(
   options?: {
     mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof postAiParseMeal>>,
+      Awaited<ReturnType<typeof postAiParse>>,
       TError,
-      { data: BodyType<AiParseMealRequest> },
+      { data: BodyType<AiParseRequest> },
       TContext
     >;
     request?: SecondParameter<typeof createInstance>;
   },
   queryClient?: QueryClient,
 ): UseMutationResult<
-  Awaited<ReturnType<typeof postAiParseMeal>>,
+  Awaited<ReturnType<typeof postAiParse>>,
   TError,
-  { data: BodyType<AiParseMealRequest> },
+  { data: BodyType<AiParseRequest> },
   TContext
 > => {
-  const mutationOptions = getPostAiParseMealMutationOptions(options);
+  const mutationOptions = getPostAiParseMutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };
@@ -5007,19 +4992,26 @@ export const getDeleteMealsIdProductResponseMock = (
   ...overrideResponse,
 });
 
-export const getPostAiParseMealResponseMock = (
-  overrideResponse: Partial<AiParseMealResponse> = {},
-): AiParseMealResponse => ({
-  parsed: faker.helpers.arrayElement([
+export const getPostAiParseResponseMock = (
+  overrideResponse: Partial<AiParseResponse> = {},
+): AiParseResponse => ({
+  meal: faker.helpers.arrayElement([
     {
+      id: faker.string.uuid(),
+      dayEntryId: faker.string.uuid(),
       type: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([
-          "breakfast",
-          "lunch",
-          "dinner",
-          "snack",
-          "other",
-        ] as const),
+        "breakfast",
+        "lunch",
+        "dinner",
+        "snack",
+        "other",
+      ] as const),
+      time: faker.helpers.arrayElement([
+        faker.helpers.fromRegExp("^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$"),
+        undefined,
+      ]),
+      name: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
         undefined,
       ]),
       items: faker.helpers.arrayElement([
@@ -5027,15 +5019,25 @@ export const getPostAiParseMealResponseMock = (
           { length: faker.number.int({ min: 1, max: 10 }) },
           (_, i) => i + 1,
         ).map(() => ({
-          rawText: faker.helpers.arrayElement([
-            faker.string.alpha({ length: { min: 10, max: 20 } }),
+          id: faker.string.uuid(),
+          mealId: faker.string.uuid(),
+          productId: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([faker.string.uuid(), null]),
             undefined,
           ]),
-          parsedName: faker.helpers.arrayElement([
-            faker.string.alpha({ length: { min: 10, max: 20 } }),
+          recipeId: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([faker.string.uuid(), null]),
             undefined,
           ]),
-          quantity: faker.helpers.arrayElement([
+          name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+          quantity: faker.number.float({
+            min: undefined,
+            max: undefined,
+            fractionDigits: 2,
+          }),
+          unit: faker.string.alpha({ length: { min: 10, max: 20 } }),
+          kcal: faker.number.int({ min: 0, max: undefined }),
+          protein: faker.helpers.arrayElement([
             faker.number.float({
               min: undefined,
               max: undefined,
@@ -5043,134 +5045,79 @@ export const getPostAiParseMealResponseMock = (
             }),
             undefined,
           ]),
-          unit: faker.helpers.arrayElement([
+          fat: faker.helpers.arrayElement([
+            faker.number.float({
+              min: undefined,
+              max: undefined,
+              fractionDigits: 2,
+            }),
+            undefined,
+          ]),
+          carbs: faker.helpers.arrayElement([
+            faker.number.float({
+              min: undefined,
+              max: undefined,
+              fractionDigits: 2,
+            }),
+            undefined,
+          ]),
+          source: faker.helpers.arrayElement([
             faker.string.alpha({ length: { min: 10, max: 20 } }),
-            undefined,
-          ]),
-          productSuggestions: faker.helpers.arrayElement([
-            Array.from(
-              { length: faker.number.int({ min: 1, max: 10 }) },
-              (_, i) => i + 1,
-            ).map(() => ({
-              productId: faker.helpers.arrayElement([
-                faker.string.uuid(),
-                undefined,
-              ]),
-              name: faker.helpers.arrayElement([
-                faker.string.alpha({ length: { min: 10, max: 20 } }),
-                undefined,
-              ]),
-              kcalPer100g: faker.helpers.arrayElement([
-                faker.number.int({ min: undefined, max: undefined }),
-                undefined,
-              ]),
-              source: faker.helpers.arrayElement([
-                faker.string.alpha({ length: { min: 10, max: 20 } }),
-                undefined,
-              ]),
-              matchScore: faker.helpers.arrayElement([
-                faker.number.float({
-                  min: undefined,
-                  max: undefined,
-                  fractionDigits: 2,
-                }),
-                undefined,
-              ]),
-            })),
-            undefined,
-          ]),
-          recipeSuggestions: faker.helpers.arrayElement([
-            Array.from(
-              { length: faker.number.int({ min: 1, max: 10 }) },
-              (_, i) => i + 1,
-            ).map(() => ({
-              recipeId: faker.helpers.arrayElement([
-                faker.string.uuid(),
-                undefined,
-              ]),
-              name: faker.helpers.arrayElement([
-                faker.string.alpha({ length: { min: 10, max: 20 } }),
-                undefined,
-              ]),
-              kcalPerServing: faker.helpers.arrayElement([
-                faker.number.int({ min: undefined, max: undefined }),
-                undefined,
-              ]),
-              servings: faker.helpers.arrayElement([
-                faker.number.int({ min: undefined, max: undefined }),
-                undefined,
-              ]),
-              usageCount: faker.helpers.arrayElement([
-                faker.number.int({ min: undefined, max: undefined }),
-                undefined,
-              ]),
-              matchScore: faker.helpers.arrayElement([
-                faker.number.float({
-                  min: undefined,
-                  max: undefined,
-                  fractionDigits: 2,
-                }),
-                undefined,
-              ]),
-            })),
-            undefined,
-          ]),
-          aiFallback: faker.helpers.arrayElement([
-            {
-              name: faker.helpers.arrayElement([
-                faker.string.alpha({ length: { min: 10, max: 20 } }),
-                undefined,
-              ]),
-              kcalPer100g: faker.helpers.arrayElement([
-                faker.number.int({ min: undefined, max: undefined }),
-                undefined,
-              ]),
-              proteinPer100g: faker.helpers.arrayElement([
-                faker.number.float({
-                  min: undefined,
-                  max: undefined,
-                  fractionDigits: 2,
-                }),
-                undefined,
-              ]),
-              fatPer100g: faker.helpers.arrayElement([
-                faker.number.float({
-                  min: undefined,
-                  max: undefined,
-                  fractionDigits: 2,
-                }),
-                undefined,
-              ]),
-              carbsPer100g: faker.helpers.arrayElement([
-                faker.number.float({
-                  min: undefined,
-                  max: undefined,
-                  fractionDigits: 2,
-                }),
-                undefined,
-              ]),
-              confidence: faker.helpers.arrayElement([
-                faker.number.float({
-                  min: undefined,
-                  max: undefined,
-                  fractionDigits: 2,
-                }),
-                undefined,
-              ]),
-            },
             undefined,
           ]),
         })),
         undefined,
       ]),
+      totalKcal: faker.number.int({ min: 0, max: undefined }),
+      source: faker.helpers.arrayElement(["manual", "ai"] as const),
+      aiConfidence: faker.helpers.arrayElement([
+        faker.number.float({ min: 0, max: 1, fractionDigits: 2 }),
+        undefined,
+      ]),
+      createdAt: `${faker.date.past().toISOString().split(".")[0]}Z`,
+      updatedAt: `${faker.date.past().toISOString().split(".")[0]}Z`,
     },
     undefined,
   ]),
-  needsReview: faker.helpers.arrayElement([
+  products: faker.helpers.arrayElement([
     Array.from(
       { length: faker.number.int({ min: 1, max: 10 }) },
       (_, i) => i + 1,
-    ).map(() => faker.string.alpha({ length: { min: 10, max: 20 } })),
+    ).map(() => ({
+      productId: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
+      name: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
+      quantity: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      wasCreated: faker.helpers.arrayElement([
+        faker.datatype.boolean(),
+        undefined,
+      ]),
+      source: faker.helpers.arrayElement([
+        faker.helpers.arrayElement(["ai", "database"] as const),
+        undefined,
+      ]),
+    })),
+    undefined,
+  ]),
+  confidence: faker.helpers.arrayElement([
+    faker.number.float({ min: 0, max: 1, fractionDigits: 2 }),
+    undefined,
+  ]),
+  productsCreatedCount: faker.helpers.arrayElement([
+    faker.number.int({ min: undefined, max: undefined }),
+    undefined,
+  ]),
+  productsFoundCount: faker.helpers.arrayElement([
+    faker.number.int({ min: undefined, max: undefined }),
     undefined,
   ]),
   ...overrideResponse,
@@ -7216,16 +7163,16 @@ export const getDeleteMealsIdProductMockHandler = (
   );
 };
 
-export const getPostAiParseMealMockHandler = (
+export const getPostAiParseMockHandler = (
   overrideResponse?:
-    | AiParseMealResponse
+    | AiParseResponse
     | ((
         info: Parameters<Parameters<typeof http.post>[1]>[0],
-      ) => Promise<AiParseMealResponse> | AiParseMealResponse),
+      ) => Promise<AiParseResponse> | AiParseResponse),
   options?: RequestHandlerOptions,
 ) => {
   return http.post(
-    "*/ai/parse-meal",
+    "*/ai/parse",
     async (info) => {
       await delay(1000);
 
@@ -7235,9 +7182,9 @@ export const getPostAiParseMealMockHandler = (
             ? typeof overrideResponse === "function"
               ? await overrideResponse(info)
               : overrideResponse
-            : getPostAiParseMealResponseMock(),
+            : getPostAiParseResponseMock(),
         ),
-        { status: 200, headers: { "Content-Type": "application/json" } },
+        { status: 201, headers: { "Content-Type": "application/json" } },
       );
     },
     options,
@@ -7746,7 +7693,7 @@ export const getNutriAIFoodCalorieTrackerAPIMock = () => [
   getDeleteMealsIdMockHandler(),
   getPutMealsIdProductMockHandler(),
   getDeleteMealsIdProductMockHandler(),
-  getPostAiParseMealMockHandler(),
+  getPostAiParseMockHandler(),
   getGetProductsMockHandler(),
   getPostProductsMockHandler(),
   getGetProductsSearchMockHandler(),
