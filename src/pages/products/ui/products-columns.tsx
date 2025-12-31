@@ -18,44 +18,38 @@ export interface ProductsColumnsLabels {
 
 export const createProductsColumns = (labels: ProductsColumnsLabels) => [
   columnHelper.accessor("name", {
-    header: ({ column }) => (
-      <SortableHeader column={column}>{labels.name}</SortableHeader>
-    ),
+    header: () => <div>{labels.name}</div>,
     cell: ({ row }) => (
       <div className="font-medium">{row.getValue("name")}</div>
     ),
   }),
 
   columnHelper.accessor("kcalPer100g", {
-    header: ({ column }) => (
-      <SortableHeader column={column}>{labels.kcal}</SortableHeader>
-    ),
-    cell: ({ row }) => (
-      <div className="text-right">{row.getValue("kcalPer100g")}</div>
-    ),
+    header: () => <div>{labels.kcal}</div>,
+    cell: ({ row }) => <div>{row.getValue("kcalPer100g")}</div>,
   }),
 
   columnHelper.accessor("proteinPer100g", {
-    header: () => <div className="text-right">{labels.protein}</div>,
+    header: () => <div>{labels.protein}</div>,
     cell: ({ row }) => {
       const value = row.getValue("proteinPer100g") as number | undefined;
-      return <div className="text-right">{value?.toFixed(1) ?? "-"}</div>;
+      return <div>{value?.toFixed(1) ?? "-"}</div>;
     },
   }),
 
   columnHelper.accessor("fatPer100g", {
-    header: () => <div className="text-right">{labels.fat}</div>,
+    header: () => <div>{labels.fat}</div>,
     cell: ({ row }) => {
       const value = row.getValue("fatPer100g") as number | undefined;
-      return <div className="text-right">{value?.toFixed(1) ?? "-"}</div>;
+      return <div>{value?.toFixed(1) ?? "-"}</div>;
     },
   }),
 
   columnHelper.accessor("carbsPer100g", {
-    header: () => <div className="text-right">{labels.carbs}</div>,
+    header: () => <div>{labels.carbs}</div>,
     cell: ({ row }) => {
       const value = row.getValue("carbsPer100g") as number | undefined;
-      return <div className="text-right">{value?.toFixed(1) ?? "-"}</div>;
+      return <div>{value?.toFixed(1) ?? "-"}</div>;
     },
   }),
 
@@ -76,9 +70,7 @@ export const createProductsColumns = (labels: ProductsColumnsLabels) => [
     header: () => labels.category,
     cell: ({ row }) => {
       const category = row.getValue("category") as string | undefined;
-      return (
-        <span className="text-muted-foreground">{category ?? "-"}</span>
-      );
+      return <span className="text-muted-foreground">{category ?? "-"}</span>;
     },
   }),
 ];
