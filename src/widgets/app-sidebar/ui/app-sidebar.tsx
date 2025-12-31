@@ -12,11 +12,11 @@ type TranslateFn = (
 ) => string;
 
 const getNavItems = (t: TranslateFn) => [
-  { name: t("board"), href: "/board", icon: Home, color: "bg-orange-500" },
-  { name: t("products"), href: "/products", icon: Package, color: "bg-blue-500" },
-  { name: t("boost"), href: "/boost", icon: Zap, color: "bg-yellow-500" },
-  { name: t("lunch"), href: "/lunch", icon: Utensils, color: "bg-green-500" },
-  { name: t("more"), href: "/more", icon: Settings, color: "bg-purple-500" },
+  { name: t("board"), href: "/board", icon: Home },
+  { name: t("products"), href: "/products", icon: Package },
+  { name: t("boost"), href: "/boost", icon: Zap },
+  { name: t("lunch"), href: "/lunch", icon: Utensils },
+  { name: t("more"), href: "/more", icon: Settings },
 ];
 
 export function AppSidebar() {
@@ -33,7 +33,8 @@ export function AppSidebar() {
       <nav className="flex flex-col gap-2">
         {navItems.map((item) => {
           const Icon = item.icon;
-          const isActive = pathname === item.href;
+          const isActive =
+            pathname === item.href || pathname.startsWith(`${item.href}/`);
 
           return (
             <Link
@@ -42,8 +43,8 @@ export function AppSidebar() {
               className={cn(
                 "px-4 py-3 rounded-lg transition-all duration-300 flex items-center gap-3 font-medium",
                 isActive
-                  ? `${item.color} shadow-lg`
-                  : "bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white",
+                  ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-lg"
+                  : "text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent",
               )}
             >
               <Icon className="w-5 h-5 flex-shrink-0" />
