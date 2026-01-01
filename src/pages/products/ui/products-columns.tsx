@@ -2,7 +2,7 @@
 
 import { createColumnHelper } from "@tanstack/react-table";
 import type { Product } from "@/shared/api/generated/nutriAIFoodCalorieTrackerAPI";
-import { SortableHeader } from "@/shared/ui/data-table";
+import { ProductActionsMenu } from "@/entities/product";
 
 const columnHelper = createColumnHelper<Product>();
 
@@ -12,11 +12,23 @@ export interface ProductsColumnsLabels {
   protein: string;
   fat: string;
   carbs: string;
+  fiber: string;
   source: string;
   category: string;
+  actions: string;
+  edit: string;
+  delete: string;
 }
 
-export const createProductsColumns = (labels: ProductsColumnsLabels) => [
+export interface ProductsColumnsCallbacks {
+  onEdit: (product: Product) => void;
+  onDelete: (product: Product) => void;
+}
+
+export const createProductsColumns = (
+  labels: ProductsColumnsLabels,
+  callbacks: ProductsColumnsCallbacks
+) => [
   columnHelper.accessor("name", {
     header: () => <div>{labels.name}</div>,
     cell: ({ row }) => (
@@ -53,6 +65,14 @@ export const createProductsColumns = (labels: ProductsColumnsLabels) => [
     },
   }),
 
+  columnHelper.accessor("fiberPer100g", {
+    header: () => <div>{labels.fiber}</div>,
+    cell: ({ row }) => {
+      const value = row.getValue("fiberPer100g") as number | undefined;
+      return <div>{value?.toFixed(1) ?? "-"}</div>;
+    },
+  }),
+
   columnHelper.accessor("source", {
     header: () => labels.source,
     cell: ({ row }) => {
@@ -71,6 +91,31 @@ export const createProductsColumns = (labels: ProductsColumnsLabels) => [
     cell: ({ row }) => {
       const category = row.getValue("category") as string | undefined;
       return <span className="text-muted-foreground">{category ?? "-"}</span>;
+    },
+  }),
+
+  columnHelper.display({
+    id: "actions",
+    header: () => <div className="text-right">{labels.actions}</div>,
+    cell: ({ row }) => {
+      const product = row.original;
+
+      return (
+        <div className="text-right">
+          <ProductActionsMenu
+            onEdit={() => callbacks.onEdit(product)}
+            onDelete={() => callbacks.onDelete(product)}
+            labels={{
+              actions: labels.actions,
+              edit: labels.edit,
+              delete: labels.delete,
+            }}
+            buttonVariant="ghost"
+            buttonClassName="h-8 w-8"
+            stopPropagation
+          />
+        </div>
+      );
     },
   }),
 ];

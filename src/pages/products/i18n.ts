@@ -29,6 +29,10 @@ export const useI18n = createI18nModule({
     en: "Carbs",
     ru: "Углеводы",
   },
+  fiber: {
+    en: "Fiber",
+    ru: "Клетчатка",
+  },
   source: {
     en: "Source",
     ru: "Источник",
@@ -48,5 +52,17 @@ export const useI18n = createI18nModule({
   all: {
     en: "All",
     ru: "Все",
+  },
+  actions: {
+    en: "Actions",
+    ru: "Действия",
+  },
+  edit: {
+    en: "Edit",
+    ru: "Редактировать",
+  },
+  delete: {
+    en: "Delete",
+    ru: "Удалить",
   },
 } as const);

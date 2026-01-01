@@ -69,4 +69,16 @@ export const useI18n = createI18nModule({
     en: "Product not found.",
     ru: "Продукт не найден.",
   },
+  actions: {
+    en: "Actions",
+    ru: "Действия",
+  },
+  edit: {
+    en: "Edit",
+    ru: "Редактировать",
+  },
+  delete: {
+    en: "Delete",
+    ru: "Удалить",
+  },
 } as const);

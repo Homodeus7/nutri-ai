@@ -1,8 +1,11 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { UiText } from "@/shared/ui/ui-text";
 import { DataTable } from "@/shared/ui/data-table";
+import type { Product } from "@/shared/api/generated/nutriAIFoodCalorieTrackerAPI";
+import { EditProductDialog } from "@/features/product/edit-product";
+import { DeleteProductDialog } from "@/features/product/delete-product";
 import { useProductsTable } from "./model/use-products-table";
 import { createProductsColumns } from "./ui/products-columns";
 import { ProductsFiltersToolbar } from "./ui/products-filters";
@@ -10,6 +13,9 @@ import { useI18n } from "./i18n";
 
 export function ProductsPage() {
   const { t } = useI18n();
+
+  const [editProduct, setEditProduct] = useState<Product | null>(null);
+  const [deleteProduct, setDeleteProduct] = useState<Product | null>(null);
 
   const {
     products,
@@ -23,6 +29,14 @@ export function ProductsPage() {
     handleRowClick,
   } = useProductsTable();
 
+  const handleEdit = useCallback((product: Product) => {
+    setEditProduct(product);
+  }, []);
+
+  const handleDelete = useCallback((product: Product) => {
+    setDeleteProduct(product);
+  }, []);
+
   const columnLabels = useMemo(
     () => ({
       name: t("name"),
@@ -30,15 +44,27 @@ export function ProductsPage() {
       protein: t("protein"),
       fat: t("fat"),
       carbs: t("carbs"),
+      fiber: t("fiber"),
       source: t("source"),
       category: t("category"),
+      actions: t("actions"),
+      edit: t("edit"),
+      delete: t("delete"),
     }),
     [t],
   );
 
+  const columnCallbacks = useMemo(
+    () => ({
+      onEdit: handleEdit,
+      onDelete: handleDelete,
+    }),
+    [handleEdit, handleDelete],
+  );
+
   const columns = useMemo(
-    () => createProductsColumns(columnLabels),
-    [columnLabels],
+    () => createProductsColumns(columnLabels, columnCallbacks),
+    [columnLabels, columnCallbacks],
   );
 
   return (
@@ -73,6 +99,23 @@ export function ProductsPage() {
           </div>
         }
       />
+
+      {editProduct && (
+        <EditProductDialog
+          product={editProduct}
+          isOpen={!!editProduct}
+          onOpenChange={(open) => !open && setEditProduct(null)}
+        />
+      )}
+
+      {deleteProduct && (
+        <DeleteProductDialog
+          productId={deleteProduct.id}
+          productName={deleteProduct.name}
+          isOpen={!!deleteProduct}
+          onOpenChange={(open) => !open && setDeleteProduct(null)}
+        />
+      )}
     </div>
   );
 }
