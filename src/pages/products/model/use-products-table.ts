@@ -7,6 +7,7 @@ import {
   type GetProductsSource,
 } from "@/shared/api/generated/nutriAIFoodCalorieTrackerAPI";
 import { useDebounce } from "@/shared/lib/react";
+import { transliterate, hasCyrillic } from "@/shared/lib/transliterate";
 import type { TablePaginationState } from "@/shared/ui/data-table";
 
 export interface ProductsFilters {
@@ -31,15 +32,20 @@ export function useProductsTable() {
 
   const debouncedSearch = useDebounce(filters.search, 300);
 
+  const processedSearch = useMemo(
+    () => (hasCyrillic(debouncedSearch) ? transliterate(debouncedSearch) : debouncedSearch),
+    [debouncedSearch]
+  );
+
   const queryParams = useMemo(
     () => ({
-      search: debouncedSearch || undefined,
+      search: processedSearch || undefined,
       category: filters.category || undefined,
       source: (filters.source || undefined) as GetProductsSource | undefined,
       limit: pagination.pageSize,
       offset: pagination.pageIndex * pagination.pageSize,
     }),
-    [debouncedSearch, filters.category, filters.source, pagination]
+    [processedSearch, filters.category, filters.source, pagination]
   );
 
   const { data, isLoading, error } = useGetProducts(queryParams);
