@@ -17,7 +17,7 @@ export function CalorieTracker({
     ((caloriesTotal - caloriesRemaining) / caloriesTotal) * 100;
 
   return (
-    <div className="bg-gradient-to-br from-purple-400 to-purple-300 rounded-2xl p-12 flex items-center justify-center">
+    <div className="bg-primary rounded-2xl p-12 flex items-center justify-center">
       <div className="flex flex-col items-center">
         <div className="relative w-48 h-48 mb-6">
           <svg

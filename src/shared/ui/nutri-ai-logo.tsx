@@ -42,11 +42,11 @@ export function NutriAiLogo({
       {/* AI - orange #FF5A16 in light, more vibrant #FF6B2B in dark */}
       <path
         d="M111.641 0.917999H120.133L129.588 33.048H124.034L121.923 25.6122H109.851L107.694 33.048H102.14L111.641 0.917999ZM111.182 20.7468H120.592L116.14 5.4621H115.589L111.182 20.7468Z"
-        className="fill-[#FF5A16] dark:fill-[#FF6B2B]"
+        className="fill-primary"
       />
       <path
         d="M133.038 0.917999H138.363V33.048H133.038V0.917999Z"
-        className="fill-[#FF5A16] dark:fill-[#FF6B2B]"
+        className="fill-primary"
       />
     </svg>
   );

@@ -97,12 +97,8 @@ export function DatePicker({ onDateChange }: DatePickerProps) {
                 <Button
                   key={dayData.date.toISOString()}
                   onClick={() => handleDayClick(dayData.date)}
-                  variant="ghost"
-                  className={`flex flex-col items-center gap-2 p-3 rounded-xl transition-all flex-1 h-auto ${
-                    isSelected
-                      ? "bg-purple-500 text-white scale-105 shadow-lg hover:bg-purple-600!"
-                      : "hover:bg-muted text-foreground"
-                  }`}
+                  variant={isSelected ? "default" : "ghost"}
+                  className="flex flex-col text-foreground items-center gap-2 p-3 rounded-xl transition-all flex-1 h-auto"
                 >
                   <UiText variant="small" weight="semibold" as="span">
                     {dayData.day}
