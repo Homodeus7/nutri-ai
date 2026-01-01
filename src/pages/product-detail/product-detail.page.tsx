@@ -1,7 +1,10 @@
 "use client";
 
+import { useState } from "react";
+import { useRouter } from "next/router";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/shared/ui/primitives/button";
+import { ProductActionsMenu } from "@/entities/product";
 import { UiText } from "@/shared/ui/ui-text";
 import { UiPageSpinner } from "@/shared/ui/ui-page-spinner";
 import {
@@ -10,13 +13,23 @@ import {
   CardHeader,
   CardTitle,
 } from "@/shared/ui/primitives/card";
+import { EditProductDialog } from "@/features/product/edit-product";
+import { DeleteProductDialog } from "@/features/product/delete-product";
 import { useProductDetail } from "./model/use-product-detail";
 import { ProductNutritionTable } from "./ui/product-nutrition-table";
 import { useI18n } from "./i18n";
 
 export function ProductDetailPage() {
   const { t } = useI18n();
+  const router = useRouter();
   const { product, isLoading, goBack } = useProductDetail();
+
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+
+  const handleDeleteSuccess = () => {
+    router.push("/products");
+  };
 
   if (isLoading) {
     return <UiPageSpinner />;
@@ -41,11 +54,23 @@ export function ProductDetailPage() {
         {t("backToList")}
       </Button>
 
-      <div>
-        <UiText variant="h1" weight="bold">
-          {product.name}
-        </UiText>
-        {product.brand && <UiText variant="muted">{product.brand}</UiText>}
+      <div className="flex items-start justify-between">
+        <div>
+          <UiText variant="h1" weight="bold">
+            {product.name}
+          </UiText>
+          {product.brand && <UiText variant="muted">{product.brand}</UiText>}
+        </div>
+
+        <ProductActionsMenu
+          onEdit={() => setIsEditOpen(true)}
+          onDelete={() => setIsDeleteOpen(true)}
+          labels={{
+            actions: t("actions"),
+            edit: t("edit"),
+            delete: t("delete"),
+          }}
+        />
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
@@ -100,6 +125,20 @@ export function ProductDetailPage() {
           </CardContent>
         </Card>
       </div>
+
+      <EditProductDialog
+        product={product}
+        isOpen={isEditOpen}
+        onOpenChange={setIsEditOpen}
+      />
+
+      <DeleteProductDialog
+        productId={product.id}
+        productName={product.name}
+        isOpen={isDeleteOpen}
+        onOpenChange={setIsDeleteOpen}
+        onSuccess={handleDeleteSuccess}
+      />
     </div>
   );
 }
