@@ -9,13 +9,21 @@ import {
   InputGroupTextarea,
 } from "@/shared/ui/primitives/input-group";
 import { useI18n } from "../i18n";
+import { AI_PARSE_ERROR_CODES, type AiParseErrorCode } from "@/features/ai-parse";
 
 interface AiInputTabProps {
   onSubmit?: (text: string) => void;
   isPending?: boolean;
+  errorCode?: AiParseErrorCode | null;
+  onClearError?: () => void;
 }
 
-export function AiInputTab({ onSubmit, isPending = false }: AiInputTabProps) {
+export function AiInputTab({
+  onSubmit,
+  isPending = false,
+  errorCode,
+  onClearError,
+}: AiInputTabProps) {
   const { t } = useI18n();
   const [text, setText] = useState("");
 
@@ -36,16 +44,39 @@ export function AiInputTab({ onSubmit, isPending = false }: AiInputTabProps) {
     // Voice recording logic will be implemented later
   };
 
-  const canSubmit = text.trim().length > 0 && !isPending;
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setText(e.target.value);
+    // Clear error when user starts typing
+    if (errorCode && onClearError) {
+      onClearError();
+    }
+  };
+
   const hasText = text.length > 0;
+
+  const getErrorMessage = (): string | null => {
+    if (!errorCode) return null;
+    if (errorCode === AI_PARSE_ERROR_CODES.NO_ITEMS_FOUND) {
+      return t("aiErrorNoItemsFound");
+    }
+    return null;
+  };
+
+  const errorMessage = getErrorMessage();
 
   return (
     <div className="flex flex-col h-full">
-      {/* Question header */}
+      {/* Question header or Error message */}
       <div className="flex-1 flex items-center justify-center px-4">
-        <h2 className="text-2xl font-semibold text-center">
-          {t("aiInputQuestion")}
-        </h2>
+        {errorMessage ? (
+          <p className="text-base text-destructive text-center">
+            {errorMessage}
+          </p>
+        ) : (
+          <h2 className="text-2xl font-semibold text-center">
+            {t("aiInputQuestion")}
+          </h2>
+        )}
       </div>
 
       {/* Input area */}
@@ -53,7 +84,7 @@ export function AiInputTab({ onSubmit, isPending = false }: AiInputTabProps) {
         <InputGroup className="rounded-2xl bg-foreground/10 border-0 shadow-none">
           <InputGroupTextarea
             value={text}
-            onChange={(e) => setText(e.target.value)}
+            onChange={handleTextChange}
             onKeyDown={handleKeyDown}
             placeholder={t("aiInputPlaceholder")}
             disabled={isPending}

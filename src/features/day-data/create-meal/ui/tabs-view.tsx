@@ -40,7 +40,12 @@ export function TabsView({
   const { t } = useI18n();
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { parseText, isPending: isAiPending } = useAiParse({
+  const {
+    parseText,
+    isPending: isAiPending,
+    errorCode: aiErrorCode,
+    clearError: clearAiError,
+  } = useAiParse({
     onSuccess: () => {
       onClose?.();
     },
@@ -61,7 +66,12 @@ export function TabsView({
         <TabsTrigger value="recent">{recentTabLabel}</TabsTrigger>
       </TabsList>
       <TabsContent value="ai" className="flex-1 flex flex-col min-h-0">
-        <AiInputTab onSubmit={handleAiSubmit} isPending={isAiPending} />
+        <AiInputTab
+          onSubmit={handleAiSubmit}
+          isPending={isAiPending}
+          errorCode={aiErrorCode}
+          onClearError={clearAiError}
+        />
       </TabsContent>
       <TabsContent value="search" className="flex-1 flex flex-col min-h-0">
         <SearchProductsTab
