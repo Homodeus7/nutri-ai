@@ -1,0 +1,7 @@
+{
+    "name": "Nutri AI",
+    "short_name": "Nutri AI",
+    "icons": [],
+    "start_url": "/",
+    "display": "standalone"
+}
