@@ -837,6 +837,15 @@ components:
           format: date
           example: "2025-12-30"
 
+    AiMealUpdateRequest:
+      type: object
+      required:
+        - text
+      properties:
+        text:
+          type: string
+          example: "рис 100 г, куриная грудка 150 г"
+
     AiParseResponse:
       type: object
       properties:
@@ -1324,6 +1333,41 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+
+  /ai/meals/{id}:
+    put:
+      tags:
+        - AI
+      summary: Update meal with AI-parsed description
+      description: Parses meal description with GPT-4, finds or creates products, and merges them into existing meal. Existing products are updated if mentioned, new products are added. Products not mentioned remain unchanged.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Meal ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AiMealUpdateRequest"
+      responses:
+        "200":
+          description: Meal successfully updated with parsed products
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AiParseResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
   # ========================================
   # PRODUCTS

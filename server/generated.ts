@@ -484,6 +484,10 @@ export interface AiParseRequest {
   date: string;
 }
 
+export interface AiMealUpdateRequest {
+  text: string;
+}
+
 export type AiParseResponseProductsItemSource =
   (typeof AiParseResponseProductsItemSource)[keyof typeof AiParseResponseProductsItemSource];
 
@@ -823,6 +827,18 @@ export const postAiParse = <TData = AxiosResponse<AiParseResponse>>(
 };
 
 /**
+ * Parses meal description with GPT-4, finds or creates products, and merges them into existing meal. Existing products are updated if mentioned, new products are added. Products not mentioned remain unchanged.
+ * @summary Update meal with AI-parsed description
+ */
+export const putAiMealsId = <TData = AxiosResponse<AiParseResponse>>(
+  id: string,
+  aiMealUpdateRequest: AiMealUpdateRequest,
+  options?: AxiosRequestConfig,
+): Promise<TData> => {
+  return axios.put(`/ai/meals/${id}`, aiMealUpdateRequest, options);
+};
+
+/**
  * @summary Получить список продуктов
  */
 export const getProducts = <TData = AxiosResponse<GetProducts200>>(
@@ -1041,6 +1057,7 @@ export type DeleteMealsIdResult = AxiosResponse<void>;
 export type PutMealsIdProductResult = AxiosResponse<Meal>;
 export type DeleteMealsIdProductResult = AxiosResponse<Meal>;
 export type PostAiParseResult = AxiosResponse<AiParseResponse>;
+export type PutAiMealsIdResult = AxiosResponse<AiParseResponse>;
 export type GetProductsResult = AxiosResponse<GetProducts200>;
 export type PostProductsResult = AxiosResponse<Product>;
 export type GetProductsSearchResult = AxiosResponse<GetProductsSearch200>;

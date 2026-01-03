@@ -46,14 +46,12 @@ export function TabsView({
     errorCode: aiErrorCode,
     clearError: clearAiError,
   } = useAiParse({
+    date,
+    mealType,
     onSuccess: () => {
       onClose?.();
     },
   });
-
-  const handleAiSubmit = (text: string) => {
-    parseText(text, mealType, date);
-  };
 
   return (
     <Tabs defaultValue="ai" className="w-full flex flex-col h-full">
@@ -67,7 +65,7 @@ export function TabsView({
       </TabsList>
       <TabsContent value="ai" className="flex-1 flex flex-col min-h-0">
         <AiInputTab
-          onSubmit={handleAiSubmit}
+          onSubmit={parseText}
           isPending={isAiPending}
           errorCode={aiErrorCode}
           onClearError={clearAiError}

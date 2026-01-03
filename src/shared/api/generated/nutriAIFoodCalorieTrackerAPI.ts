@@ -504,6 +504,10 @@ export interface AiParseRequest {
   date: string;
 }
 
+export interface AiMealUpdateRequest {
+  text: string;
+}
+
 export type AiParseResponseProductsItemSource =
   (typeof AiParseResponseProductsItemSource)[keyof typeof AiParseResponseProductsItemSource];
 
@@ -2116,6 +2120,104 @@ export const usePostAiParse = <
   TContext
 > => {
   const mutationOptions = getPostAiParseMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Parses meal description with GPT-4, finds or creates products, and merges them into existing meal. Existing products are updated if mentioned, new products are added. Products not mentioned remain unchanged.
+ * @summary Update meal with AI-parsed description
+ */
+export const putAiMealsId = (
+  id: string,
+  aiMealUpdateRequest: BodyType<AiMealUpdateRequest>,
+  options?: SecondParameter<typeof createInstance>,
+) => {
+  return createInstance<AiParseResponse>(
+    {
+      url: `/ai/meals/${id}`,
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      data: aiMealUpdateRequest,
+    },
+    options,
+  );
+};
+
+export const getPutAiMealsIdMutationOptions = <
+  TError = ErrorType<
+    BadRequestResponse | UnauthorizedResponse | NotFoundResponse
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof putAiMealsId>>,
+    TError,
+    { id: string; data: BodyType<AiMealUpdateRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof createInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof putAiMealsId>>,
+  TError,
+  { id: string; data: BodyType<AiMealUpdateRequest> },
+  TContext
+> => {
+  const mutationKey = ["putAiMealsId"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof putAiMealsId>>,
+    { id: string; data: BodyType<AiMealUpdateRequest> }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return putAiMealsId(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PutAiMealsIdMutationResult = NonNullable<
+  Awaited<ReturnType<typeof putAiMealsId>>
+>;
+export type PutAiMealsIdMutationBody = BodyType<AiMealUpdateRequest>;
+export type PutAiMealsIdMutationError = ErrorType<
+  BadRequestResponse | UnauthorizedResponse | NotFoundResponse
+>;
+
+/**
+ * @summary Update meal with AI-parsed description
+ */
+export const usePutAiMealsId = <
+  TError = ErrorType<
+    BadRequestResponse | UnauthorizedResponse | NotFoundResponse
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof putAiMealsId>>,
+      TError,
+      { id: string; data: BodyType<AiMealUpdateRequest> },
+      TContext
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof putAiMealsId>>,
+  TError,
+  { id: string; data: BodyType<AiMealUpdateRequest> },
+  TContext
+> => {
+  const mutationOptions = getPutAiMealsIdMutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };
@@ -5123,6 +5225,137 @@ export const getPostAiParseResponseMock = (
   ...overrideResponse,
 });
 
+export const getPutAiMealsIdResponseMock = (
+  overrideResponse: Partial<AiParseResponse> = {},
+): AiParseResponse => ({
+  meal: faker.helpers.arrayElement([
+    {
+      id: faker.string.uuid(),
+      dayEntryId: faker.string.uuid(),
+      type: faker.helpers.arrayElement([
+        "breakfast",
+        "lunch",
+        "dinner",
+        "snack",
+        "other",
+      ] as const),
+      time: faker.helpers.arrayElement([
+        faker.helpers.fromRegExp("^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$"),
+        undefined,
+      ]),
+      name: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
+      items: faker.helpers.arrayElement([
+        Array.from(
+          { length: faker.number.int({ min: 1, max: 10 }) },
+          (_, i) => i + 1,
+        ).map(() => ({
+          id: faker.string.uuid(),
+          mealId: faker.string.uuid(),
+          productId: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([faker.string.uuid(), null]),
+            undefined,
+          ]),
+          recipeId: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([faker.string.uuid(), null]),
+            undefined,
+          ]),
+          name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+          quantity: faker.number.float({
+            min: undefined,
+            max: undefined,
+            fractionDigits: 2,
+          }),
+          unit: faker.string.alpha({ length: { min: 10, max: 20 } }),
+          kcal: faker.number.int({ min: 0, max: undefined }),
+          protein: faker.helpers.arrayElement([
+            faker.number.float({
+              min: undefined,
+              max: undefined,
+              fractionDigits: 2,
+            }),
+            undefined,
+          ]),
+          fat: faker.helpers.arrayElement([
+            faker.number.float({
+              min: undefined,
+              max: undefined,
+              fractionDigits: 2,
+            }),
+            undefined,
+          ]),
+          carbs: faker.helpers.arrayElement([
+            faker.number.float({
+              min: undefined,
+              max: undefined,
+              fractionDigits: 2,
+            }),
+            undefined,
+          ]),
+          source: faker.helpers.arrayElement([
+            faker.string.alpha({ length: { min: 10, max: 20 } }),
+            undefined,
+          ]),
+        })),
+        undefined,
+      ]),
+      totalKcal: faker.number.int({ min: 0, max: undefined }),
+      source: faker.helpers.arrayElement(["manual", "ai"] as const),
+      aiConfidence: faker.helpers.arrayElement([
+        faker.number.float({ min: 0, max: 1, fractionDigits: 2 }),
+        undefined,
+      ]),
+      createdAt: `${faker.date.past().toISOString().split(".")[0]}Z`,
+      updatedAt: `${faker.date.past().toISOString().split(".")[0]}Z`,
+    },
+    undefined,
+  ]),
+  products: faker.helpers.arrayElement([
+    Array.from(
+      { length: faker.number.int({ min: 1, max: 10 }) },
+      (_, i) => i + 1,
+    ).map(() => ({
+      productId: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
+      name: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
+      quantity: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      wasCreated: faker.helpers.arrayElement([
+        faker.datatype.boolean(),
+        undefined,
+      ]),
+      source: faker.helpers.arrayElement([
+        faker.helpers.arrayElement(["ai", "database"] as const),
+        undefined,
+      ]),
+    })),
+    undefined,
+  ]),
+  confidence: faker.helpers.arrayElement([
+    faker.number.float({ min: 0, max: 1, fractionDigits: 2 }),
+    undefined,
+  ]),
+  productsCreatedCount: faker.helpers.arrayElement([
+    faker.number.int({ min: undefined, max: undefined }),
+    undefined,
+  ]),
+  productsFoundCount: faker.helpers.arrayElement([
+    faker.number.int({ min: undefined, max: undefined }),
+    undefined,
+  ]),
+  ...overrideResponse,
+});
+
 export const getGetProductsResponseMock = (
   overrideResponse: Partial<GetProducts200> = {},
 ): GetProducts200 => ({
@@ -7191,6 +7424,34 @@ export const getPostAiParseMockHandler = (
   );
 };
 
+export const getPutAiMealsIdMockHandler = (
+  overrideResponse?:
+    | AiParseResponse
+    | ((
+        info: Parameters<Parameters<typeof http.put>[1]>[0],
+      ) => Promise<AiParseResponse> | AiParseResponse),
+  options?: RequestHandlerOptions,
+) => {
+  return http.put(
+    "*/ai/meals/:id",
+    async (info) => {
+      await delay(1000);
+
+      return new HttpResponse(
+        JSON.stringify(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === "function"
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getPutAiMealsIdResponseMock(),
+        ),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      );
+    },
+    options,
+  );
+};
+
 export const getGetProductsMockHandler = (
   overrideResponse?:
     | GetProducts200
@@ -7694,6 +7955,7 @@ export const getNutriAIFoodCalorieTrackerAPIMock = () => [
   getPutMealsIdProductMockHandler(),
   getDeleteMealsIdProductMockHandler(),
   getPostAiParseMockHandler(),
+  getPutAiMealsIdMockHandler(),
   getGetProductsMockHandler(),
   getPostProductsMockHandler(),
   getGetProductsSearchMockHandler(),
