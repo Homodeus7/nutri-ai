@@ -1,87 +1,59 @@
-import {
-  usePostAiParse,
-  type AiParseRequestMealType,
-} from "@/shared/api/generated/nutriAIFoodCalorieTrackerAPI";
-import { useQueryClient } from "@tanstack/react-query";
-import { isAxiosError } from "axios";
-import { useState } from "react";
-
-// API error codes
-export const AI_PARSE_ERROR_CODES = {
-  NO_ITEMS_FOUND: 2,
-} as const;
-
-export type AiParseErrorCode =
-  (typeof AI_PARSE_ERROR_CODES)[keyof typeof AI_PARSE_ERROR_CODES];
-
-interface ApiErrorResponse {
-  code?: number;
-  message?: string;
-  timestamp?: string;
-  path?: string;
-  extensions?: unknown[];
-}
+import type { AiParseRequestMealType } from "@/shared/api/generated/nutriAIFoodCalorieTrackerAPI";
+import { useDayData } from "@/features/day-data";
+import { useMemo, useCallback } from "react";
+import { useAiCreateMeal } from "./use-ai-create-meal";
+import { useAiUpdateMeal } from "./use-ai-update-meal";
 
 interface UseAiParseParams {
+  date: string;
+  mealType: AiParseRequestMealType;
   onSuccess?: () => void;
   onError?: (error: unknown) => void;
 }
 
-export function useAiParse({ onSuccess, onError }: UseAiParseParams = {}) {
-  const queryClient = useQueryClient();
-  const [errorCode, setErrorCode] = useState<AiParseErrorCode | null>(null);
+export function useAiParse({ date, mealType, onSuccess, onError }: UseAiParseParams) {
+  const { data: dayData } = useDayData({ date });
 
-  const { mutate, isPending, data } = usePostAiParse({
-    mutation: {
-      onSuccess: () => {
-        setErrorCode(null);
-        // Invalidate day queries to refetch fresh data with new meal
-        queryClient.invalidateQueries({
-          predicate: (query) =>
-            query.queryKey[0]?.toString().startsWith("/day/") ?? false,
-        });
-        onSuccess?.();
-      },
-      onError: (error) => {
-        console.error("Failed to parse text with AI:", error);
+  const existingMeal = useMemo(
+    () => dayData?.meals?.find((meal) => meal.type === mealType),
+    [dayData?.meals, mealType],
+  );
 
-        // Extract error code from API response
-        if (isAxiosError(error)) {
-          const data = error.response?.data as ApiErrorResponse | undefined;
-          if (data?.code === AI_PARSE_ERROR_CODES.NO_ITEMS_FOUND) {
-            setErrorCode(AI_PARSE_ERROR_CODES.NO_ITEMS_FOUND);
-          }
-        }
+  const {
+    createMeal,
+    isPending: isCreating,
+    errorCode: createErrorCode,
+    clearError: clearCreateError,
+  } = useAiCreateMeal({ onSuccess, onError });
 
-        onError?.(error);
-      },
+  const {
+    updateMeal,
+    isPending: isUpdating,
+    errorCode: updateErrorCode,
+    clearError: clearUpdateError,
+  } = useAiUpdateMeal({ onSuccess, onError });
+
+  const parseText = useCallback(
+    (text: string) => {
+      if (existingMeal) {
+        updateMeal(existingMeal.id, text);
+      } else {
+        createMeal(text, mealType, date);
+      }
     },
-  });
+    [existingMeal, updateMeal, createMeal, mealType, date],
+  );
 
-  const parseText = (
-    text: string,
-    mealType: AiParseRequestMealType,
-    date: string,
-  ) => {
-    setErrorCode(null);
-    mutate({
-      data: {
-        text,
-        mealType,
-        date,
-      },
-    });
-  };
-
-  const clearError = () => {
-    setErrorCode(null);
-  };
+  const clearError = useCallback(() => {
+    clearCreateError();
+    clearUpdateError();
+  }, [clearCreateError, clearUpdateError]);
 
   return {
     parseText,
-    isPending,
-    data,
-    errorCode,
+    isPending: isCreating || isUpdating,
+    errorCode: createErrorCode ?? updateErrorCode,
     clearError,
+    existingMeal,
   };
 }
