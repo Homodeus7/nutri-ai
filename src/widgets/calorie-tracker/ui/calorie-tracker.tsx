@@ -14,11 +14,11 @@ import { useI18n } from "../i18n";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/shared/ui/primitives/card";
+import { useIsMobile } from "@/shared/lib/use-media-query";
 
 interface CalorieTrackerProps {
   caloriesRemaining: number;
@@ -40,9 +40,15 @@ export function CalorieTracker({
   caloriesTotal,
 }: CalorieTrackerProps) {
   const { t } = useI18n();
+  const isMobile = useIsMobile();
   const caloriesConsumed = caloriesTotal - caloriesRemaining;
   const percentage = (caloriesConsumed / caloriesTotal) * 100;
   const endAngle = 90 - (percentage / 100) * 360;
+
+  const innerRadius = isMobile ? 50 : 80;
+  const outerRadius = isMobile ? 100 : 140;
+  const polarRadius: [number, number] = isMobile ? [56, 44] : [86, 74];
+  const labelOffset = isMobile ? 18 : 22;
 
   const chartData = [
     {
@@ -54,28 +60,27 @@ export function CalorieTracker({
 
   return (
     <Card className="flex flex-col w-full">
-      <CardHeader className="items-center pb-0">
-        <CardTitle>{t("title")}</CardTitle>
-        {/* <CardDescription>{t("description")}</CardDescription> */}
+      <CardHeader className="items-center pb-0 px-3 md:px-6">
+        <CardTitle className="text-base md:text-lg">{t("title")}</CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 pb-0">
+      <CardContent className="flex-1 pb-0 px-2 md:px-6">
         <ChartContainer
           config={chartConfig}
-          className="mx-auto aspect-square max-h-[200px]  max-w-[200px]"
+          className="mx-auto aspect-square max-h-[140px] max-w-[140px] md:max-h-[180px] md:max-w-[180px]"
         >
           <RadialBarChart
             data={chartData}
             startAngle={90}
             endAngle={endAngle}
-            innerRadius={80}
-            outerRadius={140}
+            innerRadius={innerRadius}
+            outerRadius={outerRadius}
           >
             <PolarGrid
               gridType="circle"
               radialLines={false}
               stroke="none"
               className="first:fill-muted last:fill-background"
-              polarRadius={[86, 74]}
+              polarRadius={polarRadius}
             />
             <RadialBar dataKey="calories" background />
             <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
@@ -92,14 +97,14 @@ export function CalorieTracker({
                         <tspan
                           x={viewBox.cx}
                           y={viewBox.cy}
-                          className="fill-foreground text-4xl font-bold"
+                          className="fill-foreground text-lg md:text-2xl font-bold"
                         >
                           {caloriesRemaining.toLocaleString()}
                         </tspan>
                         <tspan
                           x={viewBox.cx}
-                          y={(viewBox.cy || 0) + 24}
-                          className="fill-muted-foreground"
+                          y={(viewBox.cy || 0) + labelOffset}
+                          className="fill-muted-foreground text-xs md:text-sm"
                         >
                           {t("left")}
                         </tspan>
@@ -112,7 +117,7 @@ export function CalorieTracker({
           </RadialBarChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex items-center justify-center gap-12">
+      <CardFooter className="flex items-center justify-center gap-8 md:gap-12 py-3 md:py-4">
         <UiText variant="small" weight="semibold">
           0
         </UiText>
