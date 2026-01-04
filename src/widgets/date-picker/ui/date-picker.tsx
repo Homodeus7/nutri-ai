@@ -1,18 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { CalendarIcon } from "lucide-react";
+import { useMemo } from "react";
 import { Card, CardContent } from "@/shared/ui/primitives/card";
-import { Button } from "@/shared/ui/primitives/button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/shared/ui/primitives/popover";
-import { Calendar } from "@/shared/ui/primitives/calendar";
-import { UiText } from "@/shared/ui/ui-text";
 import { useI18n } from "../i18n";
 import { useSelectedDate } from "@/features/day-data";
+import { CalendarButton } from "./calendar-button";
+import { DayButton } from "./day-button";
 
 interface DayData {
   day: string;
@@ -66,7 +59,6 @@ export function DatePicker({ onDateChange }: DatePickerProps) {
   const { t } = useI18n();
   const selectedDate = useSelectedDate((state) => state.selectedDate);
   const setDate = useSelectedDate((state) => state.setDate);
-  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   const weekDays = useMemo(
     () => generateWeekDays(selectedDate, t),
@@ -78,58 +70,40 @@ export function DatePicker({ onDateChange }: DatePickerProps) {
     onDateChange?.(date);
   };
 
-  const handleCalendarSelect = (date: Date | undefined) => {
-    if (date) {
-      setDate(date);
-      onDateChange?.(date);
-      setIsCalendarOpen(false);
-    }
+  const handleCalendarSelect = (date: Date) => {
+    setDate(date);
+    onDateChange?.(date);
   };
 
   return (
     <Card>
-      <CardContent className="pt-6">
-        <div className="flex items-center gap-2">
-          <div className="flex flex-1 justify-between items-center gap-2">
-            {weekDays.map((dayData) => {
-              const isSelected = isSameDay(dayData.date, selectedDate);
-              return (
-                <Button
-                  key={dayData.date.toISOString()}
-                  onClick={() => handleDayClick(dayData.date)}
-                  variant={isSelected ? "default" : "ghost"}
-                  className="flex flex-col text-foreground items-center gap-2 p-3 rounded-xl transition-all flex-1 h-auto"
-                >
-                  <UiText variant="small" weight="semibold" as="span">
-                    {dayData.day}
-                  </UiText>
-                  <UiText variant="large" weight="bold" as="span">
-                    {dayData.date.getDate().toString().padStart(2, "0")}
-                  </UiText>
-                </Button>
-              );
-            })}
+      <CardContent>
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:gap-2">
+          <div className="md:hidden">
+            <CalendarButton
+              selectedDate={selectedDate}
+              onSelect={handleCalendarSelect}
+            />
           </div>
 
-          <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                size="icon"
-                className="shrink-0 h-auto p-3 w-12"
-                aria-label="Open calendar"
-              >
-                <CalendarIcon />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="end">
-              <Calendar
-                mode="single"
-                selected={selectedDate}
-                onSelect={handleCalendarSelect}
+          <div className="flex flex-1 justify-between items-center gap-1 md:gap-2">
+            {weekDays.map((dayData) => (
+              <DayButton
+                key={dayData.date.toISOString()}
+                day={dayData.day}
+                date={dayData.date}
+                isSelected={isSameDay(dayData.date, selectedDate)}
+                onClick={() => handleDayClick(dayData.date)}
               />
-            </PopoverContent>
-          </Popover>
+            ))}
+          </div>
+
+          <div className="hidden md:block">
+            <CalendarButton
+              selectedDate={selectedDate}
+              onSelect={handleCalendarSelect}
+            />
+          </div>
         </div>
       </CardContent>
     </Card>
