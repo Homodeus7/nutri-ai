@@ -76,36 +76,38 @@ export function DatePicker({ onDateChange }: DatePickerProps) {
   };
 
   return (
-    <Card>
-      <CardContent>
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:gap-2">
-          <div className="md:hidden">
+    <>
+      {/* Mobile: only calendar button */}
+      <div className="md:hidden">
+        <CalendarButton
+          selectedDate={selectedDate}
+          onSelect={handleCalendarSelect}
+        />
+      </div>
+
+      {/* Desktop: card with week days */}
+      <Card className="hidden md:block">
+        <CardContent>
+          <div className="flex items-center gap-2">
+            <div className="flex flex-1 justify-between items-center gap-2">
+              {weekDays.map((dayData) => (
+                <DayButton
+                  key={dayData.date.toISOString()}
+                  day={dayData.day}
+                  date={dayData.date}
+                  isSelected={isSameDay(dayData.date, selectedDate)}
+                  onClick={() => handleDayClick(dayData.date)}
+                />
+              ))}
+            </div>
+
             <CalendarButton
               selectedDate={selectedDate}
               onSelect={handleCalendarSelect}
             />
           </div>
-
-          <div className="flex flex-1 justify-between items-center gap-1 md:gap-2">
-            {weekDays.map((dayData) => (
-              <DayButton
-                key={dayData.date.toISOString()}
-                day={dayData.day}
-                date={dayData.date}
-                isSelected={isSameDay(dayData.date, selectedDate)}
-                onClick={() => handleDayClick(dayData.date)}
-              />
-            ))}
-          </div>
-
-          <div className="hidden md:block">
-            <CalendarButton
-              selectedDate={selectedDate}
-              onSelect={handleCalendarSelect}
-            />
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </>
   );
 }

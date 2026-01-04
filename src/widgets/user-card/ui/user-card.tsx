@@ -2,13 +2,11 @@
 
 import { useState } from "react";
 import { User as UserIcon } from "lucide-react";
-import { Card, CardContent, CardHeader } from "@/shared/ui/primitives/card";
+import { Card, CardContent } from "@/shared/ui/primitives/card";
 import { UiText } from "@/shared/ui/ui-text";
 import { useAuthStore } from "@/entities/auth";
-import { useI18n } from "../i18n";
 
 export function UserCard() {
-  const { t } = useI18n();
   const { user } = useAuthStore();
   const [imageError, setImageError] = useState(false);
 
@@ -21,11 +19,8 @@ export function UserCard() {
 
   return (
     <Card className="min-h-full">
-      <CardHeader>
-        <UiText variant="large">{t("goodMorning")}</UiText>
-      </CardHeader>
-      <CardContent className="flex items-center gap-2">
-        <div className="w-10 h-10 border border-foreground rounded-full flex items-center justify-center">
+      <CardContent className="flex items-center gap-3 pt-6">
+        <div className="w-10 h-10 border border-foreground rounded-full flex items-center justify-center overflow-hidden">
           {googlePictureUrl && !imageError ? (
             <img
               src={googlePictureUrl}
@@ -38,9 +33,7 @@ export function UserCard() {
           )}
         </div>
         <div>
-          <UiText variant="small" className="mt-1">
-            {user.displayName}
-          </UiText>
+          <UiText variant="small">{displayName}</UiText>
           <UiText variant="muted" className="text-xs">
             {user.email}
           </UiText>
