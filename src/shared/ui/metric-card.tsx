@@ -107,13 +107,13 @@ export function MetricProgressCard({
     <Card
       className={cn("border-0 py-0 gap-0 hover:shadow-md", bgColor, className)}
     >
-      <CardHeader className="p-4 pb-0 sm:p-5 sm:pb-0 flex-row justify-between items-start">
-        <CardTitle className="text-sm font-semibold text-black/70">
+      <CardHeader className="p-2 pb-0 sm:p-5 sm:pb-0 flex-row justify-between items-start">
+        <CardTitle className="text-xs font-semibold text-black/70">
           {label}
         </CardTitle>
         {icon && <span className="text-xl sm:text-2xl opacity-90">{icon}</span>}
       </CardHeader>
-      <CardContent className="p-4 pt-2 sm:p-5 sm:pt-2 space-y-3">
+      <CardContent className="p-2 pt-2 sm:p-5 sm:pt-2 space-y-3">
         <MetricValue value={value} unit={unit} />
         <ProgressBar value={numericValue} max={total} />
         <div className="flex justify-between items-end text-black/60">
