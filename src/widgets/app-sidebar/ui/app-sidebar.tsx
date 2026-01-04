@@ -6,6 +6,7 @@ import { cn } from "@/shared/lib/css";
 import { NutriAiLogo } from "@/shared/ui";
 import { NAV_ITEMS } from "@/shared/constants/navigation";
 import { useI18n } from "../i18n";
+import { ROUTER_PATHS } from "@/shared/constants/routes";
 
 export function AppSidebar() {
   const pathname = usePathname();
@@ -14,7 +15,7 @@ export function AppSidebar() {
   return (
     <aside className="hidden md:flex w-64 bg-card border-r border-border flex-col py-8 px-6 sticky top-0 h-screen">
       <div className="mb-12">
-        <Link href="/">
+        <Link href={ROUTER_PATHS.BOARD}>
           <NutriAiLogo width={139} height={34} />
         </Link>
       </div>

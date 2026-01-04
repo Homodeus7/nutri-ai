@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { ArrowLeft } from "lucide-react";
+import { ROUTER_PATHS } from "@/shared/constants/routes";
 import { Button } from "@/shared/ui/primitives/button";
 import { ProductActionsMenu } from "@/entities/product";
 import { UiText } from "@/shared/ui/ui-text";
@@ -28,7 +29,7 @@ export function ProductDetailPage() {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
   const handleDeleteSuccess = () => {
-    router.push("/products");
+    router.push(ROUTER_PATHS.PRODUCTS);
   };
 
   if (isLoading) {

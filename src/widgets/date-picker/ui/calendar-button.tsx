@@ -9,6 +9,7 @@ import {
   PopoverTrigger,
 } from "@/shared/ui/primitives/popover";
 import { Calendar } from "@/shared/ui/primitives/calendar";
+import { useLang } from "@/features/i18n";
 
 interface CalendarButtonProps {
   selectedDate: Date;
@@ -17,6 +18,7 @@ interface CalendarButtonProps {
 
 export function CalendarButton({ selectedDate, onSelect }: CalendarButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const lang = useLang((state) => state.lang);
 
   const handleSelect = (date: Date | undefined) => {
     if (date) {
@@ -24,6 +26,11 @@ export function CalendarButton({ selectedDate, onSelect }: CalendarButtonProps) 
       setIsOpen(false);
     }
   };
+
+  const formattedDate = selectedDate.toLocaleDateString(lang, {
+    day: "numeric",
+    month: "long",
+  });
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
@@ -34,7 +41,7 @@ export function CalendarButton({ selectedDate, onSelect }: CalendarButtonProps) 
           aria-label="Open calendar"
         >
           <CalendarIcon className="size-4 md:size-5" />
-          <span className="md:hidden ml-2">Календарь</span>
+          <span className="md:hidden ml-2">{formattedDate}</span>
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="end">

@@ -1,5 +1,6 @@
 import { useAuthStore } from "@/entities/auth";
 import { useRouter } from "next/navigation";
+import { ROUTER_PATHS } from "@/shared/constants/routes";
 
 export interface UseLogoutOptions {
   onSuccess?: () => void;
@@ -7,7 +8,7 @@ export interface UseLogoutOptions {
 }
 
 export function useLogout(options?: UseLogoutOptions) {
-  const { onSuccess, redirectTo = "/sign-in" } = options || {};
+  const { onSuccess, redirectTo = ROUTER_PATHS.SIGN_IN } = options || {};
   const router = useRouter();
   const clearAuth = useAuthStore((state) => state.clearAuth);
 

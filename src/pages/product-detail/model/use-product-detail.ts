@@ -1,5 +1,6 @@
 import { useRouter } from "next/router";
 import { useGetProductsId } from "@/shared/api/generated/nutriAIFoodCalorieTrackerAPI";
+import { ROUTER_PATHS } from "@/shared/constants/routes";
 
 export function useProductDetail() {
   const router = useRouter();
@@ -11,7 +12,7 @@ export function useProductDetail() {
   );
 
   const goBack = () => {
-    router.push("/products");
+    router.push(ROUTER_PATHS.PRODUCTS);
   };
 
   return {

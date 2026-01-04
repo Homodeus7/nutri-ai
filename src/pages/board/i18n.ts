@@ -5,28 +5,16 @@ export const useI18n = createI18nModule({
     en: "Good Morning",
     ru: "Доброе утро",
   },
-  welcomeBack: {
-    en: "Welcome back!",
-    ru: "С возвращением!",
+  goodAfternoon: {
+    en: "Good Afternoon",
+    ru: "Добрый день",
   },
-  macronutrients: {
-    en: "Macronutrients",
-    ru: "Макронутриенты",
+  goodEvening: {
+    en: "Good Evening",
+    ru: "Добрый вечер",
   },
-  carbs: {
-    en: "Carbs",
-    ru: "Углеводы",
-  },
-  protein: {
-    en: "Protein",
-    ru: "Белки",
-  },
-  fat: {
-    en: "Fat",
-    ru: "Жиры",
-  },
-  fiber: {
-    en: "Fiber",
-    ru: "Клетчатка",
+  goodNight: {
+    en: "Good Night",
+    ru: "Доброй ночи",
   },
 } as const);
