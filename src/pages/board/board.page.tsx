@@ -12,7 +12,7 @@ import { UserCard } from "@/widgets/user-card";
 export function BoardPage() {
   const { t } = useI18n();
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="lg:col-span-1">
           <UserCard />
@@ -23,7 +23,7 @@ export function BoardPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <CalorieTracker caloriesRemaining={1672} caloriesTotal={2500} />
         </div>
