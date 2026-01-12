@@ -29,7 +29,7 @@ export function DayButton({ day, date, isSelected, onClick }: DayButtonProps) {
         variant="large"
         weight="bold"
         as="span"
-        className="text-sm md:text-lg"
+        className="text-sm md:text-2xl"
       >
         {date.getDate().toString().padStart(2, "0")}
       </UiText>
