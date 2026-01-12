@@ -43,7 +43,7 @@ export function SignInForm() {
   });
 
   const { signIn, isPending } = useSignIn({
-    redirectTo: ROUTER_PATHS.BOARD,
+    redirectTo: ROUTER_PATHS.DIARY,
     onSuccess: () => {
       toast.success(t("successMessage"));
     },

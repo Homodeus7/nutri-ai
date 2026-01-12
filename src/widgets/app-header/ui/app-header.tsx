@@ -15,12 +15,12 @@ export function AppHeader() {
     <header className="bg-card border-b border-border sticky top-0 z-50">
       <div className="px-8 py-4 flex items-center justify-between md:justify-end">
         <div className="md:hidden">
-          <Link href={ROUTER_PATHS.BOARD}>
+          <Link href={ROUTER_PATHS.DIARY}>
             <NutriAiLogo width={100} height={24} />
           </Link>
         </div>
         <div className="flex items-center gap-4">
-          <UiText variant="muted">{t("dashboard")}</UiText>
+          {/* <UiText variant="muted">{t("dashboard")}</UiText> */}
           <div className="flex gap-2">
             <UiButton variant="ghost" size="icon">
               <Crown className="w-5 h-5" />

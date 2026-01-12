@@ -1,7 +1,7 @@
 export const ROUTER_PATHS = {
   SIGN_IN: "/sign-in",
   SIGN_UP: "/sign-up",
-  BOARD: "/board",
+  DIARY: "/diary",
   PRODUCTS: "/products",
   PRODUCT_DETAIL: "/products/[id]",
   BOOST: "/boost",

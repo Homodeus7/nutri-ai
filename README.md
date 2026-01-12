@@ -118,7 +118,7 @@ The project follows [Feature-Sliced Design](https://feature-sliced.design/) arch
 │   ├── _app.tsx            # Root component
 │   ├── _document.tsx       # HTML document
 │   ├── sign-in/            # Public pages
-│   └── board/              # Protected pages
+│   └── diary/              # Protected pages
 │
 └── src/
     ├── app/                # Application infrastructure

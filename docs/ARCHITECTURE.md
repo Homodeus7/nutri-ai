@@ -75,12 +75,12 @@ import {
   getPrivateLayout,
   getPrivateRouterLoader,
 } from "@/app/pub/get-private-layout";
-import { DashboardPage } from "@/pages/dashboard";
+import { DiaryPage } from "@/pages/diary";
 import { setPageLayout } from "@/shared/lib/next";
 
 export const getServerSideProps = getPrivateRouterLoader;
 
-export default setPageLayout(DashboardPage, getPrivateLayout);
+export default setPageLayout(DiaryPage, getPrivateLayout);
 ```
 
 ---

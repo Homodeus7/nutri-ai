@@ -11,7 +11,7 @@ export const test = base.extend({
   //   await page.fill('[name="email"]', 'test@example.com');
   //   await page.fill('[name="password"]', 'password123');
   //   await page.click('button[type="submit"]');
-  //   await page.waitForURL('/board');
+  //   await page.waitForURL('/diary');
   //   await use(page);
   // },
 });

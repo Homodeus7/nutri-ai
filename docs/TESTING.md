@@ -148,7 +148,7 @@ import { signIn } from "../helpers/auth";
 
 test("должен успешно войти", async ({ page }) => {
   await signIn(page, "test@example.com", "password123");
-  await expect(page).toHaveURL("/board");
+  await expect(page).toHaveURL("/diary");
 });
 ```
 

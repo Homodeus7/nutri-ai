@@ -2,10 +2,10 @@ import {
   getPrivateLayout,
   getPrivateRouterLoader,
 } from "@/_app/pub/get-private-layout";
-import { BoardPage } from "@/pages/board";
+import { DiaryPage } from "@/pages/diary";
 import { setPageLayout } from "@/shared/lib/next";
 
-export default setPageLayout(BoardPage, getPrivateLayout);
+export default setPageLayout(DiaryPage, getPrivateLayout);
 
 export const getServerSideProps = async () => {
   const props = await getPrivateRouterLoader();

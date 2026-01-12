@@ -1,9 +1,9 @@
 import { createI18nModule } from "@/shared/lib/i18n";
 
 export const useI18n = createI18nModule({
-  board: {
-    en: "Board",
-    ru: "Доска",
+  diary: {
+    en: "Diary",
+    ru: "Дневник",
   },
   products: {
     en: "Products",

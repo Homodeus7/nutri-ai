@@ -12,10 +12,10 @@ test.describe("Accessibility", () => {
     expect(accessibilityScanResults.violations).toEqual([]);
   });
 
-  test("board page should not have accessibility violations", async ({
+  test("diary page should not have accessibility violations", async ({
     page,
   }) => {
-    await page.goto("/board");
+    await page.goto("/diary");
 
     const accessibilityScanResults = await new AxeBuilder({ page }).analyze();
 

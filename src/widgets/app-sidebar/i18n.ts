@@ -5,9 +5,9 @@ export const useI18n = createI18nModule({
     en: "Nutri AI",
     ru: "Nutri AI",
   },
-  board: {
-    en: "Board",
-    ru: "Доска",
+  diary: {
+    en: "Diary",
+    ru: "Дневник",
   },
   products: {
     en: "Products",

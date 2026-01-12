@@ -18,7 +18,7 @@ export function SignUpPage() {
   const timezone = useTimezone();
 
   const { handleGoogleLogin } = useGoogleAuth({
-    redirectTo: ROUTER_PATHS.BOARD,
+    redirectTo: ROUTER_PATHS.DIARY,
     onSuccess: () => {
       toast.success("Successfully signed up with Google");
     },

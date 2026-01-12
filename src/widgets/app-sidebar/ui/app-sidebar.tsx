@@ -15,7 +15,7 @@ export function AppSidebar() {
   return (
     <aside className="hidden md:flex w-64 bg-card border-r border-border flex-col py-8 px-6 sticky top-0 h-screen">
       <div className="mb-12">
-        <Link href={ROUTER_PATHS.BOARD}>
+        <Link href={ROUTER_PATHS.DIARY}>
           <NutriAiLogo width={139} height={34} />
         </Link>
       </div>

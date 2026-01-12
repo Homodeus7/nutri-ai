@@ -52,7 +52,7 @@ export function SignUpForm() {
   });
 
   const { signUp, isPending } = useSignUp({
-    redirectTo: ROUTER_PATHS.BOARD,
+    redirectTo: ROUTER_PATHS.DIARY,
     onSuccess: () => {
       toast.success(t("successMessage"));
     },

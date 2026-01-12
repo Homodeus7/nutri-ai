@@ -8,7 +8,7 @@ import { MacrosGrid } from "@/widgets/macros-grid";
 import { useGreeting } from "./model/use-greeting";
 import { useAuthStore } from "@/entities/auth";
 
-export function BoardPage() {
+export function DiaryPage() {
   const greeting = useGreeting();
   const { user } = useAuthStore();
   return (
