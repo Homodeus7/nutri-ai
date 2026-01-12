@@ -1,4 +1,11 @@
-import { Home, Package, Zap, Utensils, Settings, LucideIcon } from "lucide-react";
+import {
+  Apple,
+  Zap,
+  Utensils,
+  Settings,
+  LucideIcon,
+  Notebook,
+} from "lucide-react";
 import { ROUTER_PATHS } from "./routes";
 
 export type NavItem = {
@@ -8,8 +15,8 @@ export type NavItem = {
 };
 
 export const NAV_ITEMS: NavItem[] = [
-  { key: "diary", href: ROUTER_PATHS.DIARY, icon: Home },
-  { key: "products", href: ROUTER_PATHS.PRODUCTS, icon: Package },
+  { key: "diary", href: ROUTER_PATHS.DIARY, icon: Notebook },
+  { key: "products", href: ROUTER_PATHS.PRODUCTS, icon: Apple },
   { key: "boost", href: ROUTER_PATHS.BOOST, icon: Zap },
   { key: "lunch", href: ROUTER_PATHS.LUNCH, icon: Utensils },
   { key: "more", href: ROUTER_PATHS.MORE, icon: Settings },
