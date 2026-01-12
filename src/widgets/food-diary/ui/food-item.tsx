@@ -13,21 +13,36 @@ interface FoodItemProps {
 export function FoodItem({ item, onEdit, onDelete }: FoodItemProps) {
   const { t } = useI18n();
 
+  const formatValue = (value: number | undefined) =>
+    value !== undefined ? Math.round(value * 10) / 10 : 0;
+
   return (
     <div
       onClick={onEdit}
-      className="flex items-center justify-between bg-background/50 rounded-lg px-3 py-2 group hover:ring-2 hover:ring-inset hover:ring-primary transition-all cursor-pointer"
+      className="flex items-center justify-between bg-background/50 rounded-lg px-2 py-1.5 group hover:ring-2 hover:ring-inset hover:ring-primary transition-all cursor-pointer"
     >
-      <UiText as="span" variant="small" className="truncate">
-        {item.name}
-      </UiText>
-      <div className="flex items-center gap-2">
-        <UiText variant="muted" className="text-sm">
-          {item.quantity ?? 0} {t("g")}
+      <div className="flex flex-col gap-0.5 min-w-0 flex-1">
+        <UiText as="span" variant="small" className="truncate text-xs">
+          {item.name}
         </UiText>
-        <UiText variant="muted" className="text-sm">
-          {item.calories} {t("kcal")}
-        </UiText>
+        <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+          <span>P: {formatValue(item.protein)}g</span>
+          <span>F: {formatValue(item.fat)}g</span>
+          <span>C: {formatValue(item.carbs)}g</span>
+          {item.fiber !== undefined && item.fiber > 0 && (
+            <span>Fb: {formatValue(item.fiber)}g</span>
+          )}
+        </div>
+      </div>
+      <div className="flex items-center gap-1.5 shrink-0">
+        <div className="flex flex-col items-end gap-0.5">
+          <UiText variant="muted" className="text-xs">
+            {formatValue(item.calories)} {t("kcal")}
+          </UiText>
+          <UiText variant="muted" className="text-[10px]">
+            {item.quantity ?? 0} {t("g")}
+          </UiText>
+        </div>
         <Button
           variant="ghost"
           size="icon"

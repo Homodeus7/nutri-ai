@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { ChevronDown, ChevronUp } from "lucide-react";
+import { Button } from "@/shared/ui/primitives/button";
+import { useIsMobile } from "@/shared/lib/use-media-query";
 import { FoodItem } from "./food-item";
 import { MealTotals } from "./meal-totals";
-import { UiText } from "@/shared/ui/ui-text";
+import { MealEmptyState } from "./meal-empty-state";
 import type { FoodItem as FoodItemType, NutritionTotals } from "../model/types";
-import { useI18n } from "../i18n";
 import { useMealCardContext } from "../model/meal-card-context";
 import {
   UpdateMealProductDialog,
@@ -17,23 +19,10 @@ interface MealContentProps {
   totals: NutritionTotals;
 }
 
-function EmptyState() {
-  const { t } = useI18n();
-
-  return (
-    <div className="text-center py-6">
-      <UiText variant="small" className="text-muted-foreground">
-        {t("noEntries")}
-      </UiText>
-      {/* <UiText variant="muted" className="text-xs mt-1">
-        {t("clickToAdd")}
-      </UiText> */}
-    </div>
-  );
-}
-
 export function MealContent({ items, totals }: MealContentProps) {
   const { mealId } = useMealCardContext();
+  const isMobile = useIsMobile();
+  const [isExpanded, setIsExpanded] = useState(true);
   const [editingProduct, setEditingProduct] = useState<FoodItemType | null>(
     null,
   );
@@ -44,23 +33,55 @@ export function MealContent({ items, totals }: MealContentProps) {
   const hasItems = items.length > 0;
 
   if (!hasItems) {
-    return <EmptyState />;
+    // На мобильных не показываем empty state
+    if (isMobile) {
+      return null;
+    }
+    return <MealEmptyState />;
   }
+
+  // На десктопе всегда показываем список
+  const shouldShowItems = !isMobile || isExpanded;
 
   return (
     <>
-      <div className="space-y-3">
-        <div className="space-y-2 max-h-32 overflow-y-auto">
-          {items.map((item) => (
-            <FoodItem
-              key={item.id}
-              item={item}
-              onEdit={() => setEditingProduct(item)}
-              onDelete={() => setDeletingProduct(item)}
-            />
-          ))}
+      <div className="space-y-2">
+        <div
+          className={`flex items-center justify-between ${isMobile ? "cursor-pointer" : ""}`}
+          onClick={isMobile ? () => setIsExpanded(!isExpanded) : undefined}
+        >
+          <MealTotals totals={totals} />
+          {isMobile && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 shrink-0"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsExpanded(!isExpanded);
+              }}
+            >
+              {isExpanded ? (
+                <ChevronUp className="w-4 h-4" />
+              ) : (
+                <ChevronDown className="w-4 h-4" />
+              )}
+            </Button>
+          )}
         </div>
-        <MealTotals totals={totals} />
+
+        {shouldShowItems && (
+          <div className="space-y-2 max-h-64 overflow-y-auto">
+            {items.map((item) => (
+              <FoodItem
+                key={item.id}
+                item={item}
+                onEdit={() => setEditingProduct(item)}
+                onDelete={() => setDeletingProduct(item)}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       {editingProduct && (

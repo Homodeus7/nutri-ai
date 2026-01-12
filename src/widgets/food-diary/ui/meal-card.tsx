@@ -27,21 +27,29 @@ export function MealCard({ date, meal }: MealCardProps) {
   const { t } = useI18n();
   const totals = useMemo(() => calculateTotals(meal), [meal]);
   const mealName = t(meal.type);
+  const isEmpty = meal.items.length === 0;
 
   const contextValue = useMemo(
     () => ({
       date,
       mealId: meal.id,
       mealType: meal.type,
+      mealName,
     }),
-    [date, meal.id, meal.type],
+    [date, meal.id, meal.type, mealName],
   );
 
   return (
     <MealCardProvider value={contextValue}>
       <Card className={`${meal.bgColor} border-0`}>
         <CardContent className="flex flex-col gap-2">
-          <MealHeader name={mealName} icon={meal.icon} color={meal.color} />
+          <MealHeader
+            name={mealName}
+            icon={meal.icon}
+            color={meal.color}
+            isEmpty={isEmpty}
+            calories={totals.calories}
+          />
           <MealContent items={meal.items} totals={totals} />
         </CardContent>
       </Card>

@@ -46,7 +46,7 @@ export function CreateMealDialog({
           className="h-10 w-10 rounded-full"
           disabled={isPending}
         >
-          <Plus className="size-6 text-chart-2" />
+          <Plus className="size-7 text-chart-2" />
         </Button>
       </DialogTrigger>
       <DialogContent className="flex h-[90vh] max-h-[90vh] flex-col lg:max-h-[500px] lg:min-h-[400px]">

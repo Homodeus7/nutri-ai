@@ -6,6 +6,7 @@ export interface FoodItem {
   protein: number;
   fat: number;
   carbs: number;
+  fiber?: number;
 }
 
 export type MealType = "breakfast" | "lunch" | "dinner" | "snack" | "other";

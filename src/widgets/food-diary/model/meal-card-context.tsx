@@ -6,6 +6,7 @@ interface MealCardContextValue {
   date: string;
   mealId: string;
   mealType: "breakfast" | "lunch" | "dinner" | "snack" | "other";
+  mealName: string;
 }
 
 const MealCardContext = createContext<MealCardContextValue | null>(null);
