@@ -25,4 +25,8 @@ export const useI18n = createI18nModule({
     en: "Current",
     ru: "Текущее",
   },
+  goal: {
+    en: "Goal",
+    ru: "Цель",
+  },
 } as const);

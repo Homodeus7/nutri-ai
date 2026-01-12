@@ -25,13 +25,11 @@ export function StatsGrid({
       <MetricCard
         label={t("waterIntake")}
         value={waterIntake}
-        bgColor="bg-yellow-300"
         subtext={t("ofGoal", { goal: waterGoal })}
       />
       <MetricCard
         label={t("steps")}
         value={steps}
-        bgColor="bg-green-400"
         subtext={t("ofGoal", { goal: stepsGoal })}
       />
     </>

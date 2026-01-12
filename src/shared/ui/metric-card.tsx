@@ -7,6 +7,7 @@ import {
   CardDescription,
   CardContent,
 } from "@/shared/ui/primitives/card";
+import { Progress } from "@/shared/ui/primitives/progress";
 import { cn } from "@/shared/lib/css";
 
 interface MetricValueProps {
@@ -17,30 +18,12 @@ interface MetricValueProps {
 function MetricValue({ value, unit }: MetricValueProps) {
   return (
     <div className="flex items-baseline gap-1">
-      <span className="text-xl md:text-2xl font-bold text-black leading-none">
+      <span className="text-xl md:text-2xl font-bold leading-none">
         {value}
       </span>
       {unit && (
-        <span className="text-sm font-medium text-black/60">{unit}</span>
+        <span className="text-sm font-medium text-muted-foreground">{unit}</span>
       )}
-    </div>
-  );
-}
-
-interface ProgressBarProps {
-  value: number;
-  max: number;
-}
-
-function ProgressBar({ value, max }: ProgressBarProps) {
-  const percentage = Math.min(Math.max((value / max) * 100, 0), 100);
-
-  return (
-    <div className="h-2 bg-black/10 rounded-full overflow-hidden">
-      <div
-        className="h-full bg-black/70 transition-all duration-500 ease-out"
-        style={{ width: `${percentage}%` }}
-      />
     </div>
   );
 }
@@ -52,7 +35,6 @@ interface MetricCardProps {
   subtext?: string;
   icon?: React.ReactNode;
   className?: string;
-  bgColor?: string;
 }
 
 export function MetricCard({
@@ -62,22 +44,19 @@ export function MetricCard({
   subtext,
   icon,
   className,
-  bgColor = "bg-card",
 }: MetricCardProps) {
   return (
-    <Card
-      className={cn("border-0 py-0 gap-0 hover:shadow-md", bgColor, className)}
-    >
-      <CardHeader className="p-4 pb-0 sm:p-5 sm:pb-0 flex-row justify-between items-start">
-        <CardTitle className="text-sm font-semibold text-black/70">
+    <Card className={cn("hover:shadow-md", className)}>
+      <CardHeader className="flex-row justify-between items-start">
+        <CardTitle className="text-sm font-semibold">
           {label}
         </CardTitle>
-        {icon && <span className="text-xl sm:text-2xl opacity-90">{icon}</span>}
+        {icon && <span className="text-xl sm:text-2xl">{icon}</span>}
       </CardHeader>
-      <CardContent className="p-4 pt-2 sm:p-5 sm:pt-2">
+      <CardContent>
         <MetricValue value={value} unit={unit} />
         {subtext && (
-          <CardDescription className="text-black/50 mt-1 leading-tight">
+          <CardDescription className="mt-1 leading-tight">
             {subtext}
           </CardDescription>
         )}
@@ -86,8 +65,14 @@ export function MetricCard({
   );
 }
 
-interface MetricProgressCardProps extends MetricCardProps {
+interface MetricProgressCardProps {
+  label: string;
+  value: number | string;
   total: number;
+  unit?: string;
+  goalLabel?: string;
+  icon?: React.ReactNode;
+  className?: string;
 }
 
 export function MetricProgressCard({
@@ -95,30 +80,27 @@ export function MetricProgressCard({
   value,
   total,
   unit,
-  subtext,
+  goalLabel = "Goal",
   icon,
   className,
-  bgColor = "bg-card",
 }: MetricProgressCardProps) {
   const numericValue =
     typeof value === "number" ? value : parseFloat(String(value)) || 0;
 
   return (
-    <Card
-      className={cn("border-0 py-0 gap-0 hover:shadow-md", bgColor, className)}
-    >
-      <CardHeader className="p-2 pb-0 sm:p-5 sm:pb-0 flex-row justify-between items-start">
-        <CardTitle className="text-xs font-semibold text-black/70">
+    <Card className={cn("hover:shadow-md", className)}>
+      <CardHeader className="flex-row justify-between items-start">
+        <CardTitle className="text-sm font-semibold">
           {label}
         </CardTitle>
-        {icon && <span className="text-xl sm:text-2xl opacity-90">{icon}</span>}
+        {icon && <span className="text-xl sm:text-2xl">{icon}</span>}
       </CardHeader>
-      <CardContent className="p-2 pt-2 sm:p-5 sm:pt-2 space-y-3">
+      <CardContent className="space-y-3">
         <MetricValue value={value} unit={unit} />
-        <ProgressBar value={numericValue} max={total} />
-        <div className="flex justify-between items-end text-black/60">
+        <Progress value={Math.min(Math.max((numericValue / total) * 100, 0), 100)} />
+        <div className="flex justify-between items-center text-muted-foreground">
           <span className="text-xs">
-            {subtext}: {total}
+            {goalLabel}: {total}
             {unit}
           </span>
         </div>

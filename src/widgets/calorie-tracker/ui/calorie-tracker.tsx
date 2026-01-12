@@ -63,7 +63,7 @@ export function CalorieTracker({
       <CardHeader className="items-center pb-0 px-3 md:px-6">
         <CardTitle className="text-base md:text-lg">{t("title")}</CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 pb-0 px-2 md:px-6">
+      <CardContent className="flex-1 pb-0 px-2 md:px-6 ">
         <ChartContainer
           config={chartConfig}
           className="mx-auto aspect-square max-h-[140px] max-w-[140px] md:max-h-[180px] md:max-w-[180px]"
