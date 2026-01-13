@@ -1,60 +1,18 @@
 "use client";
 
 import {
-  Label,
-  PolarGrid,
-  PolarRadiusAxis,
-  RadialBar,
-  RadialBarChart,
-} from "recharts";
-
-import { ChartContainer, type ChartConfig } from "@/shared/ui/primitives/chart";
-import { useI18n } from "../i18n";
-import { cn } from "@/shared/lib/css";
-import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from "@/shared/ui/primitives/card";
 import { useIsMobile } from "@/shared/lib/use-media-query";
-
-interface CalorieTrackerProps {
-  caloriesRemaining: number;
-  caloriesTotal: number;
-}
-
-const chartConfig = {
-  calories: {
-    label: "Calories",
-  },
-  consumed: {
-    label: "Consumed",
-    color: "hsl(var(--primary-foreground))",
-  },
-} satisfies ChartConfig;
-
-interface DataItemProps {
-  label: string;
-  value: string | number;
-  isWarning?: boolean;
-}
-
-function DataItem({ label, value, isWarning }: DataItemProps) {
-  return (
-    <div className="space-y-1">
-      <div className="text-xs text-muted-foreground">{label}</div>
-      <div
-        className={cn(
-          "text-lg md:text-xl font-bold",
-          isWarning && "text-destructive",
-        )}
-      >
-        {value}
-      </div>
-    </div>
-  );
-}
+import { calculateCalorieMetrics } from "../lib/calorie-calculations";
+import { getChartDimensions } from "../lib/chart-config";
+import type { CalorieTrackerProps, ChartDataItem } from "../model/types";
+import { DataItem } from "./data-item";
+import { CalorieChart } from "./calorie-chart";
+import { useI18n } from "../i18n";
 
 export function CalorieTracker({
   caloriesRemaining,
@@ -63,45 +21,35 @@ export function CalorieTracker({
   const { t } = useI18n();
   const isMobile = useIsMobile();
 
-  const caloriesConsumed = caloriesTotal - caloriesRemaining;
-  const isOverGoal = caloriesRemaining < 0;
-  const percentage = Math.round((caloriesConsumed / caloriesTotal) * 100);
+  const metrics = calculateCalorieMetrics(caloriesTotal, caloriesRemaining);
+  const dimensions = getChartDimensions(isMobile);
 
-  const displayValue = Math.abs(caloriesRemaining);
-  const cappedPercentage = Math.min(percentage, 100);
-  const endAngle = 90 - (cappedPercentage / 100) * 360;
-
-  const innerRadius = isMobile ? 50 : 97;
-  const outerRadius = isMobile ? 100 : 169;
-  const polarRadius: [number, number] = isMobile ? [56, 44] : [105, 89];
-  const labelOffset = isMobile ? 18 : 26;
-
-  const chartData = [
+  const chartData: ChartDataItem[] = [
     {
       name: "consumed",
-      calories: caloriesConsumed,
-      fill: isOverGoal ? "hsl(var(--destructive))" : "var(--primary)",
+      calories: metrics.consumed,
+      fill: metrics.isOverGoal ? "var(--destructive)" : "var(--primary)",
     },
   ];
 
   const dataItems = [
     {
       label: t("remaining"),
-      value: `${caloriesRemaining} ${t("unit")}`,
-      isWarning: isOverGoal,
+      value: `${metrics.remaining} ${t("unit")}`,
+      isWarning: metrics.isOverGoal,
     },
     {
       label: t("consumed"),
-      value: `${caloriesConsumed} ${t("unit")}`,
+      value: `${metrics.consumed} ${t("unit")}`,
     },
     {
       label: t("percentOfGoal"),
-      value: `${percentage}%`,
-      isWarning: percentage > 100,
+      value: `${metrics.percentage}%`,
+      isWarning: metrics.percentage > 100,
     },
     {
       label: t("goal"),
-      value: `${caloriesTotal} ${t("unit")}`,
+      value: `${metrics.total} ${t("unit")}`,
     },
   ];
 
@@ -113,55 +61,16 @@ export function CalorieTracker({
       <CardContent>
         <div className="flex gap-8 items-center md:items-start">
           <div className="w-[160px] h-[160px] md:w-[240px] md:h-[240px] flex-shrink-0">
-            <ChartContainer config={chartConfig} className="w-full h-full">
-              <RadialBarChart
-                data={chartData}
-                startAngle={90}
-                endAngle={endAngle}
-                innerRadius={innerRadius}
-                outerRadius={outerRadius}
-              >
-                <PolarGrid
-                  gridType="circle"
-                  radialLines={false}
-                  stroke="none"
-                  className="first:fill-muted last:fill-background"
-                  polarRadius={polarRadius}
-                />
-                <RadialBar dataKey="calories" background />
-                <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
-                  <Label
-                    content={({ viewBox }) => {
-                      if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                        return (
-                          <text
-                            x={viewBox.cx}
-                            y={viewBox.cy}
-                            textAnchor="middle"
-                            dominantBaseline="middle"
-                          >
-                            <tspan
-                              x={viewBox.cx}
-                              y={viewBox.cy}
-                              className="fill-foreground text-lg md:text-2xl font-bold"
-                            >
-                              {displayValue}
-                            </tspan>
-                            <tspan
-                              x={viewBox.cx}
-                              y={(viewBox.cy || 0) + labelOffset}
-                              className="fill-muted-foreground text-xs md:text-sm"
-                            >
-                              {isOverGoal ? t("over") : t("left")}
-                            </tspan>
-                          </text>
-                        );
-                      }
-                    }}
-                  />
-                </PolarRadiusAxis>
-              </RadialBarChart>
-            </ChartContainer>
+            <CalorieChart
+              data={chartData}
+              endAngle={metrics.endAngle}
+              dimensions={dimensions}
+              centerLabel={{
+                value: metrics.displayValue,
+                text: metrics.isOverGoal ? t("over") : t("left"),
+                isWarning: metrics.isOverGoal,
+              }}
+            />
           </div>
 
           <div className="flex-1 w-full flex justify-end items-center">
