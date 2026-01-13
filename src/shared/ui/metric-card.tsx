@@ -22,7 +22,9 @@ function MetricValue({ value, unit }: MetricValueProps) {
         {value}
       </span>
       {unit && (
-        <span className="text-sm font-medium text-muted-foreground">{unit}</span>
+        <span className="text-sm font-medium text-muted-foreground">
+          {unit}
+        </span>
       )}
     </div>
   );
@@ -48,9 +50,7 @@ export function MetricCard({
   return (
     <Card className={cn("hover:shadow-md", className)}>
       <CardHeader className="flex-row justify-between items-start">
-        <CardTitle className="text-sm font-semibold">
-          {label}
-        </CardTitle>
+        <CardTitle className="text-sm font-semibold">{label}</CardTitle>
         {icon && <span className="text-xl sm:text-2xl">{icon}</span>}
       </CardHeader>
       <CardContent>
@@ -89,15 +89,15 @@ export function MetricProgressCard({
 
   return (
     <Card className={cn("hover:shadow-md", className)}>
-      <CardHeader className="flex-row justify-between items-start">
-        <CardTitle className="text-sm font-semibold">
-          {label}
-        </CardTitle>
+      <CardHeader>
+        <CardTitle>{label}</CardTitle>
         {icon && <span className="text-xl sm:text-2xl">{icon}</span>}
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-2">
         <MetricValue value={value} unit={unit} />
-        <Progress value={Math.min(Math.max((numericValue / total) * 100, 0), 100)} />
+        <Progress
+          value={Math.min(Math.max((numericValue / total) * 100, 0), 100)}
+        />
         <div className="flex justify-between items-center text-muted-foreground">
           <span className="text-xs">
             {goalLabel}: {total}

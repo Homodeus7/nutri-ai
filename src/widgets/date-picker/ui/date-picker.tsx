@@ -1,59 +1,28 @@
 "use client";
 
 import { useMemo } from "react";
-import { Card, CardContent } from "@/shared/ui/primitives/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/shared/ui/primitives/card";
 import { useI18n } from "../i18n";
 import { useSelectedDate } from "@/features/day-data";
 import { CalendarButton } from "./calendar-button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DayButton } from "./day-button";
-
-interface DayData {
-  day: string;
-  date: Date;
-}
+import { Button } from "@/shared/ui/primitives/button";
+import {
+  generateWeekDays,
+  isSameDay,
+  formatMonthYear,
+} from "../lib/date-utils";
+import { useWeekNavigation } from "../model/use-week-navigation";
 
 interface DatePickerProps {
   onDateChange?: (date: Date) => void;
 }
-
-type TranslateFn = (
-  key: "mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun",
-) => string;
-
-const getWeekStart = (date: Date): Date => {
-  const result = new Date(date);
-  const day = result.getDay();
-  const diff = day === 0 ? -6 : 1 - day; // Adjust when day is Sunday
-  result.setDate(result.getDate() + diff);
-  result.setHours(0, 0, 0, 0);
-  return result;
-};
-
-const generateWeekDays = (date: Date, t: TranslateFn): DayData[] => {
-  const weekStart = getWeekStart(date);
-  const days: DayData[] = [];
-  const dayKeys: Array<"mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun"> =
-    ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
-
-  for (let i = 0; i < 7; i++) {
-    const currentDay = new Date(weekStart);
-    currentDay.setDate(weekStart.getDate() + i);
-    days.push({
-      day: t(dayKeys[i]),
-      date: currentDay,
-    });
-  }
-
-  return days;
-};
-
-const isSameDay = (date1: Date, date2: Date): boolean => {
-  return (
-    date1.getFullYear() === date2.getFullYear() &&
-    date1.getMonth() === date2.getMonth() &&
-    date1.getDate() === date2.getDate()
-  );
-};
 
 export function DatePicker({ onDateChange }: DatePickerProps) {
   const { t } = useI18n();
@@ -64,6 +33,17 @@ export function DatePicker({ onDateChange }: DatePickerProps) {
     () => generateWeekDays(selectedDate, t),
     [selectedDate, t],
   );
+
+  const currentMonthYear = useMemo(
+    () => formatMonthYear(selectedDate, t),
+    [selectedDate, t],
+  );
+
+  const { handlePrevWeek, handleNextWeek } = useWeekNavigation({
+    selectedDate,
+    onDateChange,
+    setDate,
+  });
 
   const handleDayClick = (date: Date) => {
     setDate(date);
@@ -87,9 +67,26 @@ export function DatePicker({ onDateChange }: DatePickerProps) {
 
       {/* Desktop: card with week days */}
       <Card className="hidden md:block">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <CardTitle>{currentMonthYear}</CardTitle>
+              <Button variant="ghost" size="icon-sm" onClick={handlePrevWeek}>
+                <ChevronLeft className="size-4 md:size-5" />
+              </Button>
+              <Button variant="ghost" size="icon-sm" onClick={handleNextWeek}>
+                <ChevronRight className="size-4 md:size-5" />
+              </Button>
+            </div>
+            <CalendarButton
+              selectedDate={selectedDate}
+              onSelect={handleCalendarSelect}
+            />
+          </div>
+        </CardHeader>
         <CardContent>
           <div className="flex items-center gap-2">
-            <div className="flex flex-1 justify-between items-center gap-2">
+            <div className="flex w-full justify-between items-center gap-2">
               {weekDays.map((dayData) => (
                 <DayButton
                   key={dayData.date.toISOString()}
@@ -100,11 +97,6 @@ export function DatePicker({ onDateChange }: DatePickerProps) {
                 />
               ))}
             </div>
-
-            <CalendarButton
-              selectedDate={selectedDate}
-              onSelect={handleCalendarSelect}
-            />
           </div>
         </CardContent>
       </Card>

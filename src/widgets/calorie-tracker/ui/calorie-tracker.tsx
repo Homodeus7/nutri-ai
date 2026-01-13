@@ -108,7 +108,7 @@ export function CalorieTracker({
   return (
     <Card className="flex flex-col w-full">
       <CardHeader>
-        <CardTitle className="text-base md:text-lg">{t("title")}</CardTitle>
+        <CardTitle>{t("title")}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">

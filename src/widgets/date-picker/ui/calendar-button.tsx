@@ -10,15 +10,20 @@ import {
 } from "@/shared/ui/primitives/popover";
 import { Calendar } from "@/shared/ui/primitives/calendar";
 import { useLang } from "@/features/i18n";
+import { useI18n } from "../i18n";
 
 interface CalendarButtonProps {
   selectedDate: Date;
   onSelect: (date: Date) => void;
 }
 
-export function CalendarButton({ selectedDate, onSelect }: CalendarButtonProps) {
+export function CalendarButton({
+  selectedDate,
+  onSelect,
+}: CalendarButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const lang = useLang((state) => state.lang);
+  const { t } = useI18n();
 
   const handleSelect = (date: Date | undefined) => {
     if (date) {
@@ -37,10 +42,11 @@ export function CalendarButton({ selectedDate, onSelect }: CalendarButtonProps) 
       <PopoverTrigger asChild>
         <Button
           variant="outline"
-          className="w-full md:w-auto md:shrink-0 h-10 md:h-auto md:p-3 md:w-12"
+          className="w-full md:w-auto md:shrink-0 h-10 md:h-auto"
           aria-label="Open calendar"
         >
           <CalendarIcon className="size-4 md:size-5" />
+          <span className="hidden md:flex ml-2">{t("calendar")}</span>
           <span className="md:hidden ml-2">{formattedDate}</span>
         </Button>
       </PopoverTrigger>
