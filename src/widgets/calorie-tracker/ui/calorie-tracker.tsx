@@ -111,7 +111,7 @@ export function CalorieTracker({
         <CardTitle>{t("title")}</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
+        <div className="flex gap-8 items-center md:items-start">
           <div className="w-[160px] h-[160px] md:w-[240px] md:h-[240px] flex-shrink-0">
             <ChartContainer config={chartConfig} className="w-full h-full">
               <RadialBarChart

@@ -22,7 +22,7 @@ export function DiaryPage() {
 
       <DatePicker />
 
-      <div className="w-full flex gap-4 justify-between">
+      <div className="w-full flex flex-col md:flex-row gap-4 justify-between">
         <CalorieTracker
           caloriesRemaining={caloriesRemaining}
           caloriesTotal={caloriesTotal}

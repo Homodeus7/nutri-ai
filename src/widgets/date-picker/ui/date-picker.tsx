@@ -70,7 +70,7 @@ export function DatePicker({ onDateChange }: DatePickerProps) {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <CardTitle>{currentMonthYear}</CardTitle>
+              <CardTitle className="text-2xl">{currentMonthYear}</CardTitle>
               <Button variant="ghost" size="icon-sm" onClick={handlePrevWeek}>
                 <ChevronLeft className="size-4 md:size-5" />
               </Button>
