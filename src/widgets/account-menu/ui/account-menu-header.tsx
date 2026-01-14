@@ -21,14 +21,10 @@ export function AccountMenuHeader({
 }: AccountMenuHeaderProps) {
   return (
     <div className="flex items-center gap-3 px-2 py-3">
-      <Avatar className="w-10 h-10 border border-border">
+      <Avatar className="size-10">
         <AvatarImage src={avatarUrl ?? undefined} alt={displayName} />
         <AvatarFallback>
-          <img
-            src={userFallback.src}
-            alt={displayName}
-            className="w-full h-full object-cover"
-          />
+          <img src={userFallback.src} alt={displayName} />
         </AvatarFallback>
       </Avatar>
       <div className="min-w-0 flex-1">
