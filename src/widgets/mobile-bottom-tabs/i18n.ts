@@ -17,8 +17,4 @@ export const useI18n = createI18nModule({
     en: "Lunch",
     ru: "Обед",
   },
-  more: {
-    en: "More",
-    ru: "Ещё",
-  },
 } as const);
