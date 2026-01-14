@@ -59,8 +59,8 @@ export function CalorieTracker({
         <CardTitle>{t("title")}</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="flex gap-8 items-center md:items-start">
-          <div className="w-[160px] h-[160px] md:w-[240px] md:h-[240px] flex-shrink-0">
+        <div className="flex gap-8 md:gap-20 items-center md:items-start">
+          <div className="w-[180px] h-[180px] md:w-[240px] md:h-[240px] flex-shrink-0">
             <CalorieChart
               data={chartData}
               endAngle={metrics.endAngle}
