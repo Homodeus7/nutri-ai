@@ -1,114 +1,61 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useCallback } from "react";
 import { useTheme } from "next-themes";
-import { useAuthStore } from "@/entities/auth";
 import { useLogout } from "@/features/auth";
 import { useLang } from "@/features/i18n";
 import { useColorTheme, type ColorTheme } from "@/features/theme";
-import { getGoogleAvatarUrl } from "../lib/get-google-avatar";
-import type { MenuView, SlideDirection, Theme, Lang } from "./types";
+import { useMenuState } from "./use-menu-state";
+import { useUserDisplay } from "./use-user-display";
+import type { Theme, Lang } from "./types";
 
 export function useAccountMenu() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [currentView, setCurrentView] = useState<MenuView>("main");
-  const [slideDirection, setSlideDirection] = useState<SlideDirection>("left");
-  const [mounted, setMounted] = useState(false);
+  const menuState = useMenuState();
+  const userDisplay = useUserDisplay();
 
-  const { user } = useAuthStore();
-  const { logout } = useLogout();
   const { theme, setTheme } = useTheme();
   const { lang, setLang } = useLang();
   const { colorTheme, setColorTheme } = useColorTheme();
+  const { logout } = useLogout();
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // Reset view when menu closes
-  useEffect(() => {
-    if (!isOpen) {
-      const timer = setTimeout(() => {
-        setCurrentView("main");
-      }, 200);
-      return () => clearTimeout(timer);
-    }
-  }, [isOpen]);
-
-  // Navigation handlers
-  const navigateTo = useCallback((view: MenuView) => {
-    setSlideDirection("left");
-    setCurrentView(view);
-  }, []);
-
-  const navigateBack = useCallback(() => {
-    setSlideDirection("right");
-    setCurrentView("main");
-  }, []);
-
-  const closeMenu = useCallback(() => {
-    setIsOpen(false);
-  }, []);
-
-  // Settings handlers
   const handleThemeChange = useCallback(
     (newTheme: Theme) => {
       setTheme(newTheme);
-      closeMenu();
+      menuState.closeMenu();
     },
-    [setTheme, closeMenu]
+    [setTheme, menuState.closeMenu]
   );
 
   const handleLangChange = useCallback(
     (newLang: Lang) => {
       setLang(newLang);
-      closeMenu();
+      menuState.closeMenu();
     },
-    [setLang, closeMenu]
+    [setLang, menuState.closeMenu]
   );
 
   const handleColorThemeChange = useCallback(
     (newColorTheme: ColorTheme) => {
       setColorTheme(newColorTheme);
-      closeMenu();
+      menuState.closeMenu();
     },
-    [setColorTheme, closeMenu]
+    [setColorTheme, menuState.closeMenu]
   );
 
   const handleLogout = useCallback(() => {
-    closeMenu();
+    menuState.closeMenu();
     logout();
-  }, [logout, closeMenu]);
-
-  // Derived values
-  const avatarUrl = getGoogleAvatarUrl();
-  const displayName = user?.displayName || user?.email?.split("@")[0] || "";
-  const email = user?.email || "";
+  }, [logout, menuState.closeMenu]);
 
   return {
-    // State
-    isOpen,
-    setIsOpen,
-    currentView,
-    slideDirection,
-    mounted,
+    ...menuState,
 
-    // User data
-    user,
-    avatarUrl,
-    displayName,
-    email,
+    ...userDisplay,
 
-    // Current values
     theme: (theme as Theme) || "system",
     lang,
     colorTheme,
 
-    // Navigation
-    navigateTo,
-    navigateBack,
-
-    // Handlers
     handleThemeChange,
     handleLangChange,
     handleColorThemeChange,
