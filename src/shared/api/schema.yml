@@ -13,6 +13,8 @@ servers:
 tags:
   - name: Auth
     description: Аутентификация и авторизация
+  - name: Goals
+    description: Цели по калориям и БЖУ
   - name: Calendar
     description: Календарь приёмов пищи
   - name: Day
@@ -62,6 +64,24 @@ components:
         dailyKcalGoal:
           type: integer
           minimum: 0
+        proteinPct:
+          type: integer
+          minimum: 5
+          maximum: 80
+          default: 30
+          description: "Процент белков от суточной нормы калорий"
+        fatPct:
+          type: integer
+          minimum: 5
+          maximum: 80
+          default: 30
+          description: "Процент жиров от суточной нормы калорий"
+        carbsPct:
+          type: integer
+          minimum: 5
+          maximum: 80
+          default: 40
+          description: "Процент углеводов от суточной нормы калорий"
         createdAt:
           type: string
           format: date-time
@@ -915,6 +935,74 @@ components:
               type: number
               format: float
 
+    NutritionGoals:
+      type: object
+      required:
+        - dailyKcalGoal
+        - proteinPct
+        - fatPct
+        - carbsPct
+      properties:
+        dailyKcalGoal:
+          type: integer
+          minimum: 1000
+          maximum: 10000
+          example: 2000
+        proteinPct:
+          type: integer
+          minimum: 5
+          maximum: 80
+          example: 30
+        fatPct:
+          type: integer
+          minimum: 5
+          maximum: 80
+          example: 30
+        carbsPct:
+          type: integer
+          minimum: 5
+          maximum: 80
+          example: 40
+        # Рассчитанные значения в граммах (только в ответе)
+        proteinGrams:
+          type: integer
+          description: "Рассчитанное количество белков в граммах"
+        fatGrams:
+          type: integer
+          description: "Рассчитанное количество жиров в граммах"
+        carbsGrams:
+          type: integer
+          description: "Рассчитанное количество углеводов в граммах"
+
+    UpdateNutritionGoalsRequest:
+      type: object
+      required:
+        - dailyKcalGoal
+        - proteinPct
+        - fatPct
+        - carbsPct
+      properties:
+        dailyKcalGoal:
+          type: integer
+          minimum: 1000
+          maximum: 10000
+          example: 2000
+        proteinPct:
+          type: integer
+          minimum: 5
+          maximum: 80
+          example: 30
+        fatPct:
+          type: integer
+          minimum: 5
+          maximum: 80
+          example: 30
+        carbsPct:
+          type: integer
+          minimum: 5
+          maximum: 80
+          example: 40
+
     Error:
       type: object
       properties:
@@ -1046,6 +1134,52 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+
+  # ========================================
+  # GOALS
+  # ========================================
+  /user/goals:
+    get:
+      tags:
+        - Goals
+      summary: Получить цели по питанию
+      description: Возвращает текущие цели пользователя по калориям и БЖУ
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Цели пользователя
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NutritionGoals"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+    put:
+      tags:
+        - Goals
+      summary: Обновить цели по питанию
+      description: Обновляет цели пользователя по калориям и процентному соотношению БЖУ. Сумма proteinPct + fatPct + carbsPct должна равняться 100.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateNutritionGoalsRequest"
+      responses:
+        "200":
+          description: Цели успешно обновлены
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NutritionGoals"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
 
   # ========================================
   # CALENDAR

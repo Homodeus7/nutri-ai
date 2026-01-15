@@ -4,6 +4,7 @@ export const ROUTER_PATHS = {
   DIARY: "/diary",
   PRODUCTS: "/products",
   PRODUCT_DETAIL: "/products/[id]",
+  GOALS: "/goals",
   BOOST: "/boost",
   LUNCH: "/lunch",
   403: "/403",

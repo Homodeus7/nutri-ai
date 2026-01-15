@@ -59,7 +59,7 @@ export function CalorieTracker({
         <CardTitle>{t("title")}</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="flex gap-8 md:gap-20 items-center md:items-start">
+        <div className="flex gap-8 items-center md:items-start">
           <div className="w-[180px] h-[180px] md:w-[240px] md:h-[240px] flex-shrink-0">
             <CalorieChart
               data={chartData}
@@ -74,7 +74,7 @@ export function CalorieTracker({
           </div>
 
           <div className="flex-1 w-full flex justify-end items-center">
-            <div className="space-y-3 w-full md:w-auto md:min-w-[200px]">
+            <div className="space-y-3">
               {dataItems.map((item) => (
                 <DataItem key={item.label} {...item} />
               ))}

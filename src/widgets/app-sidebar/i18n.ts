@@ -13,6 +13,10 @@ export const useI18n = createI18nModule({
     en: "Products",
     ru: "Продукты",
   },
+  goals: {
+    en: "Goals",
+    ru: "Цели",
+  },
   boost: {
     en: "Boost",
     ru: "Усилители",

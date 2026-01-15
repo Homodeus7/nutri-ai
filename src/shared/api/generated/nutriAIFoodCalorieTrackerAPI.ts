@@ -36,6 +36,24 @@ export interface User {
   timezone?: string;
   /** @minimum 0 */
   dailyKcalGoal?: number;
+  /**
+   * Процент белков от суточной нормы калорий
+   * @minimum 5
+   * @maximum 80
+   */
+  proteinPct?: number;
+  /**
+   * Процент жиров от суточной нормы калорий
+   * @minimum 5
+   * @maximum 80
+   */
+  fatPct?: number;
+  /**
+   * Процент углеводов от суточной нормы калорий
+   * @minimum 5
+   * @maximum 80
+   */
+  carbsPct?: number;
   createdAt: string;
 }
 
@@ -558,6 +576,58 @@ export interface StatsResponse {
   totalKcal?: number;
   daysTracked?: number;
   averageMacros?: StatsResponseAverageMacros;
+}
+
+export interface NutritionGoals {
+  /**
+   * @minimum 1000
+   * @maximum 10000
+   */
+  dailyKcalGoal: number;
+  /**
+   * @minimum 5
+   * @maximum 80
+   */
+  proteinPct: number;
+  /**
+   * @minimum 5
+   * @maximum 80
+   */
+  fatPct: number;
+  /**
+   * @minimum 5
+   * @maximum 80
+   */
+  carbsPct: number;
+  /** Рассчитанное количество белков в граммах */
+  proteinGrams?: number;
+  /** Рассчитанное количество жиров в граммах */
+  fatGrams?: number;
+  /** Рассчитанное количество углеводов в граммах */
+  carbsGrams?: number;
+}
+
+export interface UpdateNutritionGoalsRequest {
+  /**
+   * @minimum 1000
+   * @maximum 10000
+   */
+  dailyKcalGoal: number;
+  /**
+   * @minimum 5
+   * @maximum 80
+   */
+  proteinPct: number;
+  /**
+   * @minimum 5
+   * @maximum 80
+   */
+  fatPct: number;
+  /**
+   * @minimum 5
+   * @maximum 80
+   */
+  carbsPct: number;
 }
 
 export type ErrorDetails = { [key: string]: unknown };
@@ -1113,6 +1183,234 @@ export function useGetAuthMe<
 
   return query;
 }
+
+/**
+ * Возвращает текущие цели пользователя по калориям и БЖУ
+ * @summary Получить цели по питанию
+ */
+export const getUserGoals = (
+  options?: SecondParameter<typeof createInstance>,
+  signal?: AbortSignal,
+) => {
+  return createInstance<NutritionGoals>(
+    { url: `/user/goals`, method: "GET", signal },
+    options,
+  );
+};
+
+export const getGetUserGoalsQueryKey = () => {
+  return [`/user/goals`] as const;
+};
+
+export const getGetUserGoalsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getUserGoals>>,
+  TError = ErrorType<UnauthorizedResponse>,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof getUserGoals>>, TError, TData>
+  >;
+  request?: SecondParameter<typeof createInstance>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetUserGoalsQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getUserGoals>>> = ({
+    signal,
+  }) => getUserGoals(requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getUserGoals>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetUserGoalsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getUserGoals>>
+>;
+export type GetUserGoalsQueryError = ErrorType<UnauthorizedResponse>;
+
+export function useGetUserGoals<
+  TData = Awaited<ReturnType<typeof getUserGoals>>,
+  TError = ErrorType<UnauthorizedResponse>,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getUserGoals>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getUserGoals>>,
+          TError,
+          Awaited<ReturnType<typeof getUserGoals>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetUserGoals<
+  TData = Awaited<ReturnType<typeof getUserGoals>>,
+  TError = ErrorType<UnauthorizedResponse>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getUserGoals>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getUserGoals>>,
+          TError,
+          Awaited<ReturnType<typeof getUserGoals>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetUserGoals<
+  TData = Awaited<ReturnType<typeof getUserGoals>>,
+  TError = ErrorType<UnauthorizedResponse>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getUserGoals>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Получить цели по питанию
+ */
+
+export function useGetUserGoals<
+  TData = Awaited<ReturnType<typeof getUserGoals>>,
+  TError = ErrorType<UnauthorizedResponse>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getUserGoals>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetUserGoalsQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * Обновляет цели пользователя по калориям и процентному соотношению БЖУ. Сумма proteinPct + fatPct + carbsPct должна равняться 100.
+ * @summary Обновить цели по питанию
+ */
+export const putUserGoals = (
+  updateNutritionGoalsRequest: BodyType<UpdateNutritionGoalsRequest>,
+  options?: SecondParameter<typeof createInstance>,
+) => {
+  return createInstance<NutritionGoals>(
+    {
+      url: `/user/goals`,
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      data: updateNutritionGoalsRequest,
+    },
+    options,
+  );
+};
+
+export const getPutUserGoalsMutationOptions = <
+  TError = ErrorType<BadRequestResponse | UnauthorizedResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof putUserGoals>>,
+    TError,
+    { data: BodyType<UpdateNutritionGoalsRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof createInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof putUserGoals>>,
+  TError,
+  { data: BodyType<UpdateNutritionGoalsRequest> },
+  TContext
+> => {
+  const mutationKey = ["putUserGoals"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof putUserGoals>>,
+    { data: BodyType<UpdateNutritionGoalsRequest> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return putUserGoals(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PutUserGoalsMutationResult = NonNullable<
+  Awaited<ReturnType<typeof putUserGoals>>
+>;
+export type PutUserGoalsMutationBody = BodyType<UpdateNutritionGoalsRequest>;
+export type PutUserGoalsMutationError = ErrorType<
+  BadRequestResponse | UnauthorizedResponse
+>;
+
+/**
+ * @summary Обновить цели по питанию
+ */
+export const usePutUserGoals = <
+  TError = ErrorType<BadRequestResponse | UnauthorizedResponse>,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof putUserGoals>>,
+      TError,
+      { data: BodyType<UpdateNutritionGoalsRequest> },
+      TContext
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof putUserGoals>>,
+  TError,
+  { data: BodyType<UpdateNutritionGoalsRequest> },
+  TContext
+> => {
+  const mutationOptions = getPutUserGoalsMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
 
 /**
  * @summary Получить календарь за месяц
@@ -4442,6 +4740,18 @@ export const getPostAuthSignupResponseMock = (
         faker.number.int({ min: 0, max: undefined }),
         undefined,
       ]),
+      proteinPct: faker.helpers.arrayElement([
+        faker.number.int({ min: 5, max: 80 }),
+        undefined,
+      ]),
+      fatPct: faker.helpers.arrayElement([
+        faker.number.int({ min: 5, max: 80 }),
+        undefined,
+      ]),
+      carbsPct: faker.helpers.arrayElement([
+        faker.number.int({ min: 5, max: 80 }),
+        undefined,
+      ]),
       createdAt: `${faker.date.past().toISOString().split(".")[0]}Z`,
     },
     undefined,
@@ -4471,6 +4781,18 @@ export const getPostAuthLoginResponseMock = (
       ]),
       dailyKcalGoal: faker.helpers.arrayElement([
         faker.number.int({ min: 0, max: undefined }),
+        undefined,
+      ]),
+      proteinPct: faker.helpers.arrayElement([
+        faker.number.int({ min: 5, max: 80 }),
+        undefined,
+      ]),
+      fatPct: faker.helpers.arrayElement([
+        faker.number.int({ min: 5, max: 80 }),
+        undefined,
+      ]),
+      carbsPct: faker.helpers.arrayElement([
+        faker.number.int({ min: 5, max: 80 }),
         undefined,
       ]),
       createdAt: `${faker.date.past().toISOString().split(".")[0]}Z`,
@@ -4504,6 +4826,18 @@ export const getPostAuthGoogleResponseMock = (
         faker.number.int({ min: 0, max: undefined }),
         undefined,
       ]),
+      proteinPct: faker.helpers.arrayElement([
+        faker.number.int({ min: 5, max: 80 }),
+        undefined,
+      ]),
+      fatPct: faker.helpers.arrayElement([
+        faker.number.int({ min: 5, max: 80 }),
+        undefined,
+      ]),
+      carbsPct: faker.helpers.arrayElement([
+        faker.number.int({ min: 5, max: 80 }),
+        undefined,
+      ]),
       createdAt: `${faker.date.past().toISOString().split(".")[0]}Z`,
     },
     undefined,
@@ -4529,7 +4863,63 @@ export const getGetAuthMeResponseMock = (
     faker.number.int({ min: 0, max: undefined }),
     undefined,
   ]),
+  proteinPct: faker.helpers.arrayElement([
+    faker.number.int({ min: 5, max: 80 }),
+    undefined,
+  ]),
+  fatPct: faker.helpers.arrayElement([
+    faker.number.int({ min: 5, max: 80 }),
+    undefined,
+  ]),
+  carbsPct: faker.helpers.arrayElement([
+    faker.number.int({ min: 5, max: 80 }),
+    undefined,
+  ]),
   createdAt: `${faker.date.past().toISOString().split(".")[0]}Z`,
+  ...overrideResponse,
+});
+
+export const getGetUserGoalsResponseMock = (
+  overrideResponse: Partial<NutritionGoals> = {},
+): NutritionGoals => ({
+  dailyKcalGoal: faker.number.int({ min: 1000, max: 10000 }),
+  proteinPct: faker.number.int({ min: 5, max: 80 }),
+  fatPct: faker.number.int({ min: 5, max: 80 }),
+  carbsPct: faker.number.int({ min: 5, max: 80 }),
+  proteinGrams: faker.helpers.arrayElement([
+    faker.number.int({ min: undefined, max: undefined }),
+    undefined,
+  ]),
+  fatGrams: faker.helpers.arrayElement([
+    faker.number.int({ min: undefined, max: undefined }),
+    undefined,
+  ]),
+  carbsGrams: faker.helpers.arrayElement([
+    faker.number.int({ min: undefined, max: undefined }),
+    undefined,
+  ]),
+  ...overrideResponse,
+});
+
+export const getPutUserGoalsResponseMock = (
+  overrideResponse: Partial<NutritionGoals> = {},
+): NutritionGoals => ({
+  dailyKcalGoal: faker.number.int({ min: 1000, max: 10000 }),
+  proteinPct: faker.number.int({ min: 5, max: 80 }),
+  fatPct: faker.number.int({ min: 5, max: 80 }),
+  carbsPct: faker.number.int({ min: 5, max: 80 }),
+  proteinGrams: faker.helpers.arrayElement([
+    faker.number.int({ min: undefined, max: undefined }),
+    undefined,
+  ]),
+  fatGrams: faker.helpers.arrayElement([
+    faker.number.int({ min: undefined, max: undefined }),
+    undefined,
+  ]),
+  carbsGrams: faker.helpers.arrayElement([
+    faker.number.int({ min: undefined, max: undefined }),
+    undefined,
+  ]),
   ...overrideResponse,
 });
 
@@ -7179,6 +7569,62 @@ export const getGetAuthMeMockHandler = (
   );
 };
 
+export const getGetUserGoalsMockHandler = (
+  overrideResponse?:
+    | NutritionGoals
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) => Promise<NutritionGoals> | NutritionGoals),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    "*/user/goals",
+    async (info) => {
+      await delay(1000);
+
+      return new HttpResponse(
+        JSON.stringify(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === "function"
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getGetUserGoalsResponseMock(),
+        ),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      );
+    },
+    options,
+  );
+};
+
+export const getPutUserGoalsMockHandler = (
+  overrideResponse?:
+    | NutritionGoals
+    | ((
+        info: Parameters<Parameters<typeof http.put>[1]>[0],
+      ) => Promise<NutritionGoals> | NutritionGoals),
+  options?: RequestHandlerOptions,
+) => {
+  return http.put(
+    "*/user/goals",
+    async (info) => {
+      await delay(1000);
+
+      return new HttpResponse(
+        JSON.stringify(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === "function"
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getPutUserGoalsResponseMock(),
+        ),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      );
+    },
+    options,
+  );
+};
+
 export const getGetCalendarMockHandler = (
   overrideResponse?:
     | GetCalendar200
@@ -7946,6 +8392,8 @@ export const getNutriAIFoodCalorieTrackerAPIMock = () => [
   getPostAuthLoginMockHandler(),
   getPostAuthGoogleMockHandler(),
   getGetAuthMeMockHandler(),
+  getGetUserGoalsMockHandler(),
+  getPutUserGoalsMockHandler(),
   getGetCalendarMockHandler(),
   getGetDayDateMockHandler(),
   getPostDayDateMealsMockHandler(),

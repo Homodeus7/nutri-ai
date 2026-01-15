@@ -16,6 +16,24 @@ export interface User {
   timezone?: string;
   /** @minimum 0 */
   dailyKcalGoal?: number;
+  /**
+   * Процент белков от суточной нормы калорий
+   * @minimum 5
+   * @maximum 80
+   */
+  proteinPct?: number;
+  /**
+   * Процент жиров от суточной нормы калорий
+   * @minimum 5
+   * @maximum 80
+   */
+  fatPct?: number;
+  /**
+   * Процент углеводов от суточной нормы калорий
+   * @minimum 5
+   * @maximum 80
+   */
+  carbsPct?: number;
   createdAt: string;
 }
 
@@ -540,6 +558,58 @@ export interface StatsResponse {
   averageMacros?: StatsResponseAverageMacros;
 }
 
+export interface NutritionGoals {
+  /**
+   * @minimum 1000
+   * @maximum 10000
+   */
+  dailyKcalGoal: number;
+  /**
+   * @minimum 5
+   * @maximum 80
+   */
+  proteinPct: number;
+  /**
+   * @minimum 5
+   * @maximum 80
+   */
+  fatPct: number;
+  /**
+   * @minimum 5
+   * @maximum 80
+   */
+  carbsPct: number;
+  /** Рассчитанное количество белков в граммах */
+  proteinGrams?: number;
+  /** Рассчитанное количество жиров в граммах */
+  fatGrams?: number;
+  /** Рассчитанное количество углеводов в граммах */
+  carbsGrams?: number;
+}
+
+export interface UpdateNutritionGoalsRequest {
+  /**
+   * @minimum 1000
+   * @maximum 10000
+   */
+  dailyKcalGoal: number;
+  /**
+   * @minimum 5
+   * @maximum 80
+   */
+  proteinPct: number;
+  /**
+   * @minimum 5
+   * @maximum 80
+   */
+  fatPct: number;
+  /**
+   * @minimum 5
+   * @maximum 80
+   */
+  carbsPct: number;
+}
+
 export type ErrorDetails = { [key: string]: unknown };
 
 export interface Error {
@@ -722,6 +792,27 @@ export const getAuthMe = <TData = AxiosResponse<User>>(
   options?: AxiosRequestConfig,
 ): Promise<TData> => {
   return axios.get(`/auth/me`, options);
+};
+
+/**
+ * Возвращает текущие цели пользователя по калориям и БЖУ
+ * @summary Получить цели по питанию
+ */
+export const getUserGoals = <TData = AxiosResponse<NutritionGoals>>(
+  options?: AxiosRequestConfig,
+): Promise<TData> => {
+  return axios.get(`/user/goals`, options);
+};
+
+/**
+ * Обновляет цели пользователя по калориям и процентному соотношению БЖУ. Сумма proteinPct + fatPct + carbsPct должна равняться 100.
+ * @summary Обновить цели по питанию
+ */
+export const putUserGoals = <TData = AxiosResponse<NutritionGoals>>(
+  updateNutritionGoalsRequest: UpdateNutritionGoalsRequest,
+  options?: AxiosRequestConfig,
+): Promise<TData> => {
+  return axios.put(`/user/goals`, updateNutritionGoalsRequest, options);
 };
 
 /**
@@ -1048,6 +1139,8 @@ export type PostAuthSignupResult = AxiosResponse<AuthResponse>;
 export type PostAuthLoginResult = AxiosResponse<AuthResponse>;
 export type PostAuthGoogleResult = AxiosResponse<AuthResponse>;
 export type GetAuthMeResult = AxiosResponse<User>;
+export type GetUserGoalsResult = AxiosResponse<NutritionGoals>;
+export type PutUserGoalsResult = AxiosResponse<NutritionGoals>;
 export type GetCalendarResult = AxiosResponse<GetCalendar200>;
 export type GetDayDateResult = AxiosResponse<DayEntry>;
 export type PostDayDateMealsResult = AxiosResponse<Meal>;
