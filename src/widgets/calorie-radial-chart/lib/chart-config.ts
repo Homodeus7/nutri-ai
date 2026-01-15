@@ -1,9 +1,4 @@
-export interface ChartDimensions {
-  innerRadius: number;
-  outerRadius: number;
-  polarRadius: [number, number];
-  labelOffset: number;
-}
+import type { ChartDimensions } from "../model/types";
 
 export const MOBILE_CHART_CONFIG: ChartDimensions = {
   innerRadius: 72,

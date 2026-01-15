@@ -16,6 +16,12 @@ export type { UiTextProps, TextVariant } from "./ui-text";
 export { NutriAiLogo } from "./nutri-ai-logo";
 export type { NutriAiLogoProps } from "./nutri-ai-logo";
 
+export { DataItem } from "./data-item";
+export type { DataItemProps } from "./data-item";
+
+export { ChartCard, ChartCardLayout } from "./chart-card";
+export type { ChartCardProps, ChartCardLayoutProps } from "./chart-card";
+
 export { ControlledDialog, useControlledDialog } from "./controlled-dialog";
 export type {
   ControlledDialogProps,

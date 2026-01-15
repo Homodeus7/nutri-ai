@@ -1,7 +1,7 @@
 "use client";
 
 import { UiText } from "@/shared/ui/ui-text";
-import { CalorieTracker } from "@/widgets/calorie-tracker";
+import { CalorieRadialChart } from "@/widgets/calorie-radial-chart";
 import { DatePicker } from "@/widgets/date-picker";
 import { FoodDiary } from "@/widgets/food-diary";
 import { MacrosGrid } from "@/widgets/macros-grid";
@@ -26,7 +26,7 @@ export function DiaryPage() {
       <DatePicker />
 
       <div className="w-full flex flex-col md:flex-row gap-4 justify-between">
-        <CalorieTracker
+        <CalorieRadialChart
           caloriesRemaining={caloriesRemaining}
           caloriesTotal={caloriesTotal}
         />

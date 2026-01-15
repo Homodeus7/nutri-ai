@@ -2,14 +2,9 @@
 
 import { useMemo } from "react";
 import { Pie, PieChart, Tooltip } from "recharts";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/shared/ui/primitives/card";
+import { CardContent } from "@/shared/ui/primitives/card";
 import { ChartContainer, type ChartConfig } from "@/shared/ui/primitives/chart";
-import { DataItem } from "@/widgets/calorie-tracker";
+import { ChartCard, ChartCardLayout, DataItem } from "@/shared/ui";
 import { useIsMobile } from "@/shared/lib/use-media-query";
 import type { MacrosPieChartProps, ChartDataItem } from "../model/types";
 import { getChartDimensions } from "../lib/chart-config";
@@ -21,15 +16,15 @@ const chartConfig = {
   },
   protein: {
     label: "Protein",
-    color: "var(--chart-1)",
+    color: "var(--chart-5)",
   },
   fat: {
     label: "Fat",
-    color: "var(--chart-2)",
+    color: "var(--chart-3)",
   },
   carbs: {
     label: "Carbs",
-    color: "var(--chart-3)",
+    color: "var(--chart-2)",
   },
 } satisfies ChartConfig;
 
@@ -74,70 +69,59 @@ export function MacrosPieChart({ protein, fat, carbs }: MacrosPieChartProps) {
   const dataItems = [
     {
       label: t("protein"),
-      value: `${Math.round(protein)}g (${percentages.protein}%)`,
+      value: `${percentages.protein}%`,
     },
     {
       label: t("fat"),
-      value: `${Math.round(fat)}g (${percentages.fat}%)`,
+      value: `${percentages.fat}%`,
     },
     {
       label: t("carbs"),
-      value: `${Math.round(carbs)}g (${percentages.carbs}%)`,
+      value: `${percentages.carbs}%`,
     },
   ];
 
   if (total === 0) {
     return (
-      <Card className="flex flex-col w-full">
-        <CardHeader>
-          <CardTitle>{t("title")}</CardTitle>
-        </CardHeader>
-        <CardContent className="flex items-center justify-center h-[200px]">
+      <ChartCard title={t("title")}>
+        <CardContent className="flex items-center justify-center h-[200px] p-0">
           <p className="text-muted-foreground">{t("noData")}</p>
         </CardContent>
-      </Card>
+      </ChartCard>
     );
   }
 
   return (
-    <Card className="flex flex-col w-full">
-      <CardHeader>
-        <CardTitle>{t("title")}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="flex gap-8 md:gap-4 items-center md:items-start">
-          <div className="w-[180px] h-[180px] md:w-[230px] md:h-[230px] flex-shrink-0">
-            <ChartContainer config={chartConfig} className="w-full h-full">
-              <PieChart>
-                <Pie
-                  data={chartData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={dimensions.innerRadius}
-                  outerRadius={dimensions.outerRadius}
-                  paddingAngle={2}
-                  dataKey="value"
-                  nameKey="name"
-                />
-                <Tooltip
-                  formatter={(value: number, name: string) => [
-                    `${value}g`,
-                    t(name as "protein" | "fat" | "carbs"),
-                  ]}
-                />
-              </PieChart>
-            </ChartContainer>
-          </div>
-
-          <div className="flex-1 w-full flex justify-end items-center">
-            <div className="space-y-3 w-full md:w-auto">
-              {dataItems.map((item) => (
-                <DataItem key={item.label} {...item} />
-              ))}
-            </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+    <ChartCard title={t("title")}>
+      <ChartCardLayout
+        className="md:gap-4"
+        chartClassName="w-[180px] h-[180px] md:w-[230px] md:h-[230px]"
+        dataClassName="w-full md:w-auto"
+        chart={
+          <ChartContainer config={chartConfig} className="w-full h-full">
+            <PieChart>
+              <Pie
+                data={chartData}
+                cx="50%"
+                cy="50%"
+                innerRadius={dimensions.innerRadius}
+                outerRadius={dimensions.outerRadius}
+                dataKey="value"
+                nameKey="name"
+              />
+              <Tooltip
+                formatter={(value: number, name: string) => [
+                  `${value}g`,
+                  t(name as "protein" | "fat" | "carbs"),
+                ]}
+              />
+            </PieChart>
+          </ChartContainer>
+        }
+        data={dataItems.map((item) => (
+          <DataItem key={item.label} {...item} />
+        ))}
+      />
+    </ChartCard>
   );
 }

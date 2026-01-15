@@ -1,5 +1,11 @@
 import { cn } from "@/shared/lib/css";
-import type { DataItemProps } from "../model/types";
+
+export interface DataItemProps {
+  label: string;
+  value: string | number;
+  isWarning?: boolean;
+  color?: string;
+}
 
 export function DataItem({ label, value, isWarning, color }: DataItemProps) {
   return (
