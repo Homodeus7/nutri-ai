@@ -10,13 +10,16 @@ import {
 } from "@/features/goals";
 import { useI18n } from "../i18n";
 
+const DEFAULT_FIBER_GOAL = 25;
+
 export interface MacrosGridProps {
   protein: number;
   fat: number;
   carbs: number;
+  fiber: number;
 }
 
-export function MacrosGrid({ protein, fat, carbs }: MacrosGridProps) {
+export function MacrosGrid({ protein, fat, carbs, fiber }: MacrosGridProps) {
   const { t } = useI18n();
   const user = useAuthStore((state) => state.user);
 
@@ -33,7 +36,7 @@ export function MacrosGrid({ protein, fat, carbs }: MacrosGridProps) {
     { key: "protein", value: protein, total: goals.proteinGrams },
     { key: "fat", value: fat, total: goals.fatGrams },
     { key: "carbs", value: carbs, total: goals.carbsGrams },
-    { key: "fiber", value: 18, total: 25 },
+    { key: "fiber", value: fiber, total: DEFAULT_FIBER_GOAL },
   ] as const;
 
   return (

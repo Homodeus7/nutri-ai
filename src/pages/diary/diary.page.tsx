@@ -8,14 +8,14 @@ import { MacrosGrid } from "@/widgets/macros-grid";
 import { MacrosPieChart } from "@/widgets/macros-pie-chart";
 import { useGreeting } from "./model/use-greeting";
 import { useCalorieData } from "./model/use-calorie-data";
-import { useMacrosData } from "./model/use-macros-data";
 import { useAuthStore } from "@/entities/auth";
+import { useConsumedMacros } from "@/features/day-data";
 
 export function DiaryPage() {
   const greeting = useGreeting();
   const { user } = useAuthStore();
   const { caloriesRemaining, caloriesTotal } = useCalorieData();
-  const { protein, fat, carbs } = useMacrosData();
+  const macros = useConsumedMacros((state) => state.macros);
 
   return (
     <div className="space-y-6">
@@ -30,8 +30,17 @@ export function DiaryPage() {
           caloriesRemaining={caloriesRemaining}
           caloriesTotal={caloriesTotal}
         />
-        <MacrosPieChart protein={protein} fat={fat} carbs={carbs} />
-        <MacrosGrid protein={protein} fat={fat} carbs={carbs} />
+        <MacrosPieChart
+          protein={macros.protein}
+          fat={macros.fat}
+          carbs={macros.carbs}
+        />
+        <MacrosGrid
+          protein={macros.protein}
+          fat={macros.fat}
+          carbs={macros.carbs}
+          fiber={macros.fiber}
+        />
       </div>
       <FoodDiary />
     </div>

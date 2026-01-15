@@ -7,6 +7,7 @@ export interface DataItemProps {
   label: string;
   value: string | number;
   isWarning?: boolean;
+  color?: string;
 }
 
 export interface ChartDataItem {

@@ -105,7 +105,7 @@ export function MacrosPieChart({ protein, fat, carbs }: MacrosPieChartProps) {
         <CardTitle>{t("title")}</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="flex gap-8 items-center md:items-start">
+        <div className="flex gap-8 md:gap-4 items-center md:items-start">
           <div className="w-[180px] h-[180px] md:w-[230px] md:h-[230px] flex-shrink-0">
             <ChartContainer config={chartConfig} className="w-full h-full">
               <PieChart>
