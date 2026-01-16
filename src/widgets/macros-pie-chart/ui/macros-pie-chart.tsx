@@ -28,43 +28,53 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
+const KCAL_PER_GRAM = { protein: 4, fat: 9, carbs: 4 } as const;
+
 export function MacrosPieChart({ protein, fat, carbs }: MacrosPieChartProps) {
   const { t } = useI18n();
   const isMobile = useIsMobile();
   const dimensions = getChartDimensions(isMobile);
 
-  const total = protein + fat + carbs;
+  // Calculate calories from grams
+  const proteinKcal = protein * KCAL_PER_GRAM.protein;
+  const fatKcal = fat * KCAL_PER_GRAM.fat;
+  const carbsKcal = carbs * KCAL_PER_GRAM.carbs;
+  const totalKcal = proteinKcal + fatKcal + carbsKcal;
 
   const chartData: ChartDataItem[] = useMemo(() => {
-    if (total === 0) return [];
+    if (totalKcal === 0) return [];
 
+    // Use calories for chart proportions, keep grams for tooltip
     return [
       {
         name: "protein",
-        value: protein,
+        value: proteinKcal,
+        grams: protein,
         fill: "var(--color-protein)",
       },
       {
         name: "fat",
-        value: fat,
+        value: fatKcal,
+        grams: fat,
         fill: "var(--color-fat)",
       },
       {
         name: "carbs",
-        value: carbs,
+        value: carbsKcal,
+        grams: carbs,
         fill: "var(--color-carbs)",
       },
     ];
-  }, [protein, fat, carbs, total]);
+  }, [proteinKcal, fatKcal, carbsKcal, totalKcal, protein, fat, carbs]);
 
   const percentages = useMemo(() => {
-    if (total === 0) return { protein: 0, fat: 0, carbs: 0 };
+    if (totalKcal === 0) return { protein: 0, fat: 0, carbs: 0 };
     return {
-      protein: Math.round((protein / total) * 100),
-      fat: Math.round((fat / total) * 100),
-      carbs: Math.round((carbs / total) * 100),
+      protein: Math.round((proteinKcal / totalKcal) * 100),
+      fat: Math.round((fatKcal / totalKcal) * 100),
+      carbs: Math.round((carbsKcal / totalKcal) * 100),
     };
-  }, [protein, fat, carbs, total]);
+  }, [proteinKcal, fatKcal, carbsKcal, totalKcal]);
 
   const dataItems = [
     {
@@ -81,7 +91,7 @@ export function MacrosPieChart({ protein, fat, carbs }: MacrosPieChartProps) {
     },
   ];
 
-  if (total === 0) {
+  if (totalKcal === 0) {
     return (
       <ChartCard title={t("title")}>
         <CardContent className="flex items-center justify-center h-[200px] p-0">
@@ -110,8 +120,8 @@ export function MacrosPieChart({ protein, fat, carbs }: MacrosPieChartProps) {
                 nameKey="name"
               />
               <Tooltip
-                formatter={(value: number, name: string) => [
-                  `${value}g`,
+                formatter={(_, name: string, props) => [
+                  `${props.payload.grams}g`,
                   t(name as "protein" | "fat" | "carbs"),
                 ]}
               />

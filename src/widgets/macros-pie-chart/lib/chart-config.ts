@@ -1,6 +1,6 @@
 export function getChartDimensions(isMobile: boolean) {
   return {
-    innerRadius: isMobile ? 40 : 50,
-    outerRadius: isMobile ? 70 : 110,
+    innerRadius: isMobile ? 45 : 50,
+    outerRadius: isMobile ? 90 : 110,
   };
 }

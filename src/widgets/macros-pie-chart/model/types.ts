@@ -7,5 +7,6 @@ export interface MacrosPieChartProps {
 export interface ChartDataItem {
   name: string;
   value: number;
+  grams: number;
   fill: string;
 }
