@@ -18,23 +18,25 @@ export function DiaryPage() {
   const macros = useConsumedMacros((state) => state.macros);
 
   return (
-    <div className="space-y-6">
+    <>
       <UiText variant="h3">
         {greeting}, {user?.displayName}!
       </UiText>
 
       <DatePicker />
 
-      <div className="w-full flex flex-col md:flex-row gap-4 justify-between">
-        <CalorieRadialChart
-          caloriesRemaining={caloriesRemaining}
-          caloriesTotal={caloriesTotal}
-        />
-        <MacrosPieChart
-          protein={macros.protein}
-          fat={macros.fat}
-          carbs={macros.carbs}
-        />
+      <div className="w-full flex flex-col xl:flex-row gap-4">
+        <div className="w-full flex flex-col md:flex-row gap-4 justify-between">
+          <CalorieRadialChart
+            caloriesRemaining={caloriesRemaining}
+            caloriesTotal={caloriesTotal}
+          />
+          <MacrosPieChart
+            protein={macros.protein}
+            fat={macros.fat}
+            carbs={macros.carbs}
+          />
+        </div>
         <MacrosGrid
           protein={macros.protein}
           fat={macros.fat}
@@ -43,6 +45,6 @@ export function DiaryPage() {
         />
       </div>
       <FoodDiary />
-    </div>
+    </>
   );
 }

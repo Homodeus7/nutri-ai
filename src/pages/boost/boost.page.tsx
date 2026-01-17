@@ -8,7 +8,7 @@ export function BoostPage() {
 
   return (
     <>
-      <UiText variant="h1" weight="bold" className="mb-8">
+      <UiText variant="h1" weight="bold">
         {t("title")}
       </UiText>
       <UiText variant="muted">{t("description")}</UiText>

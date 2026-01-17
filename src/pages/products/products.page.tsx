@@ -68,7 +68,7 @@ export function ProductsPage() {
   );
 
   return (
-    <div className="space-y-4">
+    <>
       <div>
         <UiText variant="h1" weight="bold">
           {t("title")}
@@ -116,6 +116,6 @@ export function ProductsPage() {
           onOpenChange={(open) => !open && setDeleteProduct(null)}
         />
       )}
-    </div>
+    </>
   );
 }

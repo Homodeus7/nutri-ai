@@ -2,7 +2,6 @@
 
 import { useMemo } from "react";
 import { Pie, PieChart, Tooltip } from "recharts";
-import { CardContent } from "@/shared/ui/primitives/card";
 import { ChartContainer, type ChartConfig } from "@/shared/ui/primitives/chart";
 import { ChartCard, ChartCardLayout, DataItem } from "@/shared/ui";
 import { useIsMobile } from "@/shared/lib/use-media-query";
@@ -42,9 +41,16 @@ export function MacrosPieChart({ protein, fat, carbs }: MacrosPieChartProps) {
   const totalKcal = proteinKcal + fatKcal + carbsKcal;
 
   const chartData: ChartDataItem[] = useMemo(() => {
-    if (totalKcal === 0) return [];
-
     // Use calories for chart proportions, keep grams for tooltip
+    // When no data, show equal placeholder segments
+    if (totalKcal === 0) {
+      return [
+        { name: "protein", value: 1, grams: 0, fill: "var(--color-protein)" },
+        { name: "fat", value: 1, grams: 0, fill: "var(--color-fat)" },
+        { name: "carbs", value: 1, grams: 0, fill: "var(--color-carbs)" },
+      ];
+    }
+
     return [
       {
         name: "protein",
@@ -90,16 +96,6 @@ export function MacrosPieChart({ protein, fat, carbs }: MacrosPieChartProps) {
       value: `${percentages.carbs}%`,
     },
   ];
-
-  if (totalKcal === 0) {
-    return (
-      <ChartCard title={t("title")}>
-        <CardContent className="flex items-center justify-center h-[200px] p-0">
-          <p className="text-muted-foreground">{t("noData")}</p>
-        </CardContent>
-      </ChartCard>
-    );
-  }
 
   return (
     <ChartCard title={t("title")}>

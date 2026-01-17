@@ -1,12 +1,9 @@
 "use client";
 
 import {
-  ChevronLeft,
-  ChevronRight,
   ChevronsLeft,
   ChevronsRight,
 } from "lucide-react";
-import { Button } from "@/shared/ui/primitives/button";
 import {
   Select,
   SelectContent,
@@ -14,6 +11,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/ui/primitives/select";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/shared/ui/primitives/pagination";
 import type { DataTablePaginationProps } from "../types";
 
 export function DataTablePagination({
@@ -52,44 +57,44 @@ export function DataTablePagination({
           </Select>
         </div>
 
-        <div className="flex items-center space-x-2">
-          <Button
-            variant="outline"
-            size="icon"
-            className="size-8"
-            onClick={() => table.firstPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <ChevronsLeft className="size-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            className="size-8"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <ChevronLeft className="size-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            className="size-8"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            <ChevronRight className="size-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            className="size-8"
-            onClick={() => table.lastPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            <ChevronsRight className="size-4" />
-          </Button>
-        </div>
+        <Pagination className="mx-0 w-auto">
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationLink
+                size="icon"
+                onClick={() => table.firstPage()}
+                aria-disabled={!table.getCanPreviousPage()}
+                className={!table.getCanPreviousPage() ? "pointer-events-none opacity-50" : "cursor-pointer"}
+              >
+                <ChevronsLeft className="size-4" />
+              </PaginationLink>
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationPrevious
+                onClick={() => table.previousPage()}
+                aria-disabled={!table.getCanPreviousPage()}
+                className={!table.getCanPreviousPage() ? "pointer-events-none opacity-50" : "cursor-pointer"}
+              />
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationNext
+                onClick={() => table.nextPage()}
+                aria-disabled={!table.getCanNextPage()}
+                className={!table.getCanNextPage() ? "pointer-events-none opacity-50" : "cursor-pointer"}
+              />
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationLink
+                size="icon"
+                onClick={() => table.lastPage()}
+                aria-disabled={!table.getCanNextPage()}
+                className={!table.getCanNextPage() ? "pointer-events-none opacity-50" : "cursor-pointer"}
+              >
+                <ChevronsRight className="size-4" />
+              </PaginationLink>
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
       </div>
     </div>
   );

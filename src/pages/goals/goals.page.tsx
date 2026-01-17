@@ -15,7 +15,7 @@ export function GoalsPage() {
   const { t } = useI18n();
 
   return (
-    <div className="space-y-6">
+    <>
       <div>
         <UiText variant="h1" weight="bold">
           {t("title")}
@@ -34,6 +34,6 @@ export function GoalsPage() {
           <UpdateGoalsForm />
         </CardContent>
       </Card>
-    </div>
+    </>
   );
 }

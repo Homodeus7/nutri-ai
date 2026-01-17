@@ -49,7 +49,7 @@ export function ProductDetailPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <>
       <Button variant="ghost" onClick={goBack}>
         <ArrowLeft className="mr-2 size-4" />
         {t("backToList")}
@@ -140,6 +140,6 @@ export function ProductDetailPage() {
         onOpenChange={setIsDeleteOpen}
         onSuccess={handleDeleteSuccess}
       />
-    </div>
+    </>
   );
 }
