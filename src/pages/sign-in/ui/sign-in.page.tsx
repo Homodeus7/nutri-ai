@@ -17,7 +17,7 @@ export function SignInPage() {
   const { t } = useI18n();
   const timezone = useTimezone();
 
-  const { handleGoogleLogin } = useGoogleAuth({
+  const { handleGoogleLogin, isPending: isGooglePending } = useGoogleAuth({
     redirectTo: ROUTER_PATHS.DIARY,
     onSuccess: () => {
       toast.success("Successfully signed in with Google");
@@ -51,10 +51,11 @@ export function SignInPage() {
               onError={() => {
                 toast.error("Failed to sign in with Google");
               }}
+              loading={isGooglePending}
             />
           }
           separatorText={t("or")}
-          alternativeAuth={<SignInForm />}
+          alternativeAuth={<SignInForm disabled={isGooglePending} />}
         />
       </div>
     </div>

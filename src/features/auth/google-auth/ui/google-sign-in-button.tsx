@@ -1,13 +1,15 @@
 "use client";
 
 import { useGoogleLogin, CredentialResponse } from "@react-oauth/google";
-import { Button } from "@/shared/ui/primitives/button";
+import { UiButton } from "@/shared/ui/ui-button";
 import { cn } from "@/shared/lib/css";
 
 export interface GoogleSignInButtonProps {
   onSuccess: (credentialResponse: CredentialResponse) => void;
   onError?: () => void;
   className?: string;
+  disabled?: boolean;
+  loading?: boolean;
 }
 
 const GoogleIcon = () => (
@@ -41,6 +43,8 @@ export function GoogleSignInButton({
   onSuccess,
   onError,
   className,
+  disabled,
+  loading,
 }: GoogleSignInButtonProps) {
   const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
   const login = useGoogleLogin({
@@ -59,13 +63,15 @@ export function GoogleSignInButton({
   });
 
   return (
-    <Button
+    <UiButton
       type="button"
       variant="default"
       onClick={() => login()}
       className={cn("w-full", className)}
+      disabled={disabled}
+      loading={loading}
     >
       <GoogleIcon />
-    </Button>
+    </UiButton>
   );
 }

@@ -19,7 +19,11 @@ import { useI18n } from "../i18n";
 import { ROUTER_PATHS } from "@/shared/constants/routes";
 import { useTimezone } from "@/shared/lib/use-timezone";
 
-export function SignInForm() {
+export interface SignInFormProps {
+  disabled?: boolean;
+}
+
+export function SignInForm({ disabled }: SignInFormProps = {}) {
   const { t } = useI18n();
   const timezone = useTimezone();
 
@@ -59,7 +63,7 @@ export function SignInForm() {
   return (
     <Form {...form}>
       <form onSubmit={onSubmit}>
-        <fieldset disabled={isPending} className="space-y-4 md:space-y-6">
+        <fieldset disabled={isPending || disabled} className="space-y-4 md:space-y-6">
           <FormField
             control={form.control}
             name="email"
