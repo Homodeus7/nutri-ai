@@ -13,7 +13,7 @@ import {
   FormMessage,
 } from "@/shared/ui/primitives/form";
 import { Input } from "@/shared/ui/primitives/input";
-import { Button } from "@/shared/ui/primitives/button";
+import { UiButton } from "@/shared/ui/ui-button";
 import { useSignIn } from "../model/use-sign-in";
 import { useI18n } from "../i18n";
 import { ROUTER_PATHS } from "@/shared/constants/routes";
@@ -58,48 +58,50 @@ export function SignInForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={onSubmit} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("emailLabel")}</FormLabel>
-              <FormControl>
-                <Input
-                  type="email"
-                  placeholder={t("emailPlaceholder")}
-                  autoComplete="email"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <form onSubmit={onSubmit}>
+        <fieldset disabled={isPending} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("emailLabel")}</FormLabel>
+                <FormControl>
+                  <Input
+                    type="email"
+                    placeholder={t("emailPlaceholder")}
+                    autoComplete="email"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("passwordLabel")}</FormLabel>
-              <FormControl>
-                <Input
-                  type="password"
-                  placeholder={t("passwordPlaceholder")}
-                  autoComplete="current-password"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("passwordLabel")}</FormLabel>
+                <FormControl>
+                  <Input
+                    type="password"
+                    placeholder={t("passwordPlaceholder")}
+                    autoComplete="current-password"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <Button type="submit" className="w-full" disabled={isPending}>
-          {t("submitButton")}
-        </Button>
+          <UiButton type="submit" className="w-full" loading={isPending}>
+            {t("submitButton")}
+          </UiButton>
+        </fieldset>
       </form>
     </Form>
   );

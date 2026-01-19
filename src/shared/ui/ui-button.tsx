@@ -17,22 +17,10 @@ export const UiButton = forwardRef<HTMLButtonElement, UiButtonProps>(
   ({ children, icon, loading = false, disabled, className, ...props }, ref) => {
     const isDisabled = disabled || loading;
 
-    const renderContent = () => {
-      if (loading) {
-        return <Spinner className="size-4" />;
-      }
-
-      return (
-        <>
-          {icon && { icon }}
-          {children}
-        </>
-      );
-    };
-
     return (
       <Button ref={ref} disabled={isDisabled} className={className} {...props}>
-        {renderContent()}
+        {loading ? <Spinner className="size-4" /> : icon}
+        {children}
       </Button>
     );
   },
