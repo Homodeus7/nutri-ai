@@ -68,7 +68,7 @@ export function SignUpForm() {
   return (
     <Form {...form}>
       <form onSubmit={onSubmit}>
-        <fieldset disabled={isPending} className="space-y-4">
+        <fieldset disabled={isPending} className="space-y-4 md:space-y-6">
           <FormField
             control={form.control}
             name="email"

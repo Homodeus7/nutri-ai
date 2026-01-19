@@ -6,7 +6,7 @@ import {
   CardContent,
   CardFooter,
 } from "@/shared/ui/primitives/card";
-import { Separator } from "@/shared/ui/primitives/separator";
+import { FieldSeparator } from "@/shared/ui/primitives/field";
 import React from "react";
 
 export function AuthLayout({
@@ -25,21 +25,19 @@ export function AuthLayout({
   separatorText?: string;
 }) {
   return (
-    <Card className="w-full max-w-[400px]">
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
+    <Card className="w-full max-w-[440px]">
+      <CardHeader className="text-center">
+        <CardTitle className=" md:text-xl">{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 md:space-y-6">
         {form}
         {alternativeAuth && (
           <>
-            <div className="flex gap-4 items-center">
-              <Separator className="flex-1" />
-              <span className="text-xs text-muted-foreground">
+            <div>
+              <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
                 {separatorText}
-              </span>
-              <Separator className="flex-1" />
+              </FieldSeparator>
             </div>
             {alternativeAuth}
           </>

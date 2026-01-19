@@ -1,13 +1,17 @@
 import { createI18nModule } from "@/shared/lib/i18n";
 
 export const useI18n = createI18nModule({
+  appTagline: {
+    en: "Food Calorie Tracker App",
+    ru: "Приложение для подсчёта калорий",
+  },
   title: {
-    en: "Sign up",
-    ru: "Регистрация",
+    en: "Get started",
+    ru: "Начните сейчас",
   },
   description: {
-    en: "Create your account to start tracking your nutrition",
-    ru: "Создайте аккаунт, чтобы начать отслеживать питание",
+    en: "Sign up with your Google account",
+    ru: "Зарегистрируйтесь с помощью Google",
   },
   footerText: {
     en: "Already have an account?",
@@ -18,7 +22,7 @@ export const useI18n = createI18nModule({
     ru: "Войти",
   },
   or: {
-    en: "or",
-    ru: "или",
+    en: "Or continue with",
+    ru: "Или продолжить с помощью",
   },
 } as const);

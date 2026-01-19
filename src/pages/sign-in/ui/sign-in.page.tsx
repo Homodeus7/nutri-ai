@@ -11,6 +11,7 @@ import {
 } from "@/features/auth";
 import Link from "next/link";
 import { useTimezone } from "@/shared/lib/use-timezone";
+import { NutriAiLogo } from "@/shared/ui";
 
 export function SignInPage() {
   const { t } = useI18n();
@@ -27,29 +28,35 @@ export function SignInPage() {
   });
 
   return (
-    <div className="flex flex-col pt-24 items-center">
-      <AuthLayout
-        title={t("title")}
-        description={t("description")}
-        footerText={
-          <>
-            {t("footerText")}{" "}
-            <Link href={ROUTER_PATHS.SIGN_UP}>{t("signUpLink")}</Link>
-          </>
-        }
-        form={<SignInForm />}
-        separatorText={t("or")}
-        alternativeAuth={
-          <GoogleSignInButton
-            onSuccess={(credentialResponse) =>
-              handleGoogleLogin(credentialResponse, timezone)
-            }
-            onError={() => {
-              toast.error("Failed to sign in with Google");
-            }}
-          />
-        }
-      />
+    <div className="flex flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
+      <div className="flex w-full max-w-sm flex-col gap-6">
+        <div className="flex flex-col items-center gap-2">
+          <NutriAiLogo width={140} height={35} />
+          <p className="text-muted-foreground text-sm">{t("appTagline")}</p>
+        </div>
+        <AuthLayout
+          title={t("title")}
+          description={t("description")}
+          footerText={
+            <>
+              {t("footerText")}{" "}
+              <Link href={ROUTER_PATHS.SIGN_UP}>{t("signUpLink")}</Link>
+            </>
+          }
+          form={
+            <GoogleSignInButton
+              onSuccess={(credentialResponse) =>
+                handleGoogleLogin(credentialResponse, timezone)
+              }
+              onError={() => {
+                toast.error("Failed to sign in with Google");
+              }}
+            />
+          }
+          separatorText={t("or")}
+          alternativeAuth={<SignInForm />}
+        />
+      </div>
     </div>
   );
 }
