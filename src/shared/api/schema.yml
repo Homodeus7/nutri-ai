@@ -111,6 +111,10 @@ components:
         consumedKcal:
           type: integer
           minimum: 0
+        consumedFiber:
+          type: number
+          format: float
+          minimum: 0
         notes:
           type: string
         createdAt:
@@ -156,6 +160,10 @@ components:
             $ref: "#/components/schemas/FoodItem"
         totalKcal:
           type: integer
+          minimum: 0
+        totalFiber:
+          type: number
+          format: float
           minimum: 0
         source:
           type: string
@@ -218,6 +226,9 @@ components:
           type: number
           format: float
         carbs:
+          type: number
+          format: float
+        fiber:
           type: number
           format: float
         source:

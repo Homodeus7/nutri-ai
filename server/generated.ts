@@ -45,6 +45,8 @@ export interface DayEntry {
   targetKcal?: number;
   /** @minimum 0 */
   consumedKcal?: number;
+  /** @minimum 0 */
+  consumedFiber?: number;
   notes?: string;
   createdAt: string;
   updatedAt: string;
@@ -80,6 +82,8 @@ export interface Meal {
   items?: FoodItem[];
   /** @minimum 0 */
   totalKcal: number;
+  /** @minimum 0 */
+  totalFiber?: number;
   source: MealSource;
   /**
    * @minimum 0
@@ -112,6 +116,7 @@ export interface FoodItem {
   protein?: number;
   fat?: number;
   carbs?: number;
+  fiber?: number;
   /** Откуда взят item (product, recipe, ai) */
   source?: string;
 }

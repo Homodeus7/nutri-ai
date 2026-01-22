@@ -42,6 +42,7 @@ function transformFoodItem(apiItem: ApiFoodItem): FoodItem {
     protein: apiItem.protein ?? 0,
     fat: apiItem.fat ?? 0,
     carbs: apiItem.carbs ?? 0,
+    fiber: apiItem.fiber ?? 0,
   };
 }
 

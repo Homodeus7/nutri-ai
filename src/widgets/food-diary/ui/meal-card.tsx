@@ -18,8 +18,9 @@ function calculateTotals(meal: MealData): NutritionTotals {
       protein: acc.protein + item.protein,
       fat: acc.fat + item.fat,
       carbs: acc.carbs + item.carbs,
+      fiber: acc.fiber + (item.fiber ?? 0),
     }),
-    { calories: 0, protein: 0, fat: 0, carbs: 0 },
+    { calories: 0, protein: 0, fat: 0, carbs: 0, fiber: 0 },
   );
 }
 

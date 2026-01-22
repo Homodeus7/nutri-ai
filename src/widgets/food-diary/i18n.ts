@@ -94,6 +94,10 @@ export const useI18n = createI18nModule({
     en: "Carbs",
     ru: "Углев.",
   },
+  fiber: {
+    en: "Fiber",
+    ru: "Клетч.",
+  },
   g: {
     en: "g",
     ru: "г",

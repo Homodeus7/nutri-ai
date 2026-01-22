@@ -26,6 +26,7 @@ export interface NutritionTotals {
   protein: number;
   fat: number;
   carbs: number;
+  fiber: number;
 }
 
 export interface AddFoodFormData {

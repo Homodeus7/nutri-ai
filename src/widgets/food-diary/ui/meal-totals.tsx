@@ -24,6 +24,10 @@ export function MealTotals({ totals }: MealTotalsProps) {
         {t("carbs")}: {formatValue(totals.carbs)}
         {t("g")}
       </span>
+      <span>
+        {t("fiber")}: {formatValue(totals.fiber)}
+        {t("g")}
+      </span>
     </div>
   );
 }

@@ -65,6 +65,8 @@ export interface DayEntry {
   targetKcal?: number;
   /** @minimum 0 */
   consumedKcal?: number;
+  /** @minimum 0 */
+  consumedFiber?: number;
   notes?: string;
   createdAt: string;
   updatedAt: string;
@@ -100,6 +102,8 @@ export interface Meal {
   items?: FoodItem[];
   /** @minimum 0 */
   totalKcal: number;
+  /** @minimum 0 */
+  totalFiber?: number;
   source: MealSource;
   /**
    * @minimum 0
@@ -132,6 +136,7 @@ export interface FoodItem {
   protein?: number;
   fat?: number;
   carbs?: number;
+  fiber?: number;
   /** Откуда взят item (product, recipe, ai) */
   source?: string;
 }
@@ -4963,6 +4968,10 @@ export const getGetDayDateResponseMock = (
     faker.number.int({ min: 0, max: undefined }),
     undefined,
   ]),
+  consumedFiber: faker.helpers.arrayElement([
+    faker.number.float({ min: 0, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
   notes: faker.helpers.arrayElement([
     faker.string.alpha({ length: { min: 10, max: 20 } }),
     undefined,
@@ -5038,6 +5047,14 @@ export const getGetDayDateResponseMock = (
             }),
             undefined,
           ]),
+          fiber: faker.helpers.arrayElement([
+            faker.number.float({
+              min: undefined,
+              max: undefined,
+              fractionDigits: 2,
+            }),
+            undefined,
+          ]),
           source: faker.helpers.arrayElement([
             faker.string.alpha({ length: { min: 10, max: 20 } }),
             undefined,
@@ -5046,6 +5063,10 @@ export const getGetDayDateResponseMock = (
         undefined,
       ]),
       totalKcal: faker.number.int({ min: 0, max: undefined }),
+      totalFiber: faker.helpers.arrayElement([
+        faker.number.float({ min: 0, max: undefined, fractionDigits: 2 }),
+        undefined,
+      ]),
       source: faker.helpers.arrayElement(["manual", "ai"] as const),
       aiConfidence: faker.helpers.arrayElement([
         faker.number.float({ min: 0, max: 1, fractionDigits: 2 }),
@@ -5126,6 +5147,14 @@ export const getPostDayDateMealsResponseMock = (
         }),
         undefined,
       ]),
+      fiber: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
       source: faker.helpers.arrayElement([
         faker.string.alpha({ length: { min: 10, max: 20 } }),
         undefined,
@@ -5134,6 +5163,10 @@ export const getPostDayDateMealsResponseMock = (
     undefined,
   ]),
   totalKcal: faker.number.int({ min: 0, max: undefined }),
+  totalFiber: faker.helpers.arrayElement([
+    faker.number.float({ min: 0, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
   source: faker.helpers.arrayElement(["manual", "ai"] as const),
   aiConfidence: faker.helpers.arrayElement([
     faker.number.float({ min: 0, max: 1, fractionDigits: 2 }),
@@ -5211,6 +5244,14 @@ export const getGetMealsIdResponseMock = (
         }),
         undefined,
       ]),
+      fiber: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
       source: faker.helpers.arrayElement([
         faker.string.alpha({ length: { min: 10, max: 20 } }),
         undefined,
@@ -5219,6 +5260,10 @@ export const getGetMealsIdResponseMock = (
     undefined,
   ]),
   totalKcal: faker.number.int({ min: 0, max: undefined }),
+  totalFiber: faker.helpers.arrayElement([
+    faker.number.float({ min: 0, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
   source: faker.helpers.arrayElement(["manual", "ai"] as const),
   aiConfidence: faker.helpers.arrayElement([
     faker.number.float({ min: 0, max: 1, fractionDigits: 2 }),
@@ -5296,6 +5341,14 @@ export const getPutMealsIdResponseMock = (
         }),
         undefined,
       ]),
+      fiber: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
       source: faker.helpers.arrayElement([
         faker.string.alpha({ length: { min: 10, max: 20 } }),
         undefined,
@@ -5304,6 +5357,10 @@ export const getPutMealsIdResponseMock = (
     undefined,
   ]),
   totalKcal: faker.number.int({ min: 0, max: undefined }),
+  totalFiber: faker.helpers.arrayElement([
+    faker.number.float({ min: 0, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
   source: faker.helpers.arrayElement(["manual", "ai"] as const),
   aiConfidence: faker.helpers.arrayElement([
     faker.number.float({ min: 0, max: 1, fractionDigits: 2 }),
@@ -5381,6 +5438,14 @@ export const getPutMealsIdProductResponseMock = (
         }),
         undefined,
       ]),
+      fiber: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
       source: faker.helpers.arrayElement([
         faker.string.alpha({ length: { min: 10, max: 20 } }),
         undefined,
@@ -5389,6 +5454,10 @@ export const getPutMealsIdProductResponseMock = (
     undefined,
   ]),
   totalKcal: faker.number.int({ min: 0, max: undefined }),
+  totalFiber: faker.helpers.arrayElement([
+    faker.number.float({ min: 0, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
   source: faker.helpers.arrayElement(["manual", "ai"] as const),
   aiConfidence: faker.helpers.arrayElement([
     faker.number.float({ min: 0, max: 1, fractionDigits: 2 }),
@@ -5466,6 +5535,14 @@ export const getDeleteMealsIdProductResponseMock = (
         }),
         undefined,
       ]),
+      fiber: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
       source: faker.helpers.arrayElement([
         faker.string.alpha({ length: { min: 10, max: 20 } }),
         undefined,
@@ -5474,6 +5551,10 @@ export const getDeleteMealsIdProductResponseMock = (
     undefined,
   ]),
   totalKcal: faker.number.int({ min: 0, max: undefined }),
+  totalFiber: faker.helpers.arrayElement([
+    faker.number.float({ min: 0, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
   source: faker.helpers.arrayElement(["manual", "ai"] as const),
   aiConfidence: faker.helpers.arrayElement([
     faker.number.float({ min: 0, max: 1, fractionDigits: 2 }),
@@ -5553,6 +5634,14 @@ export const getPostAiParseResponseMock = (
             }),
             undefined,
           ]),
+          fiber: faker.helpers.arrayElement([
+            faker.number.float({
+              min: undefined,
+              max: undefined,
+              fractionDigits: 2,
+            }),
+            undefined,
+          ]),
           source: faker.helpers.arrayElement([
             faker.string.alpha({ length: { min: 10, max: 20 } }),
             undefined,
@@ -5561,6 +5650,10 @@ export const getPostAiParseResponseMock = (
         undefined,
       ]),
       totalKcal: faker.number.int({ min: 0, max: undefined }),
+      totalFiber: faker.helpers.arrayElement([
+        faker.number.float({ min: 0, max: undefined, fractionDigits: 2 }),
+        undefined,
+      ]),
       source: faker.helpers.arrayElement(["manual", "ai"] as const),
       aiConfidence: faker.helpers.arrayElement([
         faker.number.float({ min: 0, max: 1, fractionDigits: 2 }),
@@ -5684,6 +5777,14 @@ export const getPutAiMealsIdResponseMock = (
             }),
             undefined,
           ]),
+          fiber: faker.helpers.arrayElement([
+            faker.number.float({
+              min: undefined,
+              max: undefined,
+              fractionDigits: 2,
+            }),
+            undefined,
+          ]),
           source: faker.helpers.arrayElement([
             faker.string.alpha({ length: { min: 10, max: 20 } }),
             undefined,
@@ -5692,6 +5793,10 @@ export const getPutAiMealsIdResponseMock = (
         undefined,
       ]),
       totalKcal: faker.number.int({ min: 0, max: undefined }),
+      totalFiber: faker.helpers.arrayElement([
+        faker.number.float({ min: 0, max: undefined, fractionDigits: 2 }),
+        undefined,
+      ]),
       source: faker.helpers.arrayElement(["manual", "ai"] as const),
       aiConfidence: faker.helpers.arrayElement([
         faker.number.float({ min: 0, max: 1, fractionDigits: 2 }),
@@ -7129,6 +7234,14 @@ export const getPostRecipesIdAddToMealResponseMock = (
         }),
         undefined,
       ]),
+      fiber: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
       source: faker.helpers.arrayElement([
         faker.string.alpha({ length: { min: 10, max: 20 } }),
         undefined,
@@ -7137,6 +7250,10 @@ export const getPostRecipesIdAddToMealResponseMock = (
     undefined,
   ]),
   totalKcal: faker.number.int({ min: 0, max: undefined }),
+  totalFiber: faker.helpers.arrayElement([
+    faker.number.float({ min: 0, max: undefined, fractionDigits: 2 }),
+    undefined,
+  ]),
   source: faker.helpers.arrayElement(["manual", "ai"] as const),
   aiConfidence: faker.helpers.arrayElement([
     faker.number.float({ min: 0, max: 1, fractionDigits: 2 }),
