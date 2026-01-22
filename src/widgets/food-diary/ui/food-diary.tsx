@@ -8,7 +8,11 @@ import {
   CardTitle,
 } from "@/shared/ui/primitives/card";
 import { MealCard } from "./meal-card";
-import { useSelectedDate, useDayData, useConsumedMacros } from "@/features/day-data";
+import {
+  useSelectedDate,
+  useDayData,
+  useConsumedMacros,
+} from "@/features/day-data";
 import { useI18n } from "../i18n";
 import { mergeMealsWithBase } from "../model/merge-meals";
 
@@ -23,7 +27,7 @@ export function FoodDiary() {
 
   const meals = useMemo(
     () => mergeMealsWithBase(dayData?.meals ?? []),
-    [dayData?.meals]
+    [dayData?.meals],
   );
 
   const totals = useMemo(() => {
@@ -59,7 +63,7 @@ export function FoodDiary() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-2xl">{t("title")}</CardTitle>
+        <CardTitle>{t("title")}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

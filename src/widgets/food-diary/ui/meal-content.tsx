@@ -71,7 +71,7 @@ export function MealContent({ items, totals }: MealContentProps) {
         </div>
 
         {shouldShowItems && (
-          <div className="space-y-2 max-h-64 overflow-y-auto">
+          <div className="space-y-2 max-h-64 overflow-y-auto [scrollbar-width:thin]">
             {items.map((item) => (
               <FoodItem
                 key={item.id}

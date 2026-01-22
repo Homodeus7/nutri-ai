@@ -129,7 +129,7 @@ export function ProductsTable({
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex-1 overflow-y-auto min-h-0">
+      <div className="flex-1 overflow-y-auto min-h-0 [scrollbar-width:thin]">
         <Table>
           <TableHeader>
             <TableRow>
