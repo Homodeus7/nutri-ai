@@ -1,10 +1,15 @@
+import Head from "next/head";
 import { AppHeader } from "@/widgets/app-header";
 import { AppSidebar } from "@/widgets/app-sidebar";
 import { MobileBottomTabs } from "@/widgets/mobile-bottom-tabs";
 
 export function PrivateLayout({ children }: { children?: React.ReactNode }) {
   return (
-    <div className="min-h-screen flex">
+    <>
+      <Head>
+        <meta name="robots" content="noindex, nofollow" />
+      </Head>
+      <div className="min-h-screen flex">
       <div className="hidden xl:flex">
         <AppSidebar />
       </div>
@@ -19,6 +24,7 @@ export function PrivateLayout({ children }: { children?: React.ReactNode }) {
       <div className="xl:hidden">
         <MobileBottomTabs />
       </div>
-    </div>
+      </div>
+    </>
   );
 }

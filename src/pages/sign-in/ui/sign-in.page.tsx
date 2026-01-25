@@ -12,6 +12,7 @@ import {
 import Link from "next/link";
 import { useTimezone } from "@/shared/lib/use-timezone";
 import { NutriAiLogo } from "@/shared/ui";
+import { PageSeo } from "@/shared/lib/seo";
 
 export function SignInPage() {
   const { t } = useI18n();
@@ -28,7 +29,13 @@ export function SignInPage() {
   });
 
   return (
-    <div className="flex flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
+    <>
+      <PageSeo
+        title="Sign In"
+        description="Sign in to Nutri AI to track your calories and nutrition with AI-powered meal parsing."
+        path="/sign-in"
+      />
+      <div className="flex flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
       <div className="flex w-full max-w-sm flex-col gap-6">
         <div className="flex flex-col items-center gap-2">
           <NutriAiLogo width={140} height={35} />
@@ -58,6 +65,7 @@ export function SignInPage() {
           alternativeAuth={<SignInForm disabled={isGooglePending} />}
         />
       </div>
-    </div>
+      </div>
+    </>
   );
 }

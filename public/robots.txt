@@ -1,0 +1,22 @@
+# Nutri AI - Robots.txt
+# https://nutri-ai-gules.vercel.app
+
+User-agent: *
+
+# Allow public pages
+Allow: /sign-in
+Allow: /sign-up
+
+# Disallow protected pages (require authentication)
+Disallow: /diary
+Disallow: /products
+Disallow: /goals
+Disallow: /boost
+Disallow: /lunch
+Disallow: /403
+
+# Disallow API routes
+Disallow: /api/
+
+# Sitemap
+Sitemap: https://nutri-ai-gules.vercel.app/sitemap.xml
