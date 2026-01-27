@@ -9,7 +9,11 @@ import {
   InputGroupTextarea,
 } from "@/shared/ui/primitives/input-group";
 import { useI18n } from "../i18n";
-import { AI_PARSE_ERROR_CODES, type AiParseErrorCode } from "@/features/ai-parse";
+import {
+  AI_PARSE_ERROR_CODES,
+  type AiParseErrorCode,
+} from "@/features/ai-parse";
+import { UiText } from "@/shared/ui";
 
 interface AiInputTabProps {
   onSubmit?: (text: string) => void;
@@ -69,13 +73,13 @@ export function AiInputTab({
       {/* Question header or Error message */}
       <div className="flex-1 flex items-center justify-center px-4">
         {errorMessage ? (
-          <p className="text-base text-destructive text-center">
+          <p className="text-sm md:text-base text-destructive text-center">
             {errorMessage}
           </p>
         ) : (
-          <h2 className="text-2xl font-semibold text-center">
+          <UiText variant="h3" className="text-center">
             {t("aiInputQuestion")}
-          </h2>
+          </UiText>
         )}
       </div>
 
@@ -91,7 +95,7 @@ export function AiInputTab({
           />
           <InputGroupAddon align="block-end" className="justify-end">
             {/* Voice button */}
-            <InputGroupButton
+            {/* <InputGroupButton
               size="icon-sm"
               variant="ghost"
               onClick={handleVoiceClick}
@@ -99,7 +103,7 @@ export function AiInputTab({
               className="rounded-full"
             >
               <Mic className="size-5" />
-            </InputGroupButton>
+            </InputGroupButton> */}
 
             {/* Submit/Voice mode button */}
             <InputGroupButton
