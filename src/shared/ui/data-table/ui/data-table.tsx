@@ -26,6 +26,9 @@ export function DataTable<TData>({
   isLoading,
   onRowClick,
   emptyState,
+  footer,
+  className,
+  meta,
 }: DataTableProps<TData>) {
   const table = useDataTable({
     data,
@@ -35,14 +38,17 @@ export function DataTable<TData>({
     pageCount,
     sorting,
     onSortingChange,
+    meta,
   });
 
   if (!isLoading && data.length === 0 && emptyState) {
     return <>{emptyState}</>;
   }
 
+  const hasPagination = !!pagination;
+
   return (
-    <div className="min-w-0 space-y-4">
+    <div className={cn("min-w-0 space-y-2 md:space-y-4", className)}>
       <div className="overflow-x-auto rounded-md border [scrollbar-width:thin]">
         <Table>
           <TableHeader>
@@ -103,7 +109,8 @@ export function DataTable<TData>({
         </Table>
       </div>
 
-      <DataTablePagination table={table} />
+      {hasPagination && <DataTablePagination table={table} />}
+      {footer}
     </div>
   );
 }

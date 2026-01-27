@@ -54,7 +54,7 @@ export function TabsView({
   });
 
   return (
-    <Tabs defaultValue="ai" className="w-full flex flex-col h-full">
+    <Tabs defaultValue="ai" className="w-full flex-1 min-h-0">
       <TabsList className="grid w-full grid-cols-3">
         <TabsTrigger value="ai" className="gap-1.5">
           <Sparkle className="size-4" />

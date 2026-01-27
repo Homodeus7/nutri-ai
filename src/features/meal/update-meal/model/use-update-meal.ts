@@ -1,5 +1,8 @@
 import { usePutMealsId } from "@/shared/api/generated/nutriAIFoodCalorieTrackerAPI";
-import type { UpdateMealItemsRequest } from "@/shared/api/generated/nutriAIFoodCalorieTrackerAPI";
+import type {
+  UpdateMealItemsRequest,
+  DayEntry,
+} from "@/shared/api/generated/nutriAIFoodCalorieTrackerAPI";
 import { useQueryClient } from "@tanstack/react-query";
 
 interface UseUpdateMealParams {
@@ -15,17 +18,78 @@ export function useUpdateMeal({
 
   const { mutate, isPending } = usePutMealsId({
     mutation: {
-      onSuccess: () => {
-        // Invalidate both meal and day queries
-        queryClient.invalidateQueries({
-          queryKey: ["/meals"],
+      onMutate: async ({ id: mealId, data }) => {
+        await queryClient.cancelQueries({
+          predicate: (query) =>
+            query.queryKey[0]?.toString().startsWith("/day/") ?? false,
         });
+
+        const previousData = queryClient.getQueriesData({
+          predicate: (query) =>
+            query.queryKey[0]?.toString().startsWith("/day/") ?? false,
+        });
+
+        queryClient.setQueriesData(
+          {
+            predicate: (query) =>
+              query.queryKey[0]?.toString().startsWith("/day/") ?? false,
+          },
+          (old: DayEntry | undefined) => {
+            if (!old?.meals) return old;
+
+            return {
+              ...old,
+              meals: old.meals.map((meal) => {
+                if (meal.id !== mealId) return meal;
+
+                return {
+                  ...meal,
+                  items: data.items.map((newItem) => {
+                    const existing = meal.items?.find(
+                      (item) =>
+                        (item.productId ?? item.id) ===
+                        (newItem.productId ?? newItem.recipeId),
+                    );
+
+                    if (existing) {
+                      return { ...existing, quantity: newItem.quantity };
+                    }
+
+                    return {
+                      id: crypto.randomUUID(),
+                      mealId,
+                      productId: newItem.productId ?? null,
+                      recipeId: newItem.recipeId ?? null,
+                      name: "",
+                      quantity: newItem.quantity,
+                      unit: "g",
+                      kcal: 0,
+                      protein: 0,
+                      fat: 0,
+                      carbs: 0,
+                    };
+                  }),
+                };
+              }),
+            };
+          },
+        );
+
+        return { previousData };
+      },
+      onSuccess: () => {
         queryClient.invalidateQueries({
-          queryKey: ["day"],
+          predicate: (query) =>
+            query.queryKey[0]?.toString().startsWith("/day/") ?? false,
         });
         onSuccess?.();
       },
-      onError: (error) => {
+      onError: (error, _variables, context) => {
+        if (context?.previousData) {
+          context.previousData.forEach(([queryKey, data]) => {
+            queryClient.setQueryData(queryKey, data);
+          });
+        }
         console.error("Failed to update meal:", error);
         onError?.(error);
       },

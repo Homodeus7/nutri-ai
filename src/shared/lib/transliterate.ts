@@ -90,5 +90,7 @@ export function transliterate(text: string): string {
   return text
     .split("")
     .map((char) => cyrillicToLatinMap[char] ?? char)
-    .join("");
+    .join("")
+    .replace(/\s+/g, "")
+    .toLowerCase();
 }

@@ -17,9 +17,9 @@ export interface DataTableProps<TData> {
   data: TData[];
   columns: ColumnDef<TData, any>[];
 
-  pagination: TablePaginationState;
-  onPaginationChange: OnChangeFn<PaginationState>;
-  pageCount: number;
+  pagination?: TablePaginationState;
+  onPaginationChange?: OnChangeFn<PaginationState>;
+  pageCount?: number;
   totalRows?: number;
 
   sorting?: SortingState;
@@ -30,6 +30,12 @@ export interface DataTableProps<TData> {
   onRowClick?: (row: TData) => void;
 
   emptyState?: React.ReactNode;
+
+  footer?: React.ReactNode;
+  className?: string;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  meta?: any;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -48,9 +54,11 @@ export interface SortableHeaderProps<TData> {
 export interface UseDataTableConfig<TData> {
   data: TData[];
   columns: ColumnDef<TData, any>[];
-  pagination: TablePaginationState;
-  onPaginationChange: OnChangeFn<PaginationState>;
-  pageCount: number;
+  pagination?: TablePaginationState;
+  onPaginationChange?: OnChangeFn<PaginationState>;
+  pageCount?: number;
   sorting?: SortingState;
   onSortingChange?: OnChangeFn<SortingState>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  meta?: any;
 }
