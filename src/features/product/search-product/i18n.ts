@@ -1,12 +1,6 @@
 import { createI18nModule } from "@/shared/lib/i18n";
 
 export const useI18n = createI18nModule({
-  // SearchInput
-  searchPlaceholder: {
-    en: "Search products...",
-    ru: "Поиск продуктов...",
-  },
-
   // ProductsTable - headers
   productName: {
     en: "Name",

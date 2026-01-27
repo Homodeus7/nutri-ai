@@ -35,7 +35,7 @@ export const useI18n = createI18nModule({
     ru: "Овсянка с бананом, кофе с молоком...",
   },
   aiErrorNoItemsFound: {
-    en: "Could not find any food items in your description. Try to be more specific, for example: \"200g chicken breast, rice with vegetables\"",
+    en: 'Could not find any food items in your description. Try to be more specific, for example: "200g chicken breast, rice with vegetables"',
     ru: "Не удалось найти продукты в описании. Попробуйте быть конкретнее, например: «200г куриной грудки, рис с овощами»",
   },
 
@@ -56,6 +56,10 @@ export const useI18n = createI18nModule({
   },
 
   // SearchProductsTab
+  searchPlaceholder: {
+    en: "Search products...",
+    ru: "Поиск продуктов...",
+  },
   noResults: {
     en: "Nothing found",
     ru: "Ничего не найдено",

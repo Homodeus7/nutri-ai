@@ -4,9 +4,9 @@ import { Button } from "@/shared/ui/primitives/button";
 import { ChevronRight } from "lucide-react";
 import {
   useSearchProducts,
-  SearchInput,
   ProductsTable,
 } from "@/features/product/search-product";
+import { SearchInput } from "@/shared/ui";
 import { SearchTabLayout } from "./search-tab-layout";
 import { useI18n } from "../i18n";
 
@@ -38,7 +38,7 @@ export function SearchProductsTab({
       isLoading={isLoading}
       isEmpty={isEmpty}
       hasContent={products.length > 0}
-      searchInput={<SearchInput onSearchChange={setSearchQuery} initialValue={searchQuery} />}
+      searchInput={<SearchInput value={searchQuery} onChange={setSearchQuery} placeholder={t("searchPlaceholder")} />}
       loadingState={
         <div className="text-center text-sm text-muted-foreground py-8">
           {t("searching")}

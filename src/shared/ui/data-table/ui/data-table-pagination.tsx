@@ -27,17 +27,17 @@ export function DataTablePagination({
   showPageInfo = true,
 }: DataTablePaginationProps) {
   return (
-    <div className="flex items-center justify-between px-2">
+    <div className="flex flex-col gap-3 px-2 md:flex-row md:items-center md:justify-between">
       {showPageInfo && (
-        <div className="text-sm text-muted-foreground">
+        <div className="text-sm text-muted-foreground text-center md:text-left">
           Page {table.getState().pagination.pageIndex + 1} of{" "}
           {table.getPageCount()}
         </div>
       )}
 
-      <div className="flex items-center space-x-6 lg:space-x-8">
-        <div className="flex items-center space-x-2">
-          <p className="text-sm font-medium">Rows per page</p>
+      <div className="flex items-center justify-between gap-4 md:justify-end md:gap-6 lg:gap-8">
+        <div className="flex items-center gap-2">
+          <p className="hidden text-sm font-medium sm:block">Rows per page</p>
           <Select
             value={`${table.getState().pagination.pageSize}`}
             onValueChange={(value) => {

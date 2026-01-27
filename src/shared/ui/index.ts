@@ -28,3 +28,5 @@ export type {
   UseControlledDialogOptions,
   UseControlledDialogReturn,
 } from "./controlled-dialog";
+
+export { SearchInput } from "./search-input";

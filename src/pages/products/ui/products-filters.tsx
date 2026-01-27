@@ -1,9 +1,7 @@
 "use client";
 
-import {
-  DataTableToolbar,
-  DataTableSearch,
-} from "@/shared/ui/data-table";
+import { DataTableToolbar } from "@/shared/ui/data-table";
+import { SearchInput } from "@/shared/ui";
 import {
   Select,
   SelectContent,
@@ -39,13 +37,14 @@ export function ProductsFiltersToolbar({
 }: ProductsFiltersProps) {
   return (
     <DataTableToolbar>
-      <DataTableSearch
+      <SearchInput
         value={filters.search}
         onChange={(search) => onFiltersChange({ search })}
         placeholder={searchPlaceholder}
+        className="relative flex-1 md:max-w-sm"
       />
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 w-full md:w-auto">
         <Select
           value={filters.source}
           onValueChange={(value) =>
@@ -54,7 +53,7 @@ export function ProductsFiltersToolbar({
             })
           }
         >
-          <SelectTrigger className="w-[140px]">
+          <SelectTrigger className="w-full md:w-[140px]">
             <SelectValue placeholder="Source" />
           </SelectTrigger>
           <SelectContent>
@@ -77,7 +76,7 @@ export function ProductsFiltersToolbar({
             })
           }
         >
-          <SelectTrigger className="w-[140px]">
+          <SelectTrigger className="w-full md:w-[140px]">
             <SelectValue placeholder="Category" />
           </SelectTrigger>
           <SelectContent>
