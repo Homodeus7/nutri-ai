@@ -42,8 +42,8 @@ export function DataTable<TData>({
   }
 
   return (
-    <div className="space-y-4">
-      <div className="overflow-hidden rounded-md border">
+    <div className="min-w-0 space-y-4">
+      <div className="overflow-x-auto rounded-md border [scrollbar-width:thin]">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -54,7 +54,7 @@ export function DataTable<TData>({
                       ? null
                       : flexRender(
                           header.column.columnDef.header,
-                          header.getContext()
+                          header.getContext(),
                         )}
                   </TableHead>
                 ))}
@@ -83,7 +83,7 @@ export function DataTable<TData>({
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}

@@ -13,7 +13,7 @@ export function PrivateLayout({ children }: { children?: React.ReactNode }) {
       <div className="hidden xl:flex">
         <AppSidebar />
       </div>
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 min-w-0 flex flex-col">
         <AppHeader />
         <main className="grow bg-background text-foreground">
           <div className="px-4 py-6 xl:px-8 xl:py-12 pb-[calc(6.5rem+env(safe-area-inset-bottom,0px))] xl:pb-12">
