@@ -1,20 +1,16 @@
 import { useAuthStore } from "@/entities/auth";
 import { ROUTER_PATHS } from "@/shared/constants/routes";
-import { ComposeChildren, useEventCallback } from "@/shared/lib/react";
+import { useEventCallback } from "@/shared/lib/react";
 import { UiPageSpinner } from "@/shared/ui";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { useGetAuthMe } from "@/shared/api/generated/nutriAIFoodCalorieTrackerAPI";
 
-export const loadPrivateLoaderData = async () => {
-  return {};
-};
-
 export function PrivateLoader({
   children,
 }: {
   children?: React.ReactNode;
-  data?: Awaited<ReturnType<typeof loadPrivateLoaderData>>;
+  data?: Record<string, unknown>;
 }) {
   const router = useRouter();
   const hasHydrated = useAuthStore((s) => s._hasHydrated);
@@ -25,7 +21,11 @@ export function PrivateLoader({
   const routerReplace = useEventCallback(router.replace);
 
   // Validate token with API (only after hydration)
-  const { data: userData, error, isLoading } = useGetAuthMe({
+  const {
+    data: userData,
+    error,
+    isLoading,
+  } = useGetAuthMe({
     query: {
       enabled: hasHydrated && !!token,
       retry: false,
@@ -57,12 +57,21 @@ export function PrivateLoader({
     if (userData) {
       setUser(userData);
     }
-  }, [hasHydrated, token, isLoading, error, userData, clearAuth, setUser, routerReplace]);
+  }, [
+    hasHydrated,
+    token,
+    isLoading,
+    error,
+    userData,
+    clearAuth,
+    setUser,
+    routerReplace,
+  ]);
 
   // Show loader until token is validated
   if (!hasHydrated || isLoading || (!userData && !error)) {
     return <UiPageSpinner isLoading={true} />;
   }
 
-  return <ComposeChildren>{children}</ComposeChildren>;
+  return <>{children}</>;
 }

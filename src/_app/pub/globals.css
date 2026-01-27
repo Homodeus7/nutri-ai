@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "nprogress/nprogress.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -263,4 +264,13 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+#nprogress .bar {
+  background: var(--primary);
+}
+#nprogress .peg {
+  box-shadow:
+    0 0 10px var(--primary),
+    0 0 5px var(--primary);
 }

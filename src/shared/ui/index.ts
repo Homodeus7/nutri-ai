@@ -30,3 +30,5 @@ export type {
 } from "./controlled-dialog";
 
 export { SearchInput } from "./search-input";
+
+export { Skeleton } from "./primitives/skeleton";

@@ -1,15 +1,33 @@
 "use client";
 
+import dynamic from "next/dynamic";
+import { Skeleton } from "@/shared/ui";
 import { UiText } from "@/shared/ui/ui-text";
-import { CalorieRadialChart } from "@/widgets/calorie-radial-chart";
 import { DatePicker } from "@/widgets/date-picker";
-import { FoodDiary } from "@/widgets/food-diary";
 import { MacrosGrid } from "@/widgets/macros-grid";
-import { MacrosPieChart } from "@/widgets/macros-pie-chart";
 import { useGreeting } from "./model/use-greeting";
 import { useCalorieData } from "./model/use-calorie-data";
 import { useAuthStore } from "@/entities/auth";
 import { useConsumedMacros } from "@/features/day-data";
+
+const CalorieRadialChart = dynamic(
+  () =>
+    import("@/widgets/calorie-radial-chart").then(
+      (mod) => mod.CalorieRadialChart,
+    ),
+  { ssr: false, loading: () => <Skeleton className="h-[280px] w-full" /> },
+);
+
+const MacrosPieChart = dynamic(
+  () =>
+    import("@/widgets/macros-pie-chart").then((mod) => mod.MacrosPieChart),
+  { ssr: false, loading: () => <Skeleton className="h-[280px] w-full" /> },
+);
+
+const FoodDiary = dynamic(
+  () => import("@/widgets/food-diary").then((mod) => mod.FoodDiary),
+  { loading: () => <Skeleton className="h-[400px] w-full" /> },
+);
 
 export function DiaryPage() {
   const greeting = useGreeting();

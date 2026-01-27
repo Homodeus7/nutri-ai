@@ -1,9 +1,14 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
-import { NutriAiLogo } from "@/shared/ui";
+import { NutriAiLogo, Skeleton } from "@/shared/ui";
 import { ROUTER_PATHS } from "@/shared/constants/routes";
-import { AccountMenu } from "@/widgets/account-menu";
+
+const AccountMenu = dynamic(
+  () => import("@/widgets/account-menu").then((mod) => mod.AccountMenu),
+  { loading: () => <Skeleton className="h-9 w-9 rounded-full" /> },
+);
 
 export function AppHeader() {
   return (

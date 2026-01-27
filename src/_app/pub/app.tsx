@@ -7,6 +7,7 @@ import { AppLayout } from "../layouts/app-layout";
 import { NextPage } from "next";
 import { NextPageLayout } from "@/shared/lib/next";
 import { defaultSeoConfig } from "../config/seo.config";
+import { useNProgress } from "../lib/use-nprogress";
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: NextPageLayout;
@@ -18,6 +19,7 @@ type AppPropsWithLayout = AppProps & {
 
 export function App({ Component, pageProps }: AppPropsWithLayout) {
   const getLayout = Component.getLayout ?? ((page) => page);
+  useNProgress();
   return (
     <AppLoader data={pageProps}>
       <AppProvider>
