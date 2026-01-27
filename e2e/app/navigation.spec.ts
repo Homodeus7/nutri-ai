@@ -1,10 +1,9 @@
 import { expect, test } from "../fixtures";
 
 test.describe("App Navigation", () => {
-  test("should redirect from home to diary", async ({ page }) => {
+  test("should show diary page at root", async ({ page }) => {
     await page.goto("/");
-    // Based on CLAUDE.md: "/" redirects to "/diary"
-    await expect(page).toHaveURL("/diary");
+    await expect(page).toHaveURL("/");
   });
 
   test("should show 403 page for forbidden access", async ({ page }) => {

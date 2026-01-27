@@ -1,12 +1,12 @@
 export const ROUTER_PATHS = {
   SIGN_IN: "/sign-in",
   SIGN_UP: "/sign-up",
-  DIARY: "/diary",
+  DIARY: "/",
+  GOALS: "/goals",
   PRODUCTS: "/products",
   PRODUCT_DETAIL: "/products/[id]",
-  GOALS: "/goals",
-  BOOST: "/boost",
-  LUNCH: "/lunch",
+  // BOOST: "/boost",
+  // LUNCH: "/lunch",
   403: "/403",
 } as const;
 

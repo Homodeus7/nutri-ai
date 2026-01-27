@@ -15,7 +15,7 @@ test.describe("Accessibility", () => {
   test("diary page should not have accessibility violations", async ({
     page,
   }) => {
-    await page.goto("/diary");
+    await page.goto("/");
 
     const accessibilityScanResults = await new AxeBuilder({ page }).analyze();
 

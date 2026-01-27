@@ -32,7 +32,7 @@ test.describe("Sign In", () => {
   }) => {
     // Skip until API is mocked or test user is available
     await signIn(page, "test@example.com", "password123");
-    await expect(page).toHaveURL("/diary");
+    await expect(page).toHaveURL("/");
   });
 
   test.skip("should show error for invalid credentials", async ({ page }) => {

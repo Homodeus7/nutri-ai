@@ -16,12 +16,12 @@ export function ForbiddenPage() {
           <div className="h-12 w-px bg-white" />
 
           <UiText variant="small" align="center">
-            Доступ запрещён
+            Access denied
           </UiText>
         </div>
 
         <Button variant="outline" onClick={() => router.back()}>
-          Назад
+          Back
         </Button>
       </div>
     </div>

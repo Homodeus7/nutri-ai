@@ -8,7 +8,7 @@ Allow: /sign-in
 Allow: /sign-up
 
 # Disallow protected pages (require authentication)
-Disallow: /diary
+Disallow: /
 Disallow: /products
 Disallow: /goals
 Disallow: /boost
