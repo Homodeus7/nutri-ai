@@ -1,4 +1,4 @@
-import { Apple, LucideIcon, Notebook, Target } from "lucide-react";
+import { Apple, BookOpen, LucideIcon, Target } from "lucide-react";
 import { ROUTER_PATHS } from "./routes";
 
 export type NavItem = {
@@ -8,7 +8,7 @@ export type NavItem = {
 };
 
 export const NAV_ITEMS: NavItem[] = [
-  { key: "diary", href: ROUTER_PATHS.DIARY, icon: Notebook },
+  { key: "diary", href: ROUTER_PATHS.DIARY, icon: BookOpen },
   { key: "goals", href: ROUTER_PATHS.GOALS, icon: Target },
   { key: "products", href: ROUTER_PATHS.PRODUCTS, icon: Apple },
   // { key: "boost", href: ROUTER_PATHS.BOOST, icon: Zap },

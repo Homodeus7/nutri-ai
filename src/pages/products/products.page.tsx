@@ -69,13 +69,15 @@ export function ProductsPage() {
 
   return (
     <>
-      <div>
-        <UiText variant="h1" weight="bold">
-          {t("title")}
-        </UiText>
-        <UiText variant="muted" className="pt-4">
-          {t("description")}
-        </UiText>
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <UiText variant="h1" weight="bold">
+            {t("title")}
+          </UiText>
+          <UiText variant="muted" className="pt-2">
+            {t("description")}
+          </UiText>
+        </div>
       </div>
 
       <ProductsFiltersToolbar
