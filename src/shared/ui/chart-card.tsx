@@ -39,6 +39,7 @@ export interface ChartCardLayoutProps {
   data: React.ReactNode;
   dataClassName?: string;
   className?: string;
+  variant?: "side" | "bottom";
 }
 
 export function ChartCardLayout({
@@ -47,7 +48,19 @@ export function ChartCardLayout({
   data,
   dataClassName,
   className,
+  variant = "side",
 }: ChartCardLayoutProps) {
+  if (variant === "bottom") {
+    return (
+      <div className={cn("flex flex-col", className)}>
+        <div className={cn("mx-auto", chartClassName)}>{chart}</div>
+        <div className={cn("grid grid-cols-3 gap-2 mt-4", dataClassName)}>
+          {data}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       className={cn("flex gap-8 items-center md:items-start", className)}

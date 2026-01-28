@@ -29,7 +29,12 @@ const chartConfig = {
 
 const KCAL_PER_GRAM = { protein: 4, fat: 9, carbs: 4 } as const;
 
-export function MacrosPieChart({ protein, fat, carbs }: MacrosPieChartProps) {
+export function MacrosPieChart({
+  protein,
+  fat,
+  carbs,
+  variant = "side",
+}: MacrosPieChartProps) {
   const { t } = useI18n();
   const isMobile = useIsMobile();
   const dimensions = getChartDimensions(isMobile);
@@ -41,8 +46,6 @@ export function MacrosPieChart({ protein, fat, carbs }: MacrosPieChartProps) {
   const totalKcal = proteinKcal + fatKcal + carbsKcal;
 
   const chartData: ChartDataItem[] = useMemo(() => {
-    // Use calories for chart proportions, keep grams for tooltip
-    // When no data, show equal placeholder segments
     if (totalKcal === 0) {
       return [
         { name: "protein", value: 1, grams: 0, fill: "var(--color-protein)" },
@@ -82,51 +85,88 @@ export function MacrosPieChart({ protein, fat, carbs }: MacrosPieChartProps) {
     };
   }, [proteinKcal, fatKcal, carbsKcal, totalKcal]);
 
-  const dataItems = [
+  const macroItems = [
     {
       label: t("protein"),
-      value: `${percentages.protein}%`,
+      grams: protein,
+      percent: percentages.protein,
+      color: "var(--chart-5)",
     },
     {
       label: t("fat"),
-      value: `${percentages.fat}%`,
+      grams: fat,
+      percent: percentages.fat,
+      color: "var(--chart-3)",
     },
     {
       label: t("carbs"),
-      value: `${percentages.carbs}%`,
+      grams: carbs,
+      percent: percentages.carbs,
+      color: "var(--chart-2)",
     },
   ];
+
+  const chartNode = (
+    <ChartContainer config={chartConfig} className="w-full h-full">
+      <PieChart>
+        <Pie
+          data={chartData}
+          cx="50%"
+          cy="50%"
+          innerRadius={dimensions.innerRadius}
+          outerRadius={dimensions.outerRadius}
+          dataKey="value"
+          nameKey="name"
+        />
+        <Tooltip
+          formatter={(_, name: string, props) => [
+            `${props.payload.grams}g`,
+            t(name as "protein" | "fat" | "carbs"),
+          ]}
+        />
+      </PieChart>
+    </ChartContainer>
+  );
 
   return (
     <ChartCard title={t("title")}>
       <ChartCardLayout
+        variant={variant}
         className="md:gap-4"
         chartClassName="w-[180px] h-[180px] md:w-[230px] md:h-[230px]"
         dataClassName="w-full md:w-auto"
-        chart={
-          <ChartContainer config={chartConfig} className="w-full h-full">
-            <PieChart>
-              <Pie
-                data={chartData}
-                cx="50%"
-                cy="50%"
-                innerRadius={dimensions.innerRadius}
-                outerRadius={dimensions.outerRadius}
-                dataKey="value"
-                nameKey="name"
-              />
-              <Tooltip
-                formatter={(_, name: string, props) => [
-                  `${props.payload.grams}g`,
-                  t(name as "protein" | "fat" | "carbs"),
-                ]}
-              />
-            </PieChart>
-          </ChartContainer>
+        chart={chartNode}
+        data={
+          variant === "bottom"
+            ? macroItems.map((item) => (
+                <div
+                  key={item.label}
+                  className="bg-muted/50 rounded-xl p-3 text-center border border-border/50"
+                >
+                  <div
+                    className="w-2 h-2 rounded-full mx-auto mb-2"
+                    style={{ backgroundColor: item.color }}
+                  />
+                  <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
+                    {item.label}
+                  </div>
+                  <div className="font-bold text-lg">
+                    {item.grams}
+                    {t("grams")}
+                  </div>
+                  <div className="text-[10px] text-muted-foreground font-mono">
+                    {item.percent}%
+                  </div>
+                </div>
+              ))
+            : macroItems.map((item) => (
+                <DataItem
+                  key={item.label}
+                  label={item.label}
+                  value={`${item.percent}%`}
+                />
+              ))
         }
-        data={dataItems.map((item) => (
-          <DataItem key={item.label} {...item} />
-        ))}
       />
     </ChartCard>
   );

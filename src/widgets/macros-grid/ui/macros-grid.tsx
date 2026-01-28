@@ -1,8 +1,7 @@
 "use client";
 
-import { useMemo } from "react";
 import { MetricProgressCard } from "@/shared/ui/metric-card";
-import { useAuthStore } from "@/entities/auth";
+import { useGetUserGoals } from "@/shared/api/generated/nutriAIFoodCalorieTrackerAPI";
 import {
   calculateGrams,
   DEFAULT_DAILY_KCAL,
@@ -21,16 +20,20 @@ export interface MacrosGridProps {
 
 export function MacrosGrid({ protein, fat, carbs, fiber }: MacrosGridProps) {
   const { t } = useI18n();
-  const user = useAuthStore((state) => state.user);
+  const { data: userGoals } = useGetUserGoals();
 
-  const goals = useMemo(() => {
-    const dailyKcal = user?.dailyKcalGoal ?? DEFAULT_DAILY_KCAL;
-    const proteinPct = user?.proteinPct ?? DEFAULT_PRESET.proteinPct;
-    const fatPct = user?.fatPct ?? DEFAULT_PRESET.fatPct;
-    const carbsPct = user?.carbsPct ?? DEFAULT_PRESET.carbsPct;
+  const fallbackGrams = calculateGrams(
+    DEFAULT_DAILY_KCAL,
+    DEFAULT_PRESET.proteinPct,
+    DEFAULT_PRESET.fatPct,
+    DEFAULT_PRESET.carbsPct,
+  );
 
-    return calculateGrams(dailyKcal, proteinPct, fatPct, carbsPct);
-  }, [user]);
+  const goals = {
+    proteinGrams: userGoals?.proteinGrams ?? fallbackGrams.proteinGrams,
+    fatGrams: userGoals?.fatGrams ?? fallbackGrams.fatGrams,
+    carbsGrams: userGoals?.carbsGrams ?? fallbackGrams.carbsGrams,
+  };
 
   const macros = [
     { key: "protein", value: protein, total: goals.proteinGrams },

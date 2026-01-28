@@ -21,4 +21,8 @@ export const useI18n = createI18nModule({
     en: "No data",
     ru: "Нет данных",
   },
+  grams: {
+    en: "g",
+    ru: "г",
+  },
 } as const);

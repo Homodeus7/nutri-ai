@@ -18,10 +18,6 @@ export const useI18n = createI18nModule({
     en: "Carbs",
     ru: "Углеводы",
   },
-  presetLabel: {
-    en: "Preset",
-    ru: "Шаблон",
-  },
 
   // Presets
   balanced: {
@@ -50,16 +46,8 @@ export const useI18n = createI18nModule({
     en: "g",
     ru: "г",
   },
-  calculatedGrams: {
-    en: "Calculated amount",
-    ru: "Рассчитанное количество",
-  },
 
   // Validation
-  sumLabel: {
-    en: "Total",
-    ru: "Сумма",
-  },
   sumError: {
     en: "Sum of percentages must equal 100%",
     ru: "Сумма процентов должна равняться 100%",
@@ -89,11 +77,7 @@ export const useI18n = createI18nModule({
     ru: "Максимум 80%",
   },
 
-  // Buttons & Messages
-  submitButton: {
-    en: "Save Goals",
-    ru: "Сохранить цели",
-  },
+  // Messages
   successMessage: {
     en: "Goals saved successfully!",
     ru: "Цели успешно сохранены!",
@@ -102,8 +86,26 @@ export const useI18n = createI18nModule({
     en: "Failed to save goals",
     ru: "Не удалось сохранить цели",
   },
-  loadingMessage: {
-    en: "Loading goals...",
-    ru: "Загрузка целей...",
+
+  // Card titles
+  macroRatioTitle: {
+    en: "Macro Distribution",
+    ru: "Распределение макросов",
+  },
+  calorieTargetTitle: {
+    en: "Daily Calorie Target",
+    ru: "Суточная цель калорий",
+  },
+  kcalSuffix: {
+    en: "kcal",
+    ru: "ккал",
+  },
+  validationValid: {
+    en: "Perfectly balanced (100%)",
+    ru: "Идеально сбалансировано (100%)",
+  },
+  validationInvalid: {
+    en: "Total is {sum}%. Adjust to equal 100%.",
+    ru: "Сумма {sum}%. Измените, чтобы было 100%.",
   },
 } as const);
