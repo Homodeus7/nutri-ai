@@ -1,11 +1,11 @@
 "use client";
 
 import { MetricProgressCard } from "@/shared/ui/metric-card";
-import { useGetUserGoals } from "@/shared/api/generated/nutriAIFoodCalorieTrackerAPI";
 import {
   calculateGrams,
   DEFAULT_DAILY_KCAL,
   DEFAULT_PRESET,
+  useGoals,
 } from "@/features/goals";
 import { useI18n } from "../i18n";
 
@@ -20,7 +20,7 @@ export interface MacrosGridProps {
 
 export function MacrosGrid({ protein, fat, carbs, fiber }: MacrosGridProps) {
   const { t } = useI18n();
-  const { data: userGoals } = useGetUserGoals();
+  const { data: userGoals } = useGoals();
 
   const fallbackGrams = calculateGrams(
     DEFAULT_DAILY_KCAL,
