@@ -54,7 +54,7 @@ export function CalorieRadialChart({
     },
     {
       label: t("percentOfGoal"),
-      value: `${metrics.percentage}%`,
+      value: `${metrics.percentage} %`,
       isWarning: metrics.percentage > 100,
     },
     {

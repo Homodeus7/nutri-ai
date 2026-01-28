@@ -15,7 +15,7 @@ export function DataItem({ label, value, isWarning, color }: DataItemProps) {
       </div>
       <div
         className={cn(
-          "text-lg md:text-xl font-bold flex gap-2 items-center",
+          "text-lg md:text-xl font-bold flex gap-2 items-center whitespace-nowrap",
           isWarning && "text-destructive",
           color && "md:text-base",
         )}
