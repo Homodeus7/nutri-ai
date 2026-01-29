@@ -1,0 +1,34 @@
+node_modules
+.next
+.git
+.gitignore
+
+# Тесты и документация
+docs
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+**/*.stories.tsx
+playwright-report
+test-results
+coverage
+
+# Storybook
+.storybook
+
+# IDE и системные файлы
+.vscode
+.idea
+*.swp
+*.swo
+.DS_Store
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Env-файлы (передаются через compose)
+.env
+.env.*

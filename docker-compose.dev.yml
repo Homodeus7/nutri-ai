@@ -1,0 +1,24 @@
+services:
+  app-dev:
+    image: node:22-alpine
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./src:/app/src
+      - ./pages:/app/pages
+      - ./public:/app/public
+      - ./package.json:/app/package.json
+      - ./package-lock.json:/app/package-lock.json
+      - ./next.config.ts:/app/next.config.ts
+      - ./tsconfig.json:/app/tsconfig.json
+      - ./postcss.config.mjs:/app/postcss.config.mjs
+      - node_modules:/app/node_modules
+    command: sh -c "npm install && npm run dev"
+
+volumes:
+  node_modules:

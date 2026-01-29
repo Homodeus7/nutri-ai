@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   reactStrictMode: true,
   // Using Pages Router (/pages directory)
   // Note: /src/app is FSD infrastructure layer, not App Router
