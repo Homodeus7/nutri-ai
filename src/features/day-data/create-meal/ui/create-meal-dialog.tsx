@@ -30,6 +30,7 @@ export function CreateMealDialog({
     handleAddProducts,
     handleCreateProduct,
     isPending,
+    createProductName,
   } = useCreateMealDialog({ date, mealType });
 
   const dialogTitle =
@@ -59,6 +60,7 @@ export function CreateMealDialog({
             onBack={switchToSearch}
             onCreate={handleCreateProduct}
             backButtonLabel={t("backToSearch")}
+            initialName={createProductName}
           />
         ) : (
           <TabsView

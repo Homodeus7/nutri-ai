@@ -55,13 +55,13 @@ export function TabsView({
 
   return (
     <Tabs defaultValue="ai" className="w-full flex-1 min-h-0">
-      <TabsList className="grid w-full grid-cols-3">
+      <TabsList className="grid w-full grid-cols-2">
         <TabsTrigger value="ai" className="gap-1.5">
           <Sparkle className="size-4" />
           {t("aiTab")}
         </TabsTrigger>
         <TabsTrigger value="search">{searchTabLabel}</TabsTrigger>
-        <TabsTrigger value="recent">{recentTabLabel}</TabsTrigger>
+        {/* <TabsTrigger value="recent">{recentTabLabel}</TabsTrigger> */}
       </TabsList>
       <TabsContent value="ai" className="flex-1 flex flex-col min-h-0">
         <AiInputTab
@@ -74,15 +74,15 @@ export function TabsView({
       <TabsContent value="search" className="flex-1 flex flex-col min-h-0">
         <SearchProductsTab
           onAddProducts={onAddProducts}
-          onShowCreateForm={onSwitchToCreate}
+          onShowCreateForm={() => onSwitchToCreate(searchQuery)}
           isPending={isPending}
           searchQuery={searchQuery}
           onSearchQueryChange={setSearchQuery}
         />
       </TabsContent>
-      <TabsContent value="recent" className="flex-1 flex flex-col min-h-0">
+      {/* <TabsContent value="recent" className="flex-1 flex flex-col min-h-0">
         <RecentProductsTab />
-      </TabsContent>
+      </TabsContent> */}
     </Tabs>
   );
 }

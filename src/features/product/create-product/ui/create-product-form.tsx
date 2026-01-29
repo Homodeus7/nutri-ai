@@ -27,9 +27,10 @@ export interface ProductItemData {
 
 export interface CreateProductFormProps {
   onSuccess?: (productItemData: ProductItemData) => void;
+  initialName?: string;
 }
 
-export function CreateProductForm({ onSuccess }: CreateProductFormProps) {
+export function CreateProductForm({ onSuccess, initialName }: CreateProductFormProps) {
   const { t } = useI18n();
 
   // Zod schema with i18n translations
@@ -77,7 +78,7 @@ export function CreateProductForm({ onSuccess }: CreateProductFormProps) {
   const form = useForm<CreateProductFormData>({
     resolver: zodResolver(createProductSchema),
     defaultValues: {
-      name: "",
+      name: initialName ?? "",
       kcalPer100g: 0,
       proteinPer100g: "",
       fatPer100g: "",

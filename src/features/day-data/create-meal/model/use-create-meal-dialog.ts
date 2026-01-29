@@ -20,6 +20,7 @@ export function useCreateMealDialog({
   onSuccess,
 }: UseCreateMealDialogOptions) {
   const [mode, setMode] = useState<CreateMealMode>("search");
+  const [createProductName, setCreateProductName] = useState("");
 
   const { data: dayData } = useDayData({ date });
   const { clear, getAll } = useSelectedProducts();
@@ -60,7 +61,8 @@ export function useCreateMealDialog({
     setMode(newMode);
   }, []);
 
-  const switchToCreate = useCallback(() => {
+  const switchToCreate = useCallback((initialName?: string) => {
+    setCreateProductName(initialName ?? "");
     switchMode("create");
   }, [switchMode]);
 
@@ -125,5 +127,6 @@ export function useCreateMealDialog({
     handleCreateProduct,
     isPending,
     existingMeal,
+    createProductName,
   };
 }

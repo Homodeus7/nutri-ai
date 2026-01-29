@@ -10,12 +10,14 @@ interface CreateViewProps {
   onBack: () => void;
   onCreate: (data: ProductItemData) => void;
   backButtonLabel: string;
+  initialName?: string;
 }
 
 export function CreateView({
   onBack,
   onCreate,
   backButtonLabel,
+  initialName,
 }: CreateViewProps) {
   return (
     <div className="flex h-full min-h-0 w-full flex-1 flex-col">
@@ -25,7 +27,7 @@ export function CreateView({
         </Button>
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto [scrollbar-width:thin]">
-        <CreateProductForm onSuccess={onCreate} />
+        <CreateProductForm onSuccess={onCreate} initialName={initialName} />
       </div>
     </div>
   );

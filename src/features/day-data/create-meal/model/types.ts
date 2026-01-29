@@ -38,5 +38,5 @@ export interface CreateMealDialogProps {
  */
 export interface ProductSelectionHandlers {
   onProductsSelect: (products: Product[]) => void;
-  onSwitchToCreate: () => void;
+  onSwitchToCreate: (initialName?: string) => void;
 }
