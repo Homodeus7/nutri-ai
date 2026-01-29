@@ -1,4 +1,5 @@
 import { useAuthStore } from "@/entities/auth";
+import { useSyncPreferences } from "@/features/preferences";
 import { ROUTER_PATHS } from "@/shared/constants/routes";
 import { useEventCallback } from "@/shared/lib/react";
 import { UiPageSpinner } from "@/shared/ui";
@@ -19,6 +20,9 @@ export function PrivateLoader({
   const setUser = useAuthStore((s) => s.setUser);
 
   const routerReplace = useEventCallback(router.replace);
+
+  // Sync UI preferences from server
+  useSyncPreferences();
 
   // Validate token with API (only after hydration)
   const {

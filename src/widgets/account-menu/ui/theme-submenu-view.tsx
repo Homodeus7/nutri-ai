@@ -6,10 +6,9 @@ import {
   DropdownMenuSeparator,
 } from "@/shared/ui/primitives/dropdown-menu";
 import { UiText } from "@/shared/ui/ui-text";
+import type { Theme } from "@/features/theme";
 import { useI18n } from "../i18n";
 import { SubmenuHeader } from "./submenu-header";
-
-type Theme = "system" | "dark" | "light";
 
 interface ThemeSubmenuViewProps {
   currentTheme: Theme;

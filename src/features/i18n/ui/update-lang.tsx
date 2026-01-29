@@ -1,27 +1,28 @@
 "use client";
 
-import { Lang, useLang } from "../model/lang.store";
+import { type LangPreference, useLang } from "../model/lang.store";
 import { UiSelect } from "@/shared/ui";
 import { useEffect } from "react";
 
 type LangOption = {
-  id: Lang;
+  id: LangPreference;
   label: string;
 };
 
 const langOptions: LangOption[] = [
+  { id: "system", label: "Auto" },
   { id: "en", label: "En" },
   { id: "ru", label: "Ru" },
 ];
 
 export function UpdateLang({ className }: { className?: string }) {
-  const { lang, setLang, loadLang } = useLang();
+  const { langPreference, setLang, loadLang } = useLang();
 
   useEffect(() => {
     loadLang();
   }, [loadLang]);
 
-  const langOption = langOptions.find((option) => option.id === lang);
+  const langOption = langOptions.find((option) => option.id === langPreference);
   const onChangeLang = (lang: LangOption) => {
     setLang(lang.id);
   };

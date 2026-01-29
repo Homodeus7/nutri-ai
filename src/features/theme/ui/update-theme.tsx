@@ -3,9 +3,10 @@
 import { useTheme } from "next-themes";
 import { UiSelect } from "@/shared/ui";
 import { useEffect, useState } from "react";
+import type { Theme } from "../model/types";
 
 type ThemeOption = {
-  id: "light" | "dark" | "system";
+  id: Theme;
   label: string;
 };
 

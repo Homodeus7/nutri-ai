@@ -615,6 +615,86 @@ export interface UpdateNutritionGoalsRequest {
   carbsPct: number;
 }
 
+export type UserPreferencesTheme =
+  (typeof UserPreferencesTheme)[keyof typeof UserPreferencesTheme];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UserPreferencesTheme = {
+  light: "light",
+  dark: "dark",
+  system: "system",
+} as const;
+
+export type UserPreferencesColorTheme =
+  (typeof UserPreferencesColorTheme)[keyof typeof UserPreferencesColorTheme];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UserPreferencesColorTheme = {
+  orange: "orange",
+  blue: "blue",
+  green: "green",
+  red: "red",
+  purple: "purple",
+  pink: "pink",
+  yellow: "yellow",
+} as const;
+
+export type UserPreferencesLang =
+  (typeof UserPreferencesLang)[keyof typeof UserPreferencesLang];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UserPreferencesLang = {
+  system: "system",
+  ru: "ru",
+  en: "en",
+} as const;
+
+export interface UserPreferences {
+  theme?: UserPreferencesTheme;
+  colorTheme?: UserPreferencesColorTheme;
+  lang?: UserPreferencesLang;
+}
+
+export type UpdateUserPreferencesRequestTheme =
+  (typeof UpdateUserPreferencesRequestTheme)[keyof typeof UpdateUserPreferencesRequestTheme];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateUserPreferencesRequestTheme = {
+  light: "light",
+  dark: "dark",
+  system: "system",
+} as const;
+
+export type UpdateUserPreferencesRequestColorTheme =
+  (typeof UpdateUserPreferencesRequestColorTheme)[keyof typeof UpdateUserPreferencesRequestColorTheme];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateUserPreferencesRequestColorTheme = {
+  orange: "orange",
+  blue: "blue",
+  green: "green",
+  red: "red",
+  purple: "purple",
+  pink: "pink",
+  yellow: "yellow",
+} as const;
+
+export type UpdateUserPreferencesRequestLang =
+  (typeof UpdateUserPreferencesRequestLang)[keyof typeof UpdateUserPreferencesRequestLang];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateUserPreferencesRequestLang = {
+  system: "system",
+  ru: "ru",
+  en: "en",
+} as const;
+
+export interface UpdateUserPreferencesRequest {
+  theme?: UpdateUserPreferencesRequestTheme;
+  colorTheme?: UpdateUserPreferencesRequestColorTheme;
+  lang?: UpdateUserPreferencesRequestLang;
+}
+
 export type ErrorDetails = { [key: string]: unknown };
 
 export interface Error {
@@ -818,6 +898,27 @@ export const putUserGoals = <TData = AxiosResponse<NutritionGoals>>(
   options?: AxiosRequestConfig,
 ): Promise<TData> => {
   return axios.put(`/user/goals`, updateNutritionGoalsRequest, options);
+};
+
+/**
+ * Возвращает текущие UI-настройки (тема, цветовая тема, язык)
+ * @summary Получить UI-настройки пользователя
+ */
+export const getUserPreferences = <TData = AxiosResponse<UserPreferences>>(
+  options?: AxiosRequestConfig,
+): Promise<TData> => {
+  return axios.get(`/user/preferences`, options);
+};
+
+/**
+ * Обновляет UI-настройки пользователя (тема, цветовая тема, язык). Все поля опциональны — обновляются только переданные.
+ * @summary Обновить UI-настройки пользователя
+ */
+export const putUserPreferences = <TData = AxiosResponse<UserPreferences>>(
+  updateUserPreferencesRequest: UpdateUserPreferencesRequest,
+  options?: AxiosRequestConfig,
+): Promise<TData> => {
+  return axios.put(`/user/preferences`, updateUserPreferencesRequest, options);
 };
 
 /**
@@ -1146,6 +1247,8 @@ export type PostAuthGoogleResult = AxiosResponse<AuthResponse>;
 export type GetAuthMeResult = AxiosResponse<User>;
 export type GetUserGoalsResult = AxiosResponse<NutritionGoals>;
 export type PutUserGoalsResult = AxiosResponse<NutritionGoals>;
+export type GetUserPreferencesResult = AxiosResponse<UserPreferences>;
+export type PutUserPreferencesResult = AxiosResponse<UserPreferences>;
 export type GetCalendarResult = AxiosResponse<GetCalendar200>;
 export type GetDayDateResult = AxiosResponse<DayEntry>;
 export type PostDayDateMealsResult = AxiosResponse<Meal>;

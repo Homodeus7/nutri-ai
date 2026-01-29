@@ -38,6 +38,10 @@ export const useI18n = createI18nModule({
     en: "Language",
     ru: "Язык",
   },
+  langSystem: {
+    en: "Use device language",
+    ru: "Как на устройстве",
+  },
   langEn: {
     en: "English",
     ru: "English",

@@ -5,18 +5,10 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
 } from "@/shared/ui/primitives/dropdown-menu";
+import type { ColorTheme } from "@/features/theme";
 import { useI18n } from "../i18n";
 import { SubmenuHeader } from "./submenu-header";
 import { ColorDot } from "./color-dot";
-
-type ColorTheme =
-  | "orange"
-  | "blue"
-  | "green"
-  | "red"
-  | "purple"
-  | "pink"
-  | "yellow";
 
 interface ColorThemeSubmenuViewProps {
   currentColorTheme: ColorTheme | null;

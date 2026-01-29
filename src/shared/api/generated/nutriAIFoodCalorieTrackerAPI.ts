@@ -635,6 +635,86 @@ export interface UpdateNutritionGoalsRequest {
   carbsPct: number;
 }
 
+export type UserPreferencesTheme =
+  (typeof UserPreferencesTheme)[keyof typeof UserPreferencesTheme];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UserPreferencesTheme = {
+  light: "light",
+  dark: "dark",
+  system: "system",
+} as const;
+
+export type UserPreferencesColorTheme =
+  (typeof UserPreferencesColorTheme)[keyof typeof UserPreferencesColorTheme];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UserPreferencesColorTheme = {
+  orange: "orange",
+  blue: "blue",
+  green: "green",
+  red: "red",
+  purple: "purple",
+  pink: "pink",
+  yellow: "yellow",
+} as const;
+
+export type UserPreferencesLang =
+  (typeof UserPreferencesLang)[keyof typeof UserPreferencesLang];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UserPreferencesLang = {
+  system: "system",
+  ru: "ru",
+  en: "en",
+} as const;
+
+export interface UserPreferences {
+  theme?: UserPreferencesTheme;
+  colorTheme?: UserPreferencesColorTheme;
+  lang?: UserPreferencesLang;
+}
+
+export type UpdateUserPreferencesRequestTheme =
+  (typeof UpdateUserPreferencesRequestTheme)[keyof typeof UpdateUserPreferencesRequestTheme];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateUserPreferencesRequestTheme = {
+  light: "light",
+  dark: "dark",
+  system: "system",
+} as const;
+
+export type UpdateUserPreferencesRequestColorTheme =
+  (typeof UpdateUserPreferencesRequestColorTheme)[keyof typeof UpdateUserPreferencesRequestColorTheme];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateUserPreferencesRequestColorTheme = {
+  orange: "orange",
+  blue: "blue",
+  green: "green",
+  red: "red",
+  purple: "purple",
+  pink: "pink",
+  yellow: "yellow",
+} as const;
+
+export type UpdateUserPreferencesRequestLang =
+  (typeof UpdateUserPreferencesRequestLang)[keyof typeof UpdateUserPreferencesRequestLang];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateUserPreferencesRequestLang = {
+  system: "system",
+  ru: "ru",
+  en: "en",
+} as const;
+
+export interface UpdateUserPreferencesRequest {
+  theme?: UpdateUserPreferencesRequestTheme;
+  colorTheme?: UpdateUserPreferencesRequestColorTheme;
+  lang?: UpdateUserPreferencesRequestLang;
+}
+
 export type ErrorDetails = { [key: string]: unknown };
 
 export interface Error {
@@ -1413,6 +1493,255 @@ export const usePutUserGoals = <
   TContext
 > => {
   const mutationOptions = getPutUserGoalsMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Возвращает текущие UI-настройки (тема, цветовая тема, язык)
+ * @summary Получить UI-настройки пользователя
+ */
+export const getUserPreferences = (
+  options?: SecondParameter<typeof createInstance>,
+  signal?: AbortSignal,
+) => {
+  return createInstance<UserPreferences>(
+    { url: `/user/preferences`, method: "GET", signal },
+    options,
+  );
+};
+
+export const getGetUserPreferencesQueryKey = () => {
+  return [`/user/preferences`] as const;
+};
+
+export const getGetUserPreferencesQueryOptions = <
+  TData = Awaited<ReturnType<typeof getUserPreferences>>,
+  TError = ErrorType<UnauthorizedResponse>,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getUserPreferences>>,
+      TError,
+      TData
+    >
+  >;
+  request?: SecondParameter<typeof createInstance>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetUserPreferencesQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getUserPreferences>>
+  > = ({ signal }) => getUserPreferences(requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getUserPreferences>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetUserPreferencesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getUserPreferences>>
+>;
+export type GetUserPreferencesQueryError = ErrorType<UnauthorizedResponse>;
+
+export function useGetUserPreferences<
+  TData = Awaited<ReturnType<typeof getUserPreferences>>,
+  TError = ErrorType<UnauthorizedResponse>,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getUserPreferences>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getUserPreferences>>,
+          TError,
+          Awaited<ReturnType<typeof getUserPreferences>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetUserPreferences<
+  TData = Awaited<ReturnType<typeof getUserPreferences>>,
+  TError = ErrorType<UnauthorizedResponse>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getUserPreferences>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getUserPreferences>>,
+          TError,
+          Awaited<ReturnType<typeof getUserPreferences>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetUserPreferences<
+  TData = Awaited<ReturnType<typeof getUserPreferences>>,
+  TError = ErrorType<UnauthorizedResponse>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getUserPreferences>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Получить UI-настройки пользователя
+ */
+
+export function useGetUserPreferences<
+  TData = Awaited<ReturnType<typeof getUserPreferences>>,
+  TError = ErrorType<UnauthorizedResponse>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getUserPreferences>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetUserPreferencesQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * Обновляет UI-настройки пользователя (тема, цветовая тема, язык). Все поля опциональны — обновляются только переданные.
+ * @summary Обновить UI-настройки пользователя
+ */
+export const putUserPreferences = (
+  updateUserPreferencesRequest: BodyType<UpdateUserPreferencesRequest>,
+  options?: SecondParameter<typeof createInstance>,
+) => {
+  return createInstance<UserPreferences>(
+    {
+      url: `/user/preferences`,
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      data: updateUserPreferencesRequest,
+    },
+    options,
+  );
+};
+
+export const getPutUserPreferencesMutationOptions = <
+  TError = ErrorType<BadRequestResponse | UnauthorizedResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof putUserPreferences>>,
+    TError,
+    { data: BodyType<UpdateUserPreferencesRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof createInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof putUserPreferences>>,
+  TError,
+  { data: BodyType<UpdateUserPreferencesRequest> },
+  TContext
+> => {
+  const mutationKey = ["putUserPreferences"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof putUserPreferences>>,
+    { data: BodyType<UpdateUserPreferencesRequest> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return putUserPreferences(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PutUserPreferencesMutationResult = NonNullable<
+  Awaited<ReturnType<typeof putUserPreferences>>
+>;
+export type PutUserPreferencesMutationBody =
+  BodyType<UpdateUserPreferencesRequest>;
+export type PutUserPreferencesMutationError = ErrorType<
+  BadRequestResponse | UnauthorizedResponse
+>;
+
+/**
+ * @summary Обновить UI-настройки пользователя
+ */
+export const usePutUserPreferences = <
+  TError = ErrorType<BadRequestResponse | UnauthorizedResponse>,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof putUserPreferences>>,
+      TError,
+      { data: BodyType<UpdateUserPreferencesRequest> },
+      TContext
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof putUserPreferences>>,
+  TError,
+  { data: BodyType<UpdateUserPreferencesRequest> },
+  TContext
+> => {
+  const mutationOptions = getPutUserPreferencesMutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };
@@ -4928,6 +5257,58 @@ export const getPutUserGoalsResponseMock = (
   ...overrideResponse,
 });
 
+export const getGetUserPreferencesResponseMock = (
+  overrideResponse: Partial<UserPreferences> = {},
+): UserPreferences => ({
+  theme: faker.helpers.arrayElement([
+    faker.helpers.arrayElement(["light", "dark", "system"] as const),
+    undefined,
+  ]),
+  colorTheme: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      "orange",
+      "blue",
+      "green",
+      "red",
+      "purple",
+      "pink",
+      "yellow",
+    ] as const),
+    undefined,
+  ]),
+  lang: faker.helpers.arrayElement([
+    faker.helpers.arrayElement(["system", "ru", "en"] as const),
+    undefined,
+  ]),
+  ...overrideResponse,
+});
+
+export const getPutUserPreferencesResponseMock = (
+  overrideResponse: Partial<UserPreferences> = {},
+): UserPreferences => ({
+  theme: faker.helpers.arrayElement([
+    faker.helpers.arrayElement(["light", "dark", "system"] as const),
+    undefined,
+  ]),
+  colorTheme: faker.helpers.arrayElement([
+    faker.helpers.arrayElement([
+      "orange",
+      "blue",
+      "green",
+      "red",
+      "purple",
+      "pink",
+      "yellow",
+    ] as const),
+    undefined,
+  ]),
+  lang: faker.helpers.arrayElement([
+    faker.helpers.arrayElement(["system", "ru", "en"] as const),
+    undefined,
+  ]),
+  ...overrideResponse,
+});
+
 export const getGetCalendarResponseMock = (
   overrideResponse: Partial<GetCalendar200> = {},
 ): GetCalendar200 => ({
@@ -7742,6 +8123,62 @@ export const getPutUserGoalsMockHandler = (
   );
 };
 
+export const getGetUserPreferencesMockHandler = (
+  overrideResponse?:
+    | UserPreferences
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) => Promise<UserPreferences> | UserPreferences),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    "*/user/preferences",
+    async (info) => {
+      await delay(1000);
+
+      return new HttpResponse(
+        JSON.stringify(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === "function"
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getGetUserPreferencesResponseMock(),
+        ),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      );
+    },
+    options,
+  );
+};
+
+export const getPutUserPreferencesMockHandler = (
+  overrideResponse?:
+    | UserPreferences
+    | ((
+        info: Parameters<Parameters<typeof http.put>[1]>[0],
+      ) => Promise<UserPreferences> | UserPreferences),
+  options?: RequestHandlerOptions,
+) => {
+  return http.put(
+    "*/user/preferences",
+    async (info) => {
+      await delay(1000);
+
+      return new HttpResponse(
+        JSON.stringify(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === "function"
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getPutUserPreferencesResponseMock(),
+        ),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      );
+    },
+    options,
+  );
+};
+
 export const getGetCalendarMockHandler = (
   overrideResponse?:
     | GetCalendar200
@@ -8511,6 +8948,8 @@ export const getNutriAIFoodCalorieTrackerAPIMock = () => [
   getGetAuthMeMockHandler(),
   getGetUserGoalsMockHandler(),
   getPutUserGoalsMockHandler(),
+  getGetUserPreferencesMockHandler(),
+  getPutUserPreferencesMockHandler(),
   getGetCalendarMockHandler(),
   getGetDayDateMockHandler(),
   getPostDayDateMealsMockHandler(),

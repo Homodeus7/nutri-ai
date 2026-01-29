@@ -4,42 +4,47 @@ import { useCallback } from "react";
 import { useTheme } from "next-themes";
 import { useLogout } from "@/features/auth";
 import { useLang } from "@/features/i18n";
-import { useColorTheme, type ColorTheme } from "@/features/theme";
+import { useUpdatePreferences } from "@/features/preferences";
+import { useColorTheme, type ColorTheme, type Theme } from "@/features/theme";
+import { type LangPreference } from "@/features/i18n";
 import { useMenuState } from "./use-menu-state";
 import { useUserDisplay } from "./use-user-display";
-import type { Theme, Lang } from "./types";
 
 export function useAccountMenu() {
   const menuState = useMenuState();
   const userDisplay = useUserDisplay();
 
   const { theme, setTheme } = useTheme();
-  const { lang, setLang } = useLang();
+  const { langPreference, setLang } = useLang();
   const { colorTheme, setColorTheme } = useColorTheme();
   const { logout } = useLogout();
+  const { updatePreferences } = useUpdatePreferences();
 
   const handleThemeChange = useCallback(
     (newTheme: Theme) => {
       setTheme(newTheme);
+      updatePreferences({ theme: newTheme });
       menuState.closeMenu();
     },
-    [setTheme, menuState.closeMenu]
+    [setTheme, updatePreferences, menuState.closeMenu]
   );
 
   const handleLangChange = useCallback(
-    (newLang: Lang) => {
+    (newLang: LangPreference) => {
       setLang(newLang);
+      updatePreferences({ lang: newLang });
       menuState.closeMenu();
     },
-    [setLang, menuState.closeMenu]
+    [setLang, updatePreferences, menuState.closeMenu]
   );
 
   const handleColorThemeChange = useCallback(
     (newColorTheme: ColorTheme) => {
       setColorTheme(newColorTheme);
+      updatePreferences({ colorTheme: newColorTheme });
       menuState.closeMenu();
     },
-    [setColorTheme, menuState.closeMenu]
+    [setColorTheme, updatePreferences, menuState.closeMenu]
   );
 
   const handleLogout = useCallback(() => {
@@ -53,7 +58,7 @@ export function useAccountMenu() {
     ...userDisplay,
 
     theme: (theme as Theme) || "system",
-    lang,
+    lang: langPreference,
     colorTheme,
 
     handleThemeChange,

@@ -1,12 +1,14 @@
 import { create } from "zustand";
 
 export type Lang = "ru" | "en";
+export type LangPreference = "system" | Lang;
 
 type LangStore = {
   isLoading: boolean;
   lang: Lang;
+  langPreference: LangPreference;
   loadLang: () => void;
-  setLang: (lang: Lang) => void;
+  setLang: (langPreference: LangPreference) => void;
 };
 
 const getSystemLang = (): Lang => {
@@ -20,17 +22,22 @@ const getSystemLang = (): Lang => {
   return "en";
 };
 
+const resolveLang = (preference: LangPreference): Lang => {
+  if (preference === "system") return getSystemLang();
+  return preference;
+};
+
 export const useLang = create<LangStore>((set) => ({
   isLoading: true,
   lang: "en",
+  langPreference: "system",
   loadLang: () => {
-    const savedLang = localStorage.getItem("lang") as Lang | null;
-    const lang = savedLang ?? getSystemLang();
-    set({ lang, isLoading: false });
+    const saved = localStorage.getItem("lang") as LangPreference | null;
+    const langPreference = saved ?? "system";
+    set({ lang: resolveLang(langPreference), langPreference, isLoading: false });
   },
-  setLang: (lang) => {
-    localStorage.setItem("lang", lang);
-
-    set({ lang });
+  setLang: (langPreference) => {
+    localStorage.setItem("lang", langPreference);
+    set({ lang: resolveLang(langPreference), langPreference });
   },
 }));

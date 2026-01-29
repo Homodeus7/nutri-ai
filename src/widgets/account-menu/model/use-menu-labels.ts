@@ -1,8 +1,8 @@
 "use client";
 
-import type { ColorTheme } from "@/features/theme";
+import type { ColorTheme, Theme } from "@/features/theme";
+import type { LangPreference } from "@/features/i18n";
 import { useI18n } from "../i18n";
-import type { Theme, Lang } from "./types";
 
 export function useMenuLabels(mounted: boolean) {
   const { t } = useI18n();
@@ -19,7 +19,7 @@ export function useMenuLabels(mounted: boolean) {
     }
   };
 
-  const getLangLabel = (lang: Lang): string => {
+  const getLangLabel = (lang: LangPreference): string => {
     if (!mounted) return "";
     switch (lang) {
       case "ru":

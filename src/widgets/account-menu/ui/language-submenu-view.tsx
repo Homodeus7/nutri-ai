@@ -5,14 +5,13 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
 } from "@/shared/ui/primitives/dropdown-menu";
+import type { LangPreference } from "@/features/i18n";
 import { useI18n } from "../i18n";
 import { SubmenuHeader } from "./submenu-header";
 
-type Lang = "ru" | "en";
-
 interface LanguageSubmenuViewProps {
-  currentLang: Lang;
-  onLangChange: (lang: Lang) => void;
+  currentLang: LangPreference;
+  onLangChange: (lang: LangPreference) => void;
   onBack: () => void;
 }
 
@@ -23,7 +22,8 @@ export function LanguageSubmenuView({
 }: LanguageSubmenuViewProps) {
   const { t } = useI18n();
 
-  const langOptions: { value: Lang; label: string }[] = [
+  const langOptions: { value: LangPreference; label: string }[] = [
+    { value: "system", label: t("langSystem") },
     { value: "en", label: t("langEn") },
     { value: "ru", label: t("langRu") },
   ];
@@ -35,7 +35,7 @@ export function LanguageSubmenuView({
 
       <DropdownMenuRadioGroup
         value={currentLang}
-        onValueChange={(value) => onLangChange(value as Lang)}
+        onValueChange={(value) => onLangChange(value as LangPreference)}
       >
         {langOptions.map((option) => (
           <DropdownMenuRadioItem key={option.value} value={option.value}>
