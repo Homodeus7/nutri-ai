@@ -49,7 +49,7 @@ export function DataTable<TData>({
 
   return (
     <div className={cn("min-w-0 space-y-2 md:space-y-4", className)}>
-      <div className="overflow-x-auto rounded-md border [scrollbar-width:thin]">
+      <div className="overflow-auto rounded-md border [scrollbar-width:thin]">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

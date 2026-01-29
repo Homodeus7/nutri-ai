@@ -87,7 +87,7 @@ export function createProductsColumns() {
         const meta = table.options.meta as ProductsTableMeta;
         return (
           <span
-            className="font-medium cursor-pointer"
+            className="font-medium cursor-pointer min-w-[120px] break-words inline-block"
             onClick={() => meta.toggle(row.original)}
           >
             {getValue()}

@@ -32,7 +32,7 @@ export const createProductsColumns = (
   columnHelper.accessor("name", {
     header: () => <div>{labels.name}</div>,
     cell: ({ row }) => (
-      <div className="font-medium">{row.getValue("name")}</div>
+      <div className="font-medium min-w-[120px] break-words">{row.getValue("name")}</div>
     ),
   }),
 
