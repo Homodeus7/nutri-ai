@@ -86,6 +86,7 @@ export function MetricProgressCard({
 }: MetricProgressCardProps) {
   const numericValue =
     typeof value === "number" ? value : parseFloat(String(value)) || 0;
+  const isOverGoal = numericValue > total;
 
   return (
     <Card className={cn("hover:shadow-md", className)}>
@@ -97,8 +98,15 @@ export function MetricProgressCard({
         <MetricValue value={value} unit={unit} />
         <Progress
           value={Math.min(Math.max((numericValue / total) * 100, 0), 100)}
+          className={cn(isOverGoal && "bg-destructive/20")}
+          indicatorClassName={cn(isOverGoal && "bg-destructive")}
         />
-        <div className="flex justify-between items-center text-muted-foreground">
+        <div
+          className={cn(
+            "flex justify-between items-center text-muted-foreground",
+            isOverGoal && "text-destructive",
+          )}
+        >
           <span className="text-xs">
             {goalLabel}: {total}
             {unit}

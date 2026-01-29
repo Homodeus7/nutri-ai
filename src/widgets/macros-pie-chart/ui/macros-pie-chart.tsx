@@ -3,8 +3,9 @@
 import { useMemo } from "react";
 import { Pie, PieChart, Tooltip } from "recharts";
 import { ChartContainer, type ChartConfig } from "@/shared/ui/primitives/chart";
-import { ChartCard, ChartCardLayout, DataItem } from "@/shared/ui";
+import { ChartCard, ChartCardLayout, DataItem, DataItemCard } from "@/shared/ui";
 import { useIsMobile } from "@/shared/lib/use-media-query";
+import { useGoals, DEFAULT_PRESET } from "@/features/goals";
 import type { MacrosPieChartProps, ChartDataItem } from "../model/types";
 import { getChartDimensions } from "../lib/chart-config";
 import { useI18n } from "../i18n";
@@ -85,23 +86,34 @@ export function MacrosPieChart({
     };
   }, [proteinKcal, fatKcal, carbsKcal, totalKcal]);
 
+  const { data: userGoals } = useGoals();
+
+  const goalPct = {
+    protein: userGoals?.proteinPct ?? DEFAULT_PRESET.proteinPct,
+    fat: userGoals?.fatPct ?? DEFAULT_PRESET.fatPct,
+    carbs: userGoals?.carbsPct ?? DEFAULT_PRESET.carbsPct,
+  };
+
   const macroItems = [
     {
       label: t("protein"),
       grams: protein,
       percent: percentages.protein,
+      goalPct: goalPct.protein,
       color: "var(--chart-5)",
     },
     {
       label: t("fat"),
       grams: fat,
       percent: percentages.fat,
+      goalPct: goalPct.fat,
       color: "var(--chart-3)",
     },
     {
       label: t("carbs"),
       grams: carbs,
       percent: percentages.carbs,
+      goalPct: goalPct.carbs,
       color: "var(--chart-2)",
     },
   ];
@@ -139,33 +151,26 @@ export function MacrosPieChart({
         data={
           variant === "bottom"
             ? macroItems.map((item) => (
-                <div
-                  key={item.label}
-                  className="bg-muted/50 rounded-xl p-3 text-center border border-border/50"
-                >
-                  <div
-                    className="w-2 h-2 rounded-full mx-auto mb-2"
-                    style={{ backgroundColor: item.color }}
-                  />
-                  <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
-                    {item.label}
-                  </div>
-                  <div className="font-bold text-lg">
-                    {item.grams}
-                    {t("grams")}
-                  </div>
-                  <div className="text-[10px] text-muted-foreground font-mono">
-                    {item.percent}%
-                  </div>
-                </div>
-              ))
-            : macroItems.map((item) => (
-                <DataItem
+                <DataItemCard
                   key={item.label}
                   label={item.label}
-                  value={`${item.percent}%`}
+                  value={`${item.grams}${t("grams")}`}
+                  subtitle={`${item.percent}%`}
+                  color={item.color}
                 />
               ))
+            : macroItems.map((item) => {
+                const diff = item.percent - item.goalPct;
+                const isOver = diff > 0;
+                return (
+                  <DataItem
+                    key={item.label}
+                    label={item.label}
+                    value={`${item.percent}%${diff !== 0 ? ` (${diff > 0 ? "+" : ""}${diff}%)` : ""}`}
+                    isWarning={isOver}
+                  />
+                );
+              })
         }
       />
     </ChartCard>

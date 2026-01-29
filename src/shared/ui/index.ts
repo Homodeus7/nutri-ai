@@ -19,6 +19,9 @@ export type { NutriAiLogoProps } from "./nutri-ai-logo";
 export { DataItem } from "./data-item";
 export type { DataItemProps } from "./data-item";
 
+export { DataItemCard } from "./data-item-card";
+export type { DataItemCardProps } from "./data-item-card";
+
 export { ChartCard, ChartCardLayout } from "./chart-card";
 export type { ChartCardProps, ChartCardLayoutProps } from "./chart-card";
 
