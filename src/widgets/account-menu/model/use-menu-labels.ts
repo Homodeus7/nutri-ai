@@ -27,7 +27,7 @@ export function useMenuLabels(mounted: boolean) {
       case "en":
         return t("langEn");
       default:
-        return t("langEn");
+        return t("langSystem");
     }
   };
 
