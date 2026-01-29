@@ -38,6 +38,10 @@ export const useI18n = createI18nModule({
     en: 'Could not find any food items in your description. Try to be more specific, for example: "200g chicken breast, rice with vegetables"',
     ru: "Не удалось найти продукты в описании. Попробуйте быть конкретнее, например: «200г куриной грудки, рис с овощами»",
   },
+  aiErrorTokenLimitExceeded: {
+    en: "Daily AI usage limit reached. Try again tomorrow or add meals manually.",
+    ru: "Дневной лимит AI исчерпан. Попробуйте завтра или добавьте приём пищи вручную.",
+  },
 
   // Navigation
   backToSearch: {

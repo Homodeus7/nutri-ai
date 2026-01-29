@@ -63,6 +63,9 @@ export function AiInputTab({
     if (errorCode === AI_PARSE_ERROR_CODES.NO_ITEMS_FOUND) {
       return t("aiErrorNoItemsFound");
     }
+    if (errorCode === AI_PARSE_ERROR_CODES.TOKEN_LIMIT_EXCEEDED) {
+      return t("aiErrorTokenLimitExceeded");
+    }
     return null;
   };
 

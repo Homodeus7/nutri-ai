@@ -32,6 +32,9 @@ export function useAiCreateMeal({ onSuccess, onError }: UseAiCreateMealParams = 
           if (data?.code === AI_PARSE_ERROR_CODES.NO_ITEMS_FOUND) {
             setErrorCode(AI_PARSE_ERROR_CODES.NO_ITEMS_FOUND);
           }
+          if (data?.code === AI_PARSE_ERROR_CODES.TOKEN_LIMIT_EXCEEDED) {
+            setErrorCode(AI_PARSE_ERROR_CODES.TOKEN_LIMIT_EXCEEDED);
+          }
         }
         onError?.(error);
       },

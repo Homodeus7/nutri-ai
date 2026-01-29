@@ -1,5 +1,6 @@
 export const AI_PARSE_ERROR_CODES = {
   NO_ITEMS_FOUND: 2,
+  TOKEN_LIMIT_EXCEEDED: 20,
 } as const;
 
 export type AiParseErrorCode =
