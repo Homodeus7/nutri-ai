@@ -4,7 +4,7 @@ import { useState, useCallback } from "react";
 import { Player } from "@remotion/player";
 import { renderMediaOnWeb } from "@remotion/web-renderer";
 import { toast } from "sonner";
-import { Share, Download, Loader2 } from "lucide-react";
+import { Share, Loader2 } from "lucide-react";
 import { ControlledDialog } from "@/shared/ui";
 import { UiButton } from "@/shared/ui/ui-button";
 import {
@@ -78,9 +78,10 @@ export function VideoDialog({
   dailyData,
 }: VideoDialogProps) {
   const [isRendering, setIsRendering] = useState(false);
+  const [videoBlob, setVideoBlob] = useState<Blob | null>(null);
   const inputProps = dailyData ?? defaultDailyData;
 
-  const handleExport = useCallback(async () => {
+  const handleRender = useCallback(async () => {
     setIsRendering(true);
     try {
       const result = await renderMediaOnWeb({
@@ -97,8 +98,7 @@ export function VideoDialog({
         muted: true,
       });
 
-      const blob = await result.getBlob();
-      await shareOrDownload(blob);
+      setVideoBlob(await result.getBlob());
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") {
         return;
@@ -109,7 +109,12 @@ export function VideoDialog({
     }
   }, [inputProps]);
 
-  const showShare = canShare();
+  const handleShare = useCallback(async () => {
+    if (!videoBlob) return;
+    await shareOrDownload(videoBlob);
+  }, [videoBlob]);
+
+  const videoUrl = videoBlob ? URL.createObjectURL(videoBlob) : null;
 
   return (
     <ControlledDialog
@@ -119,31 +124,51 @@ export function VideoDialog({
       contentClassName="sm:max-w-[700px] max-h-[90vh] overflow-y-auto"
     >
       <div className="flex justify-center rounded-lg overflow-hidden bg-black">
-        <Player
-          component={DailySummary}
-          inputProps={inputProps}
-          durationInFrames={DAILY_SUMMARY_DURATION}
-          fps={VIDEO_FPS}
-          compositionWidth={VERTICAL_WIDTH}
-          compositionHeight={VERTICAL_HEIGHT}
-          style={playerStyle}
-          controls
-          autoPlay
-          loop
-        />
+        {videoUrl ? (
+          <video
+            src={videoUrl}
+            controls
+            autoPlay
+            loop
+            style={playerStyle}
+          />
+        ) : (
+          <Player
+            component={DailySummary}
+            inputProps={inputProps}
+            durationInFrames={DAILY_SUMMARY_DURATION}
+            fps={VIDEO_FPS}
+            compositionWidth={VERTICAL_WIDTH}
+            compositionHeight={VERTICAL_HEIGHT}
+            style={playerStyle}
+            controls
+            autoPlay
+            loop
+          />
+        )}
       </div>
 
-      <div className="flex justify-end mt-4">
-        <UiButton onClick={handleExport} disabled={isRendering}>
-          {isRendering ? (
-            <Loader2 className="size-4 animate-spin" />
-          ) : showShare ? (
-            <Share className="size-4" />
-          ) : (
-            <Download className="size-4" />
-          )}
-          {isRendering ? "Rendering..." : showShare ? "Share" : "Download MP4"}
-        </UiButton>
+      <div className="flex justify-end gap-2 mt-4">
+        {videoBlob ? (
+          <>
+            <UiButton variant="outline" onClick={() => setVideoBlob(null)}>
+              Re-render
+            </UiButton>
+            <UiButton onClick={handleShare}>
+              <Share className="size-4" />
+              Share
+            </UiButton>
+          </>
+        ) : (
+          <UiButton onClick={handleRender} disabled={isRendering}>
+            {isRendering ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Share className="size-4" />
+            )}
+            {isRendering ? "Rendering..." : "Render Video"}
+          </UiButton>
+        )}
       </div>
     </ControlledDialog>
   );
