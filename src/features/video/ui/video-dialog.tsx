@@ -143,7 +143,6 @@ export function VideoDialog({
             style={playerStyle}
             controls
             autoPlay
-            loop
           />
         )}
       </div>
