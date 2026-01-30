@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { Player } from "@remotion/player";
 import { renderMediaOnWeb } from "@remotion/web-renderer";
+import { toast } from "sonner";
 import { Share, Download, Loader2 } from "lucide-react";
 import { ControlledDialog } from "@/shared/ui";
 import { UiButton } from "@/shared/ui/ui-button";
@@ -48,10 +49,21 @@ async function shareOrDownload(blob: Blob) {
   const file = new File([blob], FILE_NAME, { type: "video/mp4" });
 
   if (canShare() && navigator.canShare({ files: [file] })) {
-    await navigator.share({ files: [file] });
+    try {
+      await navigator.share({ files: [file] });
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") {
+        return;
+      }
+      downloadBlob(blob);
+    }
     return;
   }
 
+  downloadBlob(blob);
+}
+
+function downloadBlob(blob: Blob) {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
@@ -87,6 +99,11 @@ export function VideoDialog({
 
       const blob = await result.getBlob();
       await shareOrDownload(blob);
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") {
+        return;
+      }
+      toast.error("Failed to render video. Please try again.");
     } finally {
       setIsRendering(false);
     }

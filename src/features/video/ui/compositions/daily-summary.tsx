@@ -29,21 +29,21 @@ export function DailySummary({
 
   const isOverCalories = calories > caloriesGoal;
 
-  // Scene 1: Title (0-15)
-  const titleOpacity = interpolate(frame, [0, 15], [0, 1], {
+  // Scene 1: Title (0-7)
+  const titleOpacity = interpolate(frame, [0, 7], [0, 1], {
     extrapolateRight: "clamp",
   });
-  const titleY = interpolate(frame, [0, 15], [40, 0], {
+  const titleY = interpolate(frame, [0, 7], [40, 0], {
     extrapolateRight: "clamp",
   });
 
-  // Scene 2: Calorie circle (15-75)
+  // Scene 2: Calorie circle (7-35)
   const circleScale = spring({
-    frame: frame - 15,
+    frame: frame - 7,
     fps,
-    config: { damping: 12, stiffness: 60 },
+    config: { damping: 12, stiffness: 100 },
   });
-  const calorieProgress = interpolate(frame, [20, 70], [0, 1], {
+  const calorieProgress = interpolate(frame, [9, 32], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
@@ -54,8 +54,9 @@ export function DailySummary({
   const visualRatio = Math.min(ratio, 1);
   const strokeDashoffset = circumference * (1 - visualRatio * calorieProgress);
   const circleStrokeColor = isOverCalories ? c.destructive : c.primary;
+  const calorieDiff = Math.abs(calories - caloriesGoal);
 
-  // Scene 3: Macros bars (120-180)
+  // Scene 3: Macros bars (30-50)
   const macrosData = [
     { label: "Protein", value: protein, goal: proteinGoal },
     { label: "Fat", value: fat, goal: fatGoal },
@@ -63,9 +64,9 @@ export function DailySummary({
     { label: "Fiber", value: fiber, goal: fiberGoal },
   ];
 
-  // Scene 4: Meals (115-175)
-  // Scene 5: Outro (175-200)
-  const outroOpacity = interpolate(frame, [170, 195], [0, 1], {
+  // Scene 4: Meals (48-75)
+  // Scene 5: Outro (73-88)
+  const outroOpacity = interpolate(frame, [73, 88], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
@@ -75,13 +76,19 @@ export function DailySummary({
       style={{
         backgroundColor: c.background,
         fontFamily: "Inter, system-ui, sans-serif",
-        padding: 24,
+        marginTop: -60,
+        paddingBottom: 80,
+        paddingLeft: 24,
+        paddingRight: 24,
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
       }}
     >
+      {/* Top spacer for vertical centering */}
+      <div style={{ marginBottom: "auto" }} />
+
       {/* Title */}
       <div
         style={{
@@ -172,6 +179,21 @@ export function DailySummary({
           <div style={{ color: c.mutedForeground, fontSize: 42 }}>
             of {caloriesGoal} kcal
           </div>
+          {calorieDiff > 0 && (
+            <div
+              style={{
+                color: isOverCalories ? c.destructive : c.primary,
+                fontSize: 34,
+                fontWeight: 600,
+                marginTop: 8,
+                opacity: calorieProgress,
+              }}
+            >
+              {isOverCalories
+                ? `+${Math.round(calorieDiff * calorieProgress)} over`
+                : `${Math.round(calorieDiff)} left`}
+            </div>
+          )}
         </div>
       </div>
 
@@ -179,15 +201,15 @@ export function DailySummary({
       <div style={{ width: "100%", maxWidth: 960, marginBottom: 24 }}>
         {macrosData.map((macro, i) => {
           const slideIn = spring({
-            frame: frame - 70 - i * 10,
+            frame: frame - 30 - i * 4,
             fps,
-            config: { damping: 15, stiffness: 80 },
+            config: { damping: 15, stiffness: 120 },
           });
           const translateX = interpolate(slideIn, [0, 1], [200, 0]);
           const barProgress = spring({
-            frame: frame - 78 - i * 10,
+            frame: frame - 34 - i * 4,
             fps,
-            config: { damping: 15, stiffness: 80 },
+            config: { damping: 15, stiffness: 120 },
           });
           const isOver = macro.goal > 0 && macro.value > macro.goal;
           const barRatio =
@@ -253,9 +275,9 @@ export function DailySummary({
       <div style={{ width: "100%", maxWidth: 900 }}>
         {meals.map((meal, i) => {
           const slideIn = spring({
-            frame: frame - 115 - i * 10,
+            frame: frame - 48 - i * 5,
             fps,
-            config: { damping: 15, stiffness: 80 },
+            config: { damping: 15, stiffness: 120 },
           });
           const translateX = interpolate(slideIn, [0, 1], [200, 0]);
           return (
@@ -313,8 +335,7 @@ export function DailySummary({
       <div
         style={{
           opacity: outroOpacity,
-          position: "absolute",
-          bottom: 10,
+          marginTop: "auto",
           textAlign: "center",
         }}
       >
