@@ -1,8 +1,8 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { Player } from "@remotion/player";
-import { Share, Loader2 } from "lucide-react";
+import { Share } from "lucide-react";
 import { ControlledDialog } from "@/shared/ui";
 import { UiButton } from "@/shared/ui/ui-button";
 import {
@@ -46,14 +46,17 @@ export function VideoDialog({
   dailyData,
 }: VideoDialogProps) {
   const inputProps = dailyData ?? defaultDailyData;
-  const { isRendering, videoBlob, reset } = useVideoRender(inputProps, isOpen);
+  const { isRendering, videoBlob } = useVideoRender(inputProps, isOpen);
 
   const handleShare = useCallback(async () => {
     if (!videoBlob) return;
     await shareOrDownload(videoBlob);
   }, [videoBlob]);
 
-  const videoUrl = videoBlob ? URL.createObjectURL(videoBlob) : null;
+  const videoUrl = useMemo(
+    () => (videoBlob ? URL.createObjectURL(videoBlob) : null),
+    [videoBlob],
+  );
 
   return (
     <ControlledDialog
