@@ -5,8 +5,8 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
-  InputGroupTextarea,
 } from "@/shared/ui/primitives/input-group";
+import { AutosizeTextarea } from "@/shared/ui/primitives/autosize-textarea";
 import { useI18n } from "../i18n";
 import {
   AI_PARSE_ERROR_CODES,
@@ -84,23 +84,17 @@ export function AiInputTab({
 
       <div className="px-4 pb-4">
         <InputGroup className="rounded-2xl bg-foreground/10 border-0 shadow-none">
-          <InputGroupTextarea
+          <AutosizeTextarea
+            data-slot="input-group-control"
             value={text}
             onChange={handleTextChange}
             onKeyDown={handleKeyDown}
             placeholder={t("aiInputPlaceholder")}
             disabled={isPending}
+            maxHeight={200}
+            className="flex-none resize-none rounded-none border-0 bg-transparent py-3 shadow-none focus-visible:ring-0 dark:bg-transparent"
           />
           <InputGroupAddon align="block-end" className="justify-end">
-            {/* <InputGroupButton
-              size="icon-sm"
-              variant="ghost"
-              onClick={handleVoiceClick}
-              disabled={isPending}
-              className="rounded-full"
-            >
-              <Mic className="size-5" />
-            </InputGroupButton> */}
             <InputGroupButton
               size="icon-sm"
               onClick={handleSubmit}
