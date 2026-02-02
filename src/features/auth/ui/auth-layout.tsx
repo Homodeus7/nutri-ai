@@ -7,7 +7,7 @@ import {
   CardFooter,
 } from "@/shared/ui/primitives/card";
 import { FieldSeparator } from "@/shared/ui/primitives/field";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 export function AuthLayout({
   form,
@@ -24,8 +24,17 @@ export function AuthLayout({
   alternativeAuth?: React.ReactNode;
   separatorText?: string;
 }) {
+  const [telegramInitData, setTelegramInitData] = useState<string | null>(null);
+
+  useEffect(() => {
+    const initData = window.Telegram?.WebApp?.initData;
+    if (initData) {
+      setTelegramInitData(initData);
+    }
+  }, []);
   return (
     <Card className="w-full max-w-[440px]">
+      {telegramInitData && <p>{telegramInitData}</p>}
       <CardHeader className="text-center">
         <CardTitle className=" md:text-xl">{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
