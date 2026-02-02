@@ -14,6 +14,7 @@ import type { CreateMealDialogProps } from "../model/types";
 import { TabsView } from "./tabs-view";
 import { CreateView } from "./create-view";
 import { useI18n } from "../i18n";
+import { useAiParse } from "@/features/ai-parse";
 
 export function CreateMealDialog({
   date,
@@ -23,23 +24,36 @@ export function CreateMealDialog({
   const { t } = useI18n();
 
   const {
-    state,
+    mode,
+    isOpen,
     setOpen,
     switchToCreate,
     switchToSearch,
     handleAddProducts,
-    handleCreateProduct,
     isPending,
     createProductName,
   } = useCreateMealDialog({ date, mealType });
 
+  const {
+    parseText,
+    isPending: isAiPending,
+    errorCode: aiErrorCode,
+    clearError: clearAiError,
+  } = useAiParse({
+    date,
+    mealType,
+    onSuccess: () => {
+      setOpen(false);
+    },
+  });
+
   const dialogTitle =
-    state.mode === "create"
+    mode === "create"
       ? t("createProductTitle")
       : `${t("addFoodTo")} ${mealName.toLowerCase()}`;
 
   return (
-    <Dialog open={state.isOpen} onOpenChange={setOpen}>
+    <Dialog open={isOpen} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
           variant="ghost"
@@ -55,23 +69,22 @@ export function CreateMealDialog({
           <DialogTitle>{dialogTitle}</DialogTitle>
         </DialogHeader>
 
-        {state.mode === "create" ? (
+        {mode === "create" ? (
           <CreateView
             onBack={switchToSearch}
-            onCreate={handleCreateProduct}
             backButtonLabel={t("backToSearch")}
             initialName={createProductName}
           />
         ) : (
           <TabsView
-            date={date}
-            mealType={mealType}
             onAddProducts={handleAddProducts}
             onSwitchToCreate={switchToCreate}
             searchTabLabel={t("searchTab")}
-            recentTabLabel={t("recentTab")}
             isPending={isPending}
-            onClose={() => setOpen(false)}
+            aiParseText={parseText}
+            isAiPending={isAiPending}
+            aiErrorCode={aiErrorCode}
+            onClearAiError={clearAiError}
           />
         )}
       </DialogContent>

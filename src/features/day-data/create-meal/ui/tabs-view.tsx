@@ -9,49 +9,35 @@ import {
   TabsTrigger,
 } from "@/shared/ui/primitives/tabs";
 import { SearchProductsTab } from "./search-products-tab";
-import { RecentProductsTab } from "./recent-products-tab";
 import { AiInputTab } from "./ai-input-tab";
 import type { ProductSelectionHandlers } from "../model/types";
 import { useI18n } from "../i18n";
-import { useAiParse } from "@/features/ai-parse";
-import type { AiParseRequestMealType } from "@/shared/api/generated/nutriAIFoodCalorieTrackerAPI";
+import type { AiParseErrorCode } from "@/features/ai-parse";
 
 interface TabsViewProps {
-  date: string;
-  mealType: AiParseRequestMealType;
   onAddProducts: () => void;
   onSwitchToCreate: ProductSelectionHandlers["onSwitchToCreate"];
   searchTabLabel: string;
-  recentTabLabel: string;
   isPending: boolean;
-  onClose?: () => void;
+  aiParseText: (text: string) => void;
+  isAiPending: boolean;
+  aiErrorCode: AiParseErrorCode | null;
+  onClearAiError: () => void;
 }
 
 export function TabsView({
-  date,
-  mealType,
   onAddProducts,
   onSwitchToCreate,
   searchTabLabel,
-  recentTabLabel,
   isPending,
-  onClose,
+  aiParseText,
+  isAiPending,
+  aiErrorCode,
+  onClearAiError,
 }: TabsViewProps) {
   const { t } = useI18n();
   const [searchQuery, setSearchQuery] = useState("");
-
-  const {
-    parseText,
-    isPending: isAiPending,
-    errorCode: aiErrorCode,
-    clearError: clearAiError,
-  } = useAiParse({
-    date,
-    mealType,
-    onSuccess: () => {
-      onClose?.();
-    },
-  });
+  const [aiText, setAiText] = useState("");
 
   return (
     <Tabs defaultValue="ai" className="w-full flex-1 min-h-0">
@@ -61,14 +47,15 @@ export function TabsView({
           {t("aiTab")}
         </TabsTrigger>
         <TabsTrigger value="search">{searchTabLabel}</TabsTrigger>
-        {/* <TabsTrigger value="recent">{recentTabLabel}</TabsTrigger> */}
       </TabsList>
       <TabsContent value="ai" className="flex-1 flex flex-col min-h-0">
         <AiInputTab
-          onSubmit={parseText}
+          text={aiText}
+          onTextChange={setAiText}
+          onSubmit={aiParseText}
           isPending={isAiPending}
           errorCode={aiErrorCode}
-          onClearError={clearAiError}
+          onClearError={onClearAiError}
         />
       </TabsContent>
       <TabsContent value="search" className="flex-1 flex flex-col min-h-0">
@@ -80,9 +67,6 @@ export function TabsView({
           onSearchQueryChange={setSearchQuery}
         />
       </TabsContent>
-      {/* <TabsContent value="recent" className="flex-1 flex flex-col min-h-0">
-        <RecentProductsTab />
-      </TabsContent> */}
     </Tabs>
   );
 }

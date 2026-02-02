@@ -1,12 +1,9 @@
-import { useState, useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import type { CreateMealRequest } from "@/shared/api/generated/nutriAIFoodCalorieTrackerAPI";
-import type { ProductItemData } from "@/features/product/create-product";
 import { useControlledDialog } from "@/shared/ui";
-import type { CreateMealMode } from "./types";
-import { transformProductsToMealItems, normalizeFoodItemsForUpdate } from "./transform-product";
-import { useCreateMeal, useDayData } from "@/features/day-data";
-import { useUpdateMeal } from "@/features/meal/update-meal";
 import { useSelectedProducts } from "./selected-products.store";
+import { useDialogMode } from "./use-dialog-mode";
+import { useAddProducts } from "./use-add-products";
 
 export interface UseCreateMealDialogOptions {
   date: string;
@@ -19,114 +16,40 @@ export function useCreateMealDialog({
   mealType,
   onSuccess,
 }: UseCreateMealDialogOptions) {
-  const [mode, setMode] = useState<CreateMealMode>("search");
-  const [createProductName, setCreateProductName] = useState("");
-
-  const { data: dayData } = useDayData({ date });
   const { clear, getAll } = useSelectedProducts();
-
-  const existingMeal = useMemo(() => {
-    return dayData?.meals?.find((meal) => meal.type === mealType);
-  }, [dayData?.meals, mealType]);
-
-  const { createMeal, isPending: isCreating } = useCreateMeal({
-    date,
-    onSuccess: () => {
-      clear();
-      dialog.close();
-      onSuccess?.();
-    },
-  });
-
-  const { updateMeal, isPending: isUpdating } = useUpdateMeal({
-    onSuccess: () => {
-      clear();
-      dialog.close();
-      onSuccess?.();
-    },
-  });
-
-  const isPending = isCreating || isUpdating;
+  const { mode, createProductName, switchToCreate, switchToSearch, reset } = useDialogMode();
 
   const dialog = useControlledDialog({
     onOpenChange: (isOpen) => {
       if (!isOpen) {
-        setMode("search");
+        reset();
         clear();
       }
     },
   });
 
-  const switchMode = useCallback((newMode: CreateMealMode) => {
-    setMode(newMode);
-  }, []);
-
-  const switchToCreate = useCallback((initialName?: string) => {
-    setCreateProductName(initialName ?? "");
-    switchMode("create");
-  }, [switchMode]);
-
-  const switchToSearch = useCallback(() => {
-    switchMode("search");
-  }, [switchMode]);
-
-  const switchToRecent = useCallback(() => {
-    switchMode("recent");
-  }, [switchMode]);
+  const { addProducts, isPending } = useAddProducts({
+    date,
+    mealType,
+    onSuccess: () => {
+      clear();
+      dialog.close();
+      onSuccess?.();
+    },
+  });
 
   const handleAddProducts = useCallback(() => {
     const selectedProducts = getAll();
-    if (selectedProducts.length === 0) return;
-
-    const newItems = transformProductsToMealItems(selectedProducts);
-
-    if (existingMeal) {
-      // Нормализуем существующие items (убираем лишние поля) и объединяем с новыми
-      const normalizedExistingItems = normalizeFoodItemsForUpdate(existingMeal.items);
-      const mergedItems = [...normalizedExistingItems, ...newItems];
-
-      updateMeal({
-        id: existingMeal.id,
-        data: {
-          items: mergedItems,
-        },
-      });
-    } else {
-      createMeal({
-        type: mealType,
-        items: newItems,
-        source: "manual",
-      });
-    }
-  }, [
-    getAll,
-    existingMeal,
-    createMeal,
-    updateMeal,
-    mealType,
-  ]);
-
-  const handleCreateProduct = useCallback(
-    (productItemData: ProductItemData) => {
-      console.warn("Create product not implemented yet", productItemData);
-      dialog.close();
-    },
-    [dialog]
-  );
+    addProducts(selectedProducts);
+  }, [getAll, addProducts]);
 
   return {
-    state: {
-      mode,
-      isOpen: dialog.isOpen,
-    },
     ...dialog,
+    mode,
     switchToCreate,
     switchToSearch,
-    switchToRecent,
     handleAddProducts,
-    handleCreateProduct,
     isPending,
-    existingMeal,
     createProductName,
   };
 }

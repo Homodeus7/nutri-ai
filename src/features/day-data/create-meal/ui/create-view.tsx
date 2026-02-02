@@ -1,21 +1,16 @@
 "use client";
 
 import { Button } from "@/shared/ui/primitives/button";
-import {
-  CreateProductForm,
-  type ProductItemData,
-} from "@/features/product/create-product";
+import { CreateProductForm } from "@/features/product/create-product";
 
 interface CreateViewProps {
   onBack: () => void;
-  onCreate: (data: ProductItemData) => void;
   backButtonLabel: string;
   initialName?: string;
 }
 
 export function CreateView({
   onBack,
-  onCreate,
   backButtonLabel,
   initialName,
 }: CreateViewProps) {
@@ -27,7 +22,7 @@ export function CreateView({
         </Button>
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto [scrollbar-width:thin]">
-        <CreateProductForm onSuccess={onCreate} initialName={initialName} />
+        <CreateProductForm onSuccess={onBack} initialName={initialName} />
       </div>
     </div>
   );

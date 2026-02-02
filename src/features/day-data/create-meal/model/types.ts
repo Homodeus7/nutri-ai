@@ -3,26 +3,7 @@ import type { Product } from "@/shared/api/generated/nutriAIFoodCalorieTrackerAP
 /**
  * Режимы диалога создания приема пищи
  */
-export type CreateMealMode = "search" | "recent" | "create";
-
-/**
- * Состояние диалога создания приема пищи
- */
-export interface CreateMealState {
-  mode: CreateMealMode;
-  isOpen: boolean;
-}
-
-/**
- * Данные формы добавления еды
- */
-export interface AddFoodFormData {
-  name: string;
-  calories: string;
-  protein: string;
-  fat: string;
-  carbs: string;
-}
+export type CreateMealMode = "search" | "create";
 
 /**
  * Пропсы для диалога создания приема пищи

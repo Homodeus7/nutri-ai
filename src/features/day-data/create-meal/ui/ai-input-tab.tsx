@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { Mic, ArrowUp, Loader2 } from "lucide-react";
+import { ArrowUp, Loader2 } from "lucide-react";
 import {
   InputGroup,
   InputGroupAddon,
@@ -16,6 +15,8 @@ import {
 import { UiText } from "@/shared/ui";
 
 interface AiInputTabProps {
+  text: string;
+  onTextChange: (text: string) => void;
   onSubmit?: (text: string) => void;
   isPending?: boolean;
   errorCode?: AiParseErrorCode | null;
@@ -23,13 +24,14 @@ interface AiInputTabProps {
 }
 
 export function AiInputTab({
+  text,
+  onTextChange,
   onSubmit,
   isPending = false,
   errorCode,
   onClearError,
 }: AiInputTabProps) {
   const { t } = useI18n();
-  const [text, setText] = useState("");
 
   const handleSubmit = () => {
     if (text.trim() && onSubmit) {
@@ -44,13 +46,8 @@ export function AiInputTab({
     }
   };
 
-  const handleVoiceClick = () => {
-    // Voice recording logic will be implemented later
-  };
-
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setText(e.target.value);
-    // Clear error when user starts typing
+    onTextChange(e.target.value);
     if (errorCode && onClearError) {
       onClearError();
     }
@@ -73,7 +70,6 @@ export function AiInputTab({
 
   return (
     <div className="flex flex-col h-full">
-      {/* Question header or Error message */}
       <div className="flex-1 flex items-center justify-center px-4">
         {errorMessage ? (
           <p className="text-sm md:text-base text-destructive text-center">
@@ -86,7 +82,6 @@ export function AiInputTab({
         )}
       </div>
 
-      {/* Input area */}
       <div className="px-4 pb-4">
         <InputGroup className="rounded-2xl bg-foreground/10 border-0 shadow-none">
           <InputGroupTextarea
@@ -97,7 +92,6 @@ export function AiInputTab({
             disabled={isPending}
           />
           <InputGroupAddon align="block-end" className="justify-end">
-            {/* Voice button */}
             {/* <InputGroupButton
               size="icon-sm"
               variant="ghost"
@@ -107,8 +101,6 @@ export function AiInputTab({
             >
               <Mic className="size-5" />
             </InputGroupButton> */}
-
-            {/* Submit/Voice mode button */}
             <InputGroupButton
               size="icon-sm"
               onClick={handleSubmit}
