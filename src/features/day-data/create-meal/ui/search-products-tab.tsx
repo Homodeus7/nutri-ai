@@ -9,6 +9,7 @@ import {
 import { SearchInput } from "@/shared/ui";
 import { SearchTabLayout } from "./search-tab-layout";
 import { useI18n } from "../i18n";
+import { useSelectedProducts } from "../model/selected-products.store";
 
 interface SearchProductsTabProps {
   onAddProducts: () => void;
@@ -26,6 +27,8 @@ export function SearchProductsTab({
   onSearchQueryChange,
 }: SearchProductsTabProps) {
   const { t } = useI18n();
+  const { products: selectedProducts, isValid } = useSelectedProducts();
+  const selectedCount = selectedProducts.size;
 
   const { setSearchQuery, products, isLoading, isEmpty } = useSearchProducts({
     limit: 100,
@@ -60,6 +63,18 @@ export function SearchProductsTab({
             <ChevronRight size="20" />
           </Button>
         </div>
+      }
+      footer={
+        selectedCount > 0 && !products.length && (
+          <div className="flex justify-end mt-auto shrink-0">
+            <Button
+              onClick={onAddProducts}
+              disabled={isPending || !isValid()}
+            >
+              {t("addSelected", { count: String(selectedCount) })}
+            </Button>
+          </div>
+        )
       }
     />
   );

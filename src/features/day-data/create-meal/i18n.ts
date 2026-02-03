@@ -72,4 +72,8 @@ export const useI18n = createI18nModule({
     en: "Create product",
     ru: "Создать продукт",
   },
+  addSelected: {
+    en: "Add ({count})",
+    ru: "Добавить ({count})",
+  },
 } as const);

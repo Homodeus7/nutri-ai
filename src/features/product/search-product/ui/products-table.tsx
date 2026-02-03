@@ -110,6 +110,7 @@ export function ProductsTable({
       columns={columns}
       footer={footer}
       meta={meta}
+      onRowClick={toggle}
       className="flex flex-col flex-1 min-h-0"
     />
   );

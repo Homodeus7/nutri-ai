@@ -27,7 +27,7 @@ export const useSelectedProducts = create<SelectedProductsStore>((set, get) => (
       if (newMap.has(id)) {
         newMap.delete(id);
       } else {
-        newMap.set(id, { product, quantity: null });
+        newMap.set(id, { product, quantity: 100 });
       }
 
       return { products: newMap };

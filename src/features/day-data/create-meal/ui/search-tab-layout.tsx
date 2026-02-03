@@ -10,6 +10,7 @@ interface SearchTabLayoutProps {
   isLoading?: boolean;
   isEmpty?: boolean;
   hasContent?: boolean;
+  footer?: ReactNode;
 }
 
 export function SearchTabLayout({
@@ -20,6 +21,7 @@ export function SearchTabLayout({
   isLoading = false,
   isEmpty = false,
   hasContent = false,
+  footer,
 }: SearchTabLayoutProps) {
   const { t } = useI18n();
 
@@ -36,10 +38,14 @@ export function SearchTabLayout({
       {isEmpty && emptyState}
 
       {!isLoading && !hasContent && !isEmpty && (
-        <div className="text-center text-sm text-muted-foreground py-8">
-          {t("startTyping")}
+        <div className="flex-1 flex flex-col">
+          <div className="text-center text-sm text-muted-foreground py-8">
+            {t("startTyping")}
+          </div>
         </div>
       )}
+
+      {footer}
     </div>
   );
 }

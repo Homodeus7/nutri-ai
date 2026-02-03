@@ -38,10 +38,15 @@ function QuantityCell({
     wasSelected.current = isSelected;
   }, [isSelected]);
 
-  if (!isSelected) return null;
+  if (!isSelected) {
+    return null;
+  }
 
   return (
-    <div className="flex items-center gap-1.5 justify-end">
+    <div
+      className="flex items-center gap-1.5 justify-end"
+      onClick={(e) => e.stopPropagation()}
+    >
       <Input
         ref={inputRef}
         type="number"
@@ -73,32 +78,23 @@ export function createProductsColumns() {
         const meta = table.options.meta as ProductsTableMeta;
         const productId = String(row.original.id);
         const isSelected = !!meta.getSelected(productId);
-        return (
-          <div onClick={() => meta.toggle(row.original)}>
-            <Checkbox checked={isSelected} />
-          </div>
-        );
+        return <Checkbox checked={isSelected} />;
       },
       size: 48,
     }),
     columnHelper.accessor("name", {
-      header: ({ table }) => (table.options.meta as ProductsTableMeta).t("productName"),
-      cell: ({ getValue, row, table }) => {
-        const meta = table.options.meta as ProductsTableMeta;
-        return (
-          <span
-            className="font-medium cursor-pointer min-w-[120px] break-words inline-block"
-            onClick={() => meta.toggle(row.original)}
-          >
-            {getValue()}
-          </span>
-        );
-      },
+      header: ({ table }) =>
+        (table.options.meta as ProductsTableMeta).t("productName"),
+      cell: ({ getValue }) => (
+        <span className="font-medium min-w-[120px] break-words inline-block">
+          {getValue()}
+        </span>
+      ),
     }),
     columnHelper.display({
       id: "quantity",
       header: ({ table }) => (
-        <span className="text-right block">
+        <span className="text-center block">
           {(table.options.meta as ProductsTableMeta).t("quantity")}
         </span>
       ),
@@ -114,17 +110,9 @@ export function createProductsColumns() {
           {(table.options.meta as ProductsTableMeta).t("kcalPer100g")}
         </span>
       ),
-      cell: ({ getValue, row, table }) => {
-        const meta = table.options.meta as ProductsTableMeta;
-        return (
-          <span
-            className="text-right block cursor-pointer"
-            onClick={() => meta.toggle(row.original)}
-          >
-            {getValue()}
-          </span>
-        );
-      },
+      cell: ({ getValue }) => (
+        <span className="text-right block">{getValue()}</span>
+      ),
     }),
     columnHelper.accessor("proteinPer100g", {
       header: ({ table }) => (
@@ -132,17 +120,11 @@ export function createProductsColumns() {
           {(table.options.meta as ProductsTableMeta).t("protein")}
         </span>
       ),
-      cell: ({ getValue, row, table }) => {
-        const meta = table.options.meta as ProductsTableMeta;
-        return (
-          <span
-            className="text-right block cursor-pointer"
-            onClick={() => meta.toggle(row.original)}
-          >
-            {getValue()?.toFixed(1) || "-"}
-          </span>
-        );
-      },
+      cell: ({ getValue }) => (
+        <span className="text-right block">
+          {getValue()?.toFixed(1) || "-"}
+        </span>
+      ),
     }),
     columnHelper.accessor("fatPer100g", {
       header: ({ table }) => (
@@ -150,17 +132,11 @@ export function createProductsColumns() {
           {(table.options.meta as ProductsTableMeta).t("fat")}
         </span>
       ),
-      cell: ({ getValue, row, table }) => {
-        const meta = table.options.meta as ProductsTableMeta;
-        return (
-          <span
-            className="text-right block cursor-pointer"
-            onClick={() => meta.toggle(row.original)}
-          >
-            {getValue()?.toFixed(1) || "-"}
-          </span>
-        );
-      },
+      cell: ({ getValue }) => (
+        <span className="text-right block">
+          {getValue()?.toFixed(1) || "-"}
+        </span>
+      ),
     }),
     columnHelper.accessor("carbsPer100g", {
       header: ({ table }) => (
@@ -168,17 +144,11 @@ export function createProductsColumns() {
           {(table.options.meta as ProductsTableMeta).t("carbs")}
         </span>
       ),
-      cell: ({ getValue, row, table }) => {
-        const meta = table.options.meta as ProductsTableMeta;
-        return (
-          <span
-            className="text-right block cursor-pointer"
-            onClick={() => meta.toggle(row.original)}
-          >
-            {getValue()?.toFixed(1) || "-"}
-          </span>
-        );
-      },
+      cell: ({ getValue }) => (
+        <span className="text-right block">
+          {getValue()?.toFixed(1) || "-"}
+        </span>
+      ),
     }),
   ];
 }
