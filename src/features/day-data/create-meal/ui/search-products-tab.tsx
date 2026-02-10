@@ -1,15 +1,24 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/shared/ui/primitives/button";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Clock, Search } from "lucide-react";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/shared/ui/primitives/tabs";
 import {
   useSearchProducts,
   ProductsTable,
 } from "@/features/product/search-product";
 import { SearchInput } from "@/shared/ui";
 import { SearchTabLayout } from "./search-tab-layout";
+import { RecentProductsTab } from "./recent-products-tab";
 import { useI18n } from "../i18n";
 import { useSelectedProducts } from "../model/selected-products.store";
+import type { MealType } from "@/shared/api/generated/nutriAIFoodCalorieTrackerAPI";
 
 interface SearchProductsTabProps {
   onAddProducts: () => void;
@@ -17,6 +26,7 @@ interface SearchProductsTabProps {
   isPending: boolean;
   searchQuery: string;
   onSearchQueryChange: (query: string) => void;
+  mealType: MealType;
 }
 
 export function SearchProductsTab({
@@ -25,6 +35,7 @@ export function SearchProductsTab({
   isPending,
   searchQuery,
   onSearchQueryChange,
+  mealType,
 }: SearchProductsTabProps) {
   const { t } = useI18n();
   const { products: selectedProducts, isValid } = useSelectedProducts();
@@ -36,12 +47,22 @@ export function SearchProductsTab({
     onQueryChange: onSearchQueryChange,
   });
 
-  return (
+  const [activeSubTab, setActiveSubTab] = useState<"recent" | "search">(
+    "recent",
+  );
+
+  const searchContent = (
     <SearchTabLayout
       isLoading={isLoading}
       isEmpty={isEmpty}
       hasContent={products.length > 0}
-      searchInput={<SearchInput value={searchQuery} onChange={setSearchQuery} placeholder={t("searchPlaceholder")} />}
+      searchInput={
+        <SearchInput
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder={t("searchPlaceholder")}
+        />
+      }
       loadingState={
         <div className="text-center text-sm text-muted-foreground py-8">
           {t("searching")}
@@ -67,15 +88,42 @@ export function SearchProductsTab({
       footer={
         selectedCount > 0 && !products.length && (
           <div className="flex justify-end mt-auto shrink-0">
-            <Button
-              onClick={onAddProducts}
-              disabled={isPending || !isValid()}
-            >
+            <Button onClick={onAddProducts} disabled={isPending || !isValid()}>
               {t("addSelected", { count: String(selectedCount) })}
             </Button>
           </div>
         )
       }
     />
+  );
+
+  return (
+    <Tabs
+      value={activeSubTab}
+      onValueChange={(v) => setActiveSubTab(v as "recent" | "search")}
+      className="w-full flex-1 min-h-0 flex flex-col"
+    >
+      <TabsList className="grid w-full grid-cols-2 shrink-0">
+        <TabsTrigger value="recent" className="gap-1.5">
+          <Clock className="size-4" />
+          Недавние
+        </TabsTrigger>
+        <TabsTrigger value="search" className="gap-1.5">
+          <Search className="size-4" />
+          Поиск
+        </TabsTrigger>
+      </TabsList>
+      <TabsContent value="recent" className="flex-1 flex flex-col min-h-0">
+        <RecentProductsTab
+          mealType={mealType}
+          onAddProducts={onAddProducts}
+          onShowCreateForm={onShowCreateForm}
+          isPending={isPending}
+        />
+      </TabsContent>
+      <TabsContent value="search" className="flex-1 flex flex-col min-h-0">
+        {searchContent}
+      </TabsContent>
+    </Tabs>
   );
 }

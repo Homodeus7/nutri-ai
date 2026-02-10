@@ -766,6 +766,36 @@ export type GetProductsSearch200 = {
   products?: Product[];
 };
 
+export type GetProductsRecentParams = {
+  /**
+   * Meal type to get recent products for
+   */
+  mealType: GetProductsRecentMealType;
+  /**
+   * Maximum number of products per list
+   */
+  limit?: number;
+};
+
+export type GetProductsRecentMealType =
+  (typeof GetProductsRecentMealType)[keyof typeof GetProductsRecentMealType];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const GetProductsRecentMealType = {
+  breakfast: "breakfast",
+  lunch: "lunch",
+  dinner: "dinner",
+  snack: "snack",
+  other: "other",
+} as const;
+
+export type GetProductsRecent200 = {
+  /** Products recently used for this specific meal type */
+  recentByMealType?: Product[];
+  /** Products recently used for other meal types */
+  recentByOtherMeals?: Product[];
+};
+
 export type GetRecipesParams = {
   category?: GetRecipesCategory;
   /**
@@ -1072,6 +1102,19 @@ export const getProductsSearch = <TData = AxiosResponse<GetProductsSearch200>>(
 };
 
 /**
+ * @summary Get recently used products grouped by meal type
+ */
+export const getProductsRecent = <TData = AxiosResponse<GetProductsRecent200>>(
+  params: GetProductsRecentParams,
+  options?: AxiosRequestConfig,
+): Promise<TData> => {
+  return axios.get(`/products/recent`, {
+    ...options,
+    params: { ...params, ...options?.params },
+  });
+};
+
+/**
  * @summary Получить продукт по ID
  */
 export const getProductsId = <TData = AxiosResponse<Product>>(
@@ -1262,6 +1305,7 @@ export type PutAiMealsIdResult = AxiosResponse<AiParseResponse>;
 export type GetProductsResult = AxiosResponse<GetProducts200>;
 export type PostProductsResult = AxiosResponse<Product>;
 export type GetProductsSearchResult = AxiosResponse<GetProductsSearch200>;
+export type GetProductsRecentResult = AxiosResponse<GetProductsRecent200>;
 export type GetProductsIdResult = AxiosResponse<Product>;
 export type PutProductsIdResult = AxiosResponse<Product>;
 export type DeleteProductsIdResult = AxiosResponse<void>;

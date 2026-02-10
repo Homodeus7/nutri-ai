@@ -85,6 +85,7 @@ export function CreateMealDialog({
             isAiPending={isAiPending}
             aiErrorCode={aiErrorCode}
             onClearAiError={clearAiError}
+            mealType={mealType}
           />
         )}
       </DialogContent>

@@ -1701,6 +1701,48 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
 
+  /products/recent:
+    get:
+      tags:
+        - Products
+      summary: Get recently used products grouped by meal type
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: mealType
+          required: true
+          schema:
+            type: string
+            enum: [breakfast, lunch, dinner, snack, other]
+          description: Meal type to get recent products for
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+          description: Maximum number of products per list
+      responses:
+        "200":
+          description: Recently used products
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  recentByMealType:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Product"
+                    description: Products recently used for this specific meal type
+                  recentByOtherMeals:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Product"
+                    description: Products recently used for other meal types
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
   /products/{id}:
     get:
       tags:

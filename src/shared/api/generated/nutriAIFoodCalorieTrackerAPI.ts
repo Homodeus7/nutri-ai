@@ -786,6 +786,36 @@ export type GetProductsSearch200 = {
   products?: Product[];
 };
 
+export type GetProductsRecentParams = {
+  /**
+   * Meal type to get recent products for
+   */
+  mealType: GetProductsRecentMealType;
+  /**
+   * Maximum number of products per list
+   */
+  limit?: number;
+};
+
+export type GetProductsRecentMealType =
+  (typeof GetProductsRecentMealType)[keyof typeof GetProductsRecentMealType];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const GetProductsRecentMealType = {
+  breakfast: "breakfast",
+  lunch: "lunch",
+  dinner: "dinner",
+  snack: "snack",
+  other: "other",
+} as const;
+
+export type GetProductsRecent200 = {
+  /** Products recently used for this specific meal type */
+  recentByMealType?: Product[];
+  /** Products recently used for other meal types */
+  recentByOtherMeals?: Product[];
+};
+
 export type GetRecipesParams = {
   category?: GetRecipesCategory;
   /**
@@ -3244,6 +3274,171 @@ export function useGetProductsSearch<
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
   const queryOptions = getGetProductsSearchQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary Get recently used products grouped by meal type
+ */
+export const getProductsRecent = (
+  params: GetProductsRecentParams,
+  options?: SecondParameter<typeof createInstance>,
+  signal?: AbortSignal,
+) => {
+  return createInstance<GetProductsRecent200>(
+    { url: `/products/recent`, method: "GET", params, signal },
+    options,
+  );
+};
+
+export const getGetProductsRecentQueryKey = (
+  params?: GetProductsRecentParams,
+) => {
+  return [`/products/recent`, ...(params ? [params] : [])] as const;
+};
+
+export const getGetProductsRecentQueryOptions = <
+  TData = Awaited<ReturnType<typeof getProductsRecent>>,
+  TError = ErrorType<UnauthorizedResponse>,
+>(
+  params: GetProductsRecentParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getProductsRecent>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetProductsRecentQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getProductsRecent>>
+  > = ({ signal }) => getProductsRecent(params, requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getProductsRecent>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetProductsRecentQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getProductsRecent>>
+>;
+export type GetProductsRecentQueryError = ErrorType<UnauthorizedResponse>;
+
+export function useGetProductsRecent<
+  TData = Awaited<ReturnType<typeof getProductsRecent>>,
+  TError = ErrorType<UnauthorizedResponse>,
+>(
+  params: GetProductsRecentParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getProductsRecent>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getProductsRecent>>,
+          TError,
+          Awaited<ReturnType<typeof getProductsRecent>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetProductsRecent<
+  TData = Awaited<ReturnType<typeof getProductsRecent>>,
+  TError = ErrorType<UnauthorizedResponse>,
+>(
+  params: GetProductsRecentParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getProductsRecent>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getProductsRecent>>,
+          TError,
+          Awaited<ReturnType<typeof getProductsRecent>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetProductsRecent<
+  TData = Awaited<ReturnType<typeof getProductsRecent>>,
+  TError = ErrorType<UnauthorizedResponse>,
+>(
+  params: GetProductsRecentParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getProductsRecent>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Get recently used products grouped by meal type
+ */
+
+export function useGetProductsRecent<
+  TData = Awaited<ReturnType<typeof getProductsRecent>>,
+  TError = ErrorType<UnauthorizedResponse>,
+>(
+  params: GetProductsRecentParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getProductsRecent>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof createInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetProductsRecentQueryOptions(params, options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,
@@ -6547,6 +6742,228 @@ export const getGetProductsSearchResponseMock = (
   ...overrideResponse,
 });
 
+export const getGetProductsRecentResponseMock = (
+  overrideResponse: Partial<GetProductsRecent200> = {},
+): GetProductsRecent200 => ({
+  recentByMealType: faker.helpers.arrayElement([
+    Array.from(
+      { length: faker.number.int({ min: 1, max: 10 }) },
+      (_, i) => i + 1,
+    ).map(() => ({
+      id: faker.string.uuid(),
+      name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      normalizedName: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
+      kcalPer100g: faker.number.int({ min: undefined, max: undefined }),
+      proteinPer100g: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      fatPer100g: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      carbsPer100g: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      fiberPer100g: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.number.float({
+            min: undefined,
+            max: undefined,
+            fractionDigits: 2,
+          }),
+          null,
+        ]),
+        undefined,
+      ]),
+      sugarPer100g: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.number.float({
+            min: undefined,
+            max: undefined,
+            fractionDigits: 2,
+          }),
+          null,
+        ]),
+        undefined,
+      ]),
+      source: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          "manual",
+          "ai",
+          "openfoodfacts",
+          "user",
+        ] as const),
+        undefined,
+      ]),
+      isVerified: faker.helpers.arrayElement([
+        faker.datatype.boolean(),
+        undefined,
+      ]),
+      usageCount: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        undefined,
+      ]),
+      createdBy: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.uuid(), null]),
+        undefined,
+      ]),
+      barcode: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.string.alpha({ length: { min: 10, max: 20 } }),
+          null,
+        ]),
+        undefined,
+      ]),
+      brand: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.string.alpha({ length: { min: 10, max: 20 } }),
+          null,
+        ]),
+        undefined,
+      ]),
+      category: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.string.alpha({ length: { min: 10, max: 20 } }),
+          null,
+        ]),
+        undefined,
+      ]),
+      createdAt: `${faker.date.past().toISOString().split(".")[0]}Z`,
+      updatedAt: faker.helpers.arrayElement([
+        `${faker.date.past().toISOString().split(".")[0]}Z`,
+        undefined,
+      ]),
+    })),
+    undefined,
+  ]),
+  recentByOtherMeals: faker.helpers.arrayElement([
+    Array.from(
+      { length: faker.number.int({ min: 1, max: 10 }) },
+      (_, i) => i + 1,
+    ).map(() => ({
+      id: faker.string.uuid(),
+      name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      normalizedName: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
+      kcalPer100g: faker.number.int({ min: undefined, max: undefined }),
+      proteinPer100g: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      fatPer100g: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      carbsPer100g: faker.helpers.arrayElement([
+        faker.number.float({
+          min: undefined,
+          max: undefined,
+          fractionDigits: 2,
+        }),
+        undefined,
+      ]),
+      fiberPer100g: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.number.float({
+            min: undefined,
+            max: undefined,
+            fractionDigits: 2,
+          }),
+          null,
+        ]),
+        undefined,
+      ]),
+      sugarPer100g: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.number.float({
+            min: undefined,
+            max: undefined,
+            fractionDigits: 2,
+          }),
+          null,
+        ]),
+        undefined,
+      ]),
+      source: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          "manual",
+          "ai",
+          "openfoodfacts",
+          "user",
+        ] as const),
+        undefined,
+      ]),
+      isVerified: faker.helpers.arrayElement([
+        faker.datatype.boolean(),
+        undefined,
+      ]),
+      usageCount: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        undefined,
+      ]),
+      createdBy: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.uuid(), null]),
+        undefined,
+      ]),
+      barcode: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.string.alpha({ length: { min: 10, max: 20 } }),
+          null,
+        ]),
+        undefined,
+      ]),
+      brand: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.string.alpha({ length: { min: 10, max: 20 } }),
+          null,
+        ]),
+        undefined,
+      ]),
+      category: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.string.alpha({ length: { min: 10, max: 20 } }),
+          null,
+        ]),
+        undefined,
+      ]),
+      createdAt: `${faker.date.past().toISOString().split(".")[0]}Z`,
+      updatedAt: faker.helpers.arrayElement([
+        `${faker.date.past().toISOString().split(".")[0]}Z`,
+        undefined,
+      ]),
+    })),
+    undefined,
+  ]),
+  ...overrideResponse,
+});
+
 export const getGetProductsIdResponseMock = (
   overrideResponse: Partial<Product> = {},
 ): Product => ({
@@ -8536,6 +8953,34 @@ export const getGetProductsSearchMockHandler = (
   );
 };
 
+export const getGetProductsRecentMockHandler = (
+  overrideResponse?:
+    | GetProductsRecent200
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) => Promise<GetProductsRecent200> | GetProductsRecent200),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    "*/products/recent",
+    async (info) => {
+      await delay(1000);
+
+      return new HttpResponse(
+        JSON.stringify(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === "function"
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getGetProductsRecentResponseMock(),
+        ),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      );
+    },
+    options,
+  );
+};
+
 export const getGetProductsIdMockHandler = (
   overrideResponse?:
     | Product
@@ -8963,6 +9408,7 @@ export const getNutriAIFoodCalorieTrackerAPIMock = () => [
   getGetProductsMockHandler(),
   getPostProductsMockHandler(),
   getGetProductsSearchMockHandler(),
+  getGetProductsRecentMockHandler(),
   getGetProductsIdMockHandler(),
   getPutProductsIdMockHandler(),
   getDeleteProductsIdMockHandler(),

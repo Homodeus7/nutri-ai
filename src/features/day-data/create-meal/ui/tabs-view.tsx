@@ -13,6 +13,7 @@ import { AiInputTab } from "./ai-input-tab";
 import type { ProductSelectionHandlers } from "../model/types";
 import { useI18n } from "../i18n";
 import type { AiParseErrorCode } from "@/features/ai-parse";
+import type { MealType } from "@/shared/api/generated/nutriAIFoodCalorieTrackerAPI";
 
 interface TabsViewProps {
   onAddProducts: () => void;
@@ -23,6 +24,7 @@ interface TabsViewProps {
   isAiPending: boolean;
   aiErrorCode: AiParseErrorCode | null;
   onClearAiError: () => void;
+  mealType: MealType;
 }
 
 export function TabsView({
@@ -34,6 +36,7 @@ export function TabsView({
   isAiPending,
   aiErrorCode,
   onClearAiError,
+  mealType,
 }: TabsViewProps) {
   const { t } = useI18n();
   const [searchQuery, setSearchQuery] = useState("");
@@ -65,6 +68,7 @@ export function TabsView({
           isPending={isPending}
           searchQuery={searchQuery}
           onSearchQueryChange={setSearchQuery}
+          mealType={mealType}
         />
       </TabsContent>
     </Tabs>
